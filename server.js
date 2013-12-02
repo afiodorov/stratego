@@ -2,7 +2,8 @@ var WebSocketServer = require('ws').Server
   , http = require('http')
   , express = require('express')
   , app = express()
-  , port = process.env.PORT || 5000;
+  , port = process.env.PORT || 5000
+  , MyString = require('./models/String.js');
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
@@ -16,9 +17,11 @@ app.configure('production', function(){
 app.use(express.static(__dirname + '/public/'));
 
 app.post('/push', function(req, res) {
-
-	var string = req.body.string
-	res.redirect('/');
+  var string = req.body.string
+  MyString.addString(string, function(err, user) {
+    if (err) throw err;
+    res.redirect('/');
+  });
 });
 
 var server = http.createServer(app);
