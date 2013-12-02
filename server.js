@@ -4,7 +4,22 @@ var WebSocketServer = require('ws').Server
   , app = express()
   , port = process.env.PORT || 5000;
 
+app.configure('development', function(){
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  app.use(express.bodyParser());
+});
+
+app.configure('production', function(){
+  app.use(express.errorHandler());
+});
+
 app.use(express.static(__dirname + '/public/'));
+
+app.post('/push', function(req, res) {
+
+	var string = req.body.string
+	res.redirect('/');
+});
 
 var server = http.createServer(app);
 server.listen(port);
