@@ -17,9 +17,12 @@ app.configure('production', function(){
 app.use(express.static(__dirname + '/public/'));
 
 app.post('/push', function(req, res) {
-  var string = req.body.string
+  var string = req.body.string;
   MyString.addString(string, function(err, user) {
-    if (err) throw err;
+    if (err) {
+    	    console.log("db error");
+    	    throw err;
+    }
     res.redirect('/');
   });
 });
