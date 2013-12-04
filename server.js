@@ -18,7 +18,7 @@ app.use(express.static(__dirname + '/public/'));
 
 app.post('/push', function(req, res) {
   var string = req.body.string;
-  MyString.addString(string, function(err, user) {
+  MyString.addString(string, function(err) {
     if (err) {
     	    console.log("db error");
     	    throw err;
@@ -36,8 +36,17 @@ var wss = new WebSocketServer({server: server});
 console.log('websocket server created');
 wss.on('connection', function(ws) {
     var id = setInterval(function() {
-        ws.send(JSON.stringify(new Date()), function() {  });
+        ws.send(JSON.stringify(new Date()), function(){});
     }, 1000);
+
+    MyString.find(function(err, strings){
+    	if(err) {throw err;}
+    	if(strings) {
+    	  strings.forEach(function(string) {
+	    ws.send(JSON.stringify(string.string));
+    	  });
+	}
+    });
 
     console.log('websocket connection open');
 
