@@ -29,9 +29,21 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="lib\db.js" />
+    <Compile Include="models\String.js" />
     <Compile Include="server.js" />
+    <Content Include=".gitattributes" />
+    <Content Include=".gitignore" />
+    <Content Include="LICENSE" />
     <Content Include="package.json" />
+    <Content Include="Procfile" />
+    <Content Include="public\index.html" />
     <Content Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="lib\" />
+    <Folder Include="models\" />
+    <Folder Include="public\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
   <ProjectExtensions>
