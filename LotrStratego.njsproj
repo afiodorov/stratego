@@ -4,14 +4,15 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>LotrStratego</Name>
-    <RootNamespace>LotrStratego</RootNamespace>
+    <RootNamespace>WontNeedAName</RootNamespace>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>91b75648-7e12-4d81-a77f-4592e0289485</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
+    <ProjectGuid>742d31f0-b21e-4063-bade-cd1b67a602bd</ProjectGuid>
+    <ProjectHome>
+    </ProjectHome>
     <StartupFile>server.js</StartupFile>
     <SearchPath>
     </SearchPath>
@@ -29,10 +30,22 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="lib\db.js" />
+    <Compile Include="lib\db.js" />
+    <Compile Include="models\String.js" />
+    <Compile Include="models\String.js" />
     <Compile Include="server.js" />
+    <Content Include="LICENSE" />
     <Content Include="package.json" />
+    <Content Include="Procfile" />
+    <Content Include="public\index.html" />
     <Content Include="README.md" />
     <Content Include="TesticlesTesty.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="lib\" />
+    <Folder Include="models\" />
+    <Folder Include="public\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
   <ProjectExtensions>
