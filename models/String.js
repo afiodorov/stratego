@@ -3,6 +3,7 @@ var db = require('../lib/db');
 var StringSchema = new db.Schema({
     string : {type: String}
 });
+
 var MyString = db.mongoose.model('String', StringSchema);
 
 function addString(string, callback) {
