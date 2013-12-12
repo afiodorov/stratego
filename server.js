@@ -1,6 +1,5 @@
 var secret = process.env.SESSION_SECRET || 'someThinWeirdAsdflk';
 var jade = require('jade')
-  , WebSocketServer = require('ws').Server
   , http = require('http')
   , express = require('express')
   , app = express()
