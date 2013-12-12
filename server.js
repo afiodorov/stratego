@@ -1,4 +1,4 @@
-var secret = 'someThinWeirdAsdflk';
+var secret = process.env.SESSION_SECRET || 'someThinWeirdAsdflk';
 var jade = require('jade')
   , WebSocketServer = require('ws').Server
   , http = require('http')
@@ -10,19 +10,17 @@ var jade = require('jade')
   , MongoStore = require('connect-mongo')(express)
   , db = require('./lib/db.js');
 
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
+app.use(express.bodyParser());
+app.use(express.cookieParser(''));
+app.use(express.session(
+	{store: new MongoStore({url: db.url}), secret: secret})); 
+
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-  app.use(express.bodyParser());
-  app.use(express.cookieParser(''));
-  app.use(express.session({
-    store: new MongoStore({
-      url: db.url
-    }),
-    secret: secret
-  }));
 });
 
 app.configure('production', function(){
