@@ -1,12 +1,15 @@
-/*global location, WebSocket, $*/
+/*global location, WebSocket, io, $*/
 "use strict";
-var host = location.origin.replace(/^http/, 'ws');
-var ws = new WebSocket(host);
+var socket = io.connect(location.origin);
 
-function startGame(password) {
-	ws.send(JSON.stringify({event:'startGame', event_data: password}));
+function startGame() {
+    socket.emit('my other event', { my: 'data' });
 }
 
 $(function() {
-   $("#startGame").click(function() {startGame();});
+  $("#startGame").click(function() {startGame();});
+  socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+  });
 });
