@@ -1,0 +1,15 @@
+doctype 5
+html
+   head
+      title Game lobby
+      script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+      script(src="src/lobbyutil.js")
+   body
+      div.container
+         header
+            h1 Our game lobby!
+         input(type='gamePassword')#gamePassword
+         button#gameStart Start New Game
+         div#gamesList
+            input(type='text')#messageInput
+            button#submit Send!
