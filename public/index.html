@@ -23,7 +23,7 @@
       ws.onmessage = function (event) {
         var li = document.createElement('li');
         li.innerHTML = JSON.parse(event.data);
-        document.querySelector('#pings').appendChild(li);
+        document.querySelector('#games').appendChild(li);
       };
     </script>
   </head>
@@ -36,7 +36,7 @@
 	<input type="submit" value="Push!"/>
   </form>
 
-    <h1>Pings</h1>
-    <ul id='pings'></ul>
+    <h1>List of games with you</h1>
+    <ul id='games'></ul>
   </body>
 </html>
