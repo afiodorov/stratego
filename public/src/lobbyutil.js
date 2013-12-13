@@ -3,7 +3,7 @@
 var socket = io.connect(location.origin);
 
 function startGame() {
-    socket.emit('my other event', { my: 'data' });
+    socket.emit('startGame', { my: 'data' });
 }
 
 $(function() {
