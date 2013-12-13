@@ -2,14 +2,14 @@
 "use strict";
 var socket = io.connect(location.origin);
 
-function startGame() {
-    socket.emit('startGame', { my: 'data' });
+function startGame(pass) {
+    socket.emit('startGame', pass);
 }
 
 $(function() {
-  $("#startGame").click(function() {startGame();});
-  socket.on('game started', function () {
-  	$("#gamesList").append("Test");
+  $("#startGame").click(function() {startGame($("#gameStartPass"));});
+  socket.on('game started', function (data) {
+  	$("#gamesList").append(data);
   });
 });
 

@@ -4,11 +4,11 @@ var jade = require('jade')
   , express = require('express')
   , app = express()
   , port = process.env.PORT || 5000
-  , parseCookie = express.cookieParser(secret)
+  , cookieParser = express.cookieParser(secret)
   , MyString = require('./models/String.js')
   , MongoStore = require('connect-mongo')(express)
   , db = require('./lib/db.js')
-  , socketio = require('socket.io');
+  , mongoStore = new MongoStore({url: db.url});
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -40,13 +40,18 @@ app.post('/newgame', function(req, res) {
 
 var server = http.createServer(app);
 server.listen(port);
+var io = require('socket.io').listen(server)
+  , SessionSockets = require('session.socket.io')
+  , sessionSockets = new SessionSockets(io, mongoStore, cookieParser);
 
 console.log('http server listening on %d', port);
 
-socketio.listen(server).on('connection', function (socket) {
+sessionSockets.on('connection', function (err, socket, session) {
 	socket.on('startGame', function (gameName) {
-	console.log('Message Received: ', gameName);
-	console.log('ID: ' + socket.id);
-	socket.emit('game started', 'hi');
+		session.games = [];
+		session.games.push(gameName);
+		session.save();
+		console.log(session);
+		socket.emit('game started', gameName);
 	});
 });
