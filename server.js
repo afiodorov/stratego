@@ -47,11 +47,10 @@ var io = require('socket.io').listen(server)
 console.log('http server listening on %d', port);
 
 sessionSockets.on('connection', function (err, socket, session) {
-	socket.on('startGame', function (gameName) {
-		session.games = [];
-		session.games.push(gameName);
+	socket.on('startGame', function (data) {
+		session.games.push(data.pass);
 		session.save();
 		console.log(session);
-		socket.emit('game started', gameName);
+		socket.emit('game started', {pass: data.pass});
 	});
 });
