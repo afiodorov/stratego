@@ -8,8 +8,8 @@ function startGame() {
 
 $(function() {
   $("#startGame").click(function() {startGame();});
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
+  socket.on('game started', function () {
+  	$("#gamesList").append("Test");
   });
 });
+

@@ -46,6 +46,6 @@ console.log('http server listening on %d', port);
 socketio.listen(server).on('connection', function (socket) {
 	socket.on('my other event', function (msg) {
 	console.log('Message Received: ', msg);
-	socket.broadcast.emit('message', msg);
+	socket.emit('game started', msg);
 	});
 });
