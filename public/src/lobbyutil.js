@@ -32,7 +32,10 @@ socket.on('listOfPlayers', function(data) {
 });
 
 socket.on('requestGame', function(data) {
-	console.log(data.playerName + 'requested a game');
+	$.pnotify({
+		title: 'Game Request',
+		text: data.playerName + ' requested a game'
+	});
 });
 
 socket.on('addNewPlayer', function(data) {
@@ -59,6 +62,7 @@ socket.on('fChangedPlayerName', function() {
 });
 
 $(function() {
+  $.pnotify.defaults.styling = "jqueryui";
   $("#startGame").click(function() {startGame($("#gameStartPass").val());});
   $("#setPlayerName").click(function() {setPlayerName($("#playerName").val());});
 });
