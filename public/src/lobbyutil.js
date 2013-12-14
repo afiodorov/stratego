@@ -14,6 +14,9 @@ function setPlayerName(name) {
     socket.emit('setPlayerName', {playerName : name});
 }
 
+function requestGame(playerName) {
+    socket.emit('requestGame', {playerName: playerName});
+}
 socket.on('listOfGames', function(data) {
 	$("#gamesList").empty();
 	data.forEach(function(entry) {
@@ -28,10 +31,18 @@ socket.on('listOfPlayers', function(data) {
 	});
 });
 
+socket.on('requestGame', function(data) {
+	console.log(data.playerName + 'requested a game');
+});
+
 socket.on('addNewPlayer', function(data) {
 	if(data.isSelf === false) {
 		$("#playersList").append('<li id="' + data.playerName + '">' +
-			data.playerName + '</li>');
+			data.playerName + '&nbsp;<a href="#" id="' +
+			data.playerName + '">Request</a></li>');
+		$("a[id=" + data.playerName + "]").click(function(){
+		requestGame(data.playerName);
+		return false;});
 	} else {
 		$("#playersList").append('<li id="' + data.playerName + '">' +
 			data.playerName + ' (You)</li>');
@@ -41,6 +52,10 @@ socket.on('addNewPlayer', function(data) {
 
 socket.on('removePlayerName', function(data) {
 	$('#' + data).remove();
+});
+
+socket.on('fChangedPlayerName', function() {
+	$('#playerNameErr').text("Such user already exists");	
 });
 
 $(function() {

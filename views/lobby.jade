@@ -10,7 +10,9 @@ html
          header
             h1 Our game lobby
          p Name:
-           input#playerName(type='name')#playerName
+           input#playerName(type='text')#playerName
+           div#playerNameErr
            button#setPlayerName Set my name
-         p List of online players
-         ul#playersList
+         div.players
+           p List of online players
+           ul#playersList

@@ -8,7 +8,7 @@ var jade = require('jade')
   , MyString = require('./models/String.js')
   , MongoStore = require('connect-mongo')(express)
   , db = require('./lib/db.js')
-  , mongoStore = new MongoStore({url: db.url});
+  , mongoStore = new MongoStore({url: db.url, auto_reconnect: true});
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -51,7 +51,8 @@ var clients = Object.create(null);
 
 function genUniquePlayerName(data) {
 	var key = "";
-	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl" +
+				"mnopqrstuvwxyz0123456789";
 	do {
 		key = "";
 		for(var i=0; i<7; i++) {
@@ -66,7 +67,7 @@ sessionSockets.on('connection', function (err, socket, session) {
 	socket.sid = session.id;
 
 	var onlineClients = io.sockets.clients();
-	var isDuplicate = false
+	var isDuplicate = false;
 	onlineClients.forEach(function(client) {
 		if ((client.id !== socket.id) && client.sid === socket.sid) {
 			// TODO handle this gracefully
@@ -77,12 +78,15 @@ sessionSockets.on('connection', function (err, socket, session) {
 	});
 
 	if(!isDuplicate) {
-	if(typeof session.playerName === 'undefined') {
+	if((typeof session.playerName === 'undefined') ||
+	      // check for duplicate name in the db of sessions
+	      ((session.playerName in clients) 
+		   && (socket.sid !== clients[session.playerName].sid))) {
 		session.playerName = genUniquePlayerName(clients);
 		session.save();
 	}
 	
-	clients[session.playerName] = session.id;
+	clients[session.playerName] = {socket: socket, sid: socket.sid};
 	socket.broadcast.emit('addNewPlayer', {playerName: session.playerName,
 		isSelf: false});
 
@@ -103,7 +107,7 @@ sessionSockets.on('connection', function (err, socket, session) {
 
 			session.playerName = data.playerName;
 			session.save();
-			clients[session.playerName] = session.id;
+			clients[session.playerName] = {socket: socket, sid: socket.sid};
 			socket.broadcast.emit('addNewPlayer', {playerName: session.playerName, 
 					isSelf: false});
 			socket.emit('addNewPlayer', {playerName:
@@ -111,8 +115,15 @@ sessionSockets.on('connection', function (err, socket, session) {
 		}
 	});
 
+	socket.on('requestGame', function(data) {
+		try {	
+			opponentSocket = clients[data.playerName].socket;
+			opponentSocket.emit('requestGame', data);
+		} catch(e) {
+			console.log(e);
+		}
+	});
 	socket.on('disconnect', function(socket) {
-		delete clients[session.playerName];
 		io.sockets.emit('removePlayerName', session.playerName);
 	});
 
