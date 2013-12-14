@@ -44,20 +44,71 @@ var io = require('socket.io').listen(server)
   , SessionSockets = require('session.socket.io')
   , sessionSockets = new SessionSockets(io, mongoStore, cookieParser);
 
+io.set('log level', 1);
 console.log('http server listening on %d', port);
 
+var clients = Object.create(null);
+
+function genUniquePlayerName(data) {
+	var key = "";
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	do {
+		key = "";
+		for(var i=0; i<7; i++) {
+			key += possible.charAt(Math.floor(Math.random() * possible.length));
+	 	}
+	} while (key in data);
+
+	return key;
+};
+
 sessionSockets.on('connection', function (err, socket, session) {
-	socket.on('startGame', function (data) {
-		if(typeof session.games === 'undefined') {
-			session.games = [];
+	socket.sid = session.id;
+
+	var onlineClients = io.sockets.clients();
+	var isDuplicate = false
+	onlineClients.forEach(function(client) {
+		if ((client.id !== socket.id) && client.sid === socket.sid) {
+			// TODO handle this gracefully
+			// break the loop as well for efficiency!
+			isDuplicate = true;
+			console.log("duplicate client");
 		}
-		session.games.push(data.pass);
-		session.save();
-		console.log(session);
-		socket.emit('listOfGames', session.games);
 	});
 
-	socket.on('getListOfGames', function() {
-		socket.emit('listOfGames', session.games);
-	}); 
+	if(!isDuplicate) {
+	if(typeof session.playerName === 'undefined') {
+		session.playerName = genUniquePlayerName(clients);
+		session.save();
+	}
+	
+	clients[session.playerName] = session.id;
+	socket.broadcast.emit('addNewPlayer', session.playerName);
+
+	onlineClients.forEach(function(client) {
+		mongoStore.get(client.sid, function(err, session) {
+			socket.emit('addNewPlayer', session.playerName);
+		});
+	});
+
+	socket.on('setPlayerName', function(data) {
+		if(data.playerName in clients) {
+			socket.emit('fChangedPlayerName');	
+		} else {
+			delete clients[session.playerName];
+			io.sockets.emit('removePlayerName', session.playerName);
+
+			session.playerName = data.playerName;
+			session.save();
+			clients[session.playerName] = session.id;
+			io.sockets.emit('addNewPlayer', session.playerName);
+		}
+	});
+
+	socket.on('disconnect', function(socket) {
+		delete clients[session.playerName];
+		io.sockets.emit('removePlayerName', session.playerName);
+	});
+
+	}
 });
