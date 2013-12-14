@@ -48,9 +48,16 @@ console.log('http server listening on %d', port);
 
 sessionSockets.on('connection', function (err, socket, session) {
 	socket.on('startGame', function (data) {
+		if(typeof session.games === 'undefined') {
+			session.games = [];
+		}
 		session.games.push(data.pass);
 		session.save();
 		console.log(session);
-		socket.emit('game started', {pass: data.pass});
+		socket.emit('listOfGames', session.games);
 	});
+
+	socket.on('getListOfGames', function() {
+		socket.emit('listOfGames', session.games);
+	}); 
 });
