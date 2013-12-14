@@ -29,7 +29,14 @@ socket.on('listOfPlayers', function(data) {
 });
 
 socket.on('addNewPlayer', function(data) {
-	$("#playersList").append('<li id="' + data + '">' + data + '</li>');
+	if(data.isSelf === false) {
+		$("#playersList").append('<li id="' + data.playerName + '">' +
+			data.playerName + '</li>');
+	} else {
+		$("#playersList").append('<li id="' + data.playerName + '">' +
+			data.playerName + ' (You)</li>');
+		$("#playerName").val(data.playerName);
+	}
 });
 
 socket.on('removePlayerName', function(data) {

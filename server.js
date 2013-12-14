@@ -83,11 +83,14 @@ sessionSockets.on('connection', function (err, socket, session) {
 	}
 	
 	clients[session.playerName] = session.id;
-	socket.broadcast.emit('addNewPlayer', session.playerName);
+	socket.broadcast.emit('addNewPlayer', {playerName: session.playerName,
+		isSelf: false});
 
 	onlineClients.forEach(function(client) {
+		var isSelf = (client.sid === socket.sid);
 		mongoStore.get(client.sid, function(err, session) {
-			socket.emit('addNewPlayer', session.playerName);
+			socket.emit('addNewPlayer', {playerName:
+			session.playerName, isSelf: isSelf});
 		});
 	});
 
@@ -101,7 +104,10 @@ sessionSockets.on('connection', function (err, socket, session) {
 			session.playerName = data.playerName;
 			session.save();
 			clients[session.playerName] = session.id;
-			io.sockets.emit('addNewPlayer', session.playerName);
+			socket.broadcast.emit('addNewPlayer', {playerName: session.playerName, 
+					isSelf: false});
+			socket.emit('addNewPlayer', {playerName:
+				session.playerName, isSelf: true});
 		}
 	});
 
