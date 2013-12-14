@@ -8,7 +8,8 @@ var jade = require('jade')
   , MyString = require('./models/String.js')
   , MongoStore = require('connect-mongo')(express)
   , db = require('./lib/db.js')
-  , mongoStore = new MongoStore({url: db.url, auto_reconnect: true});
+  , mongoStore = new MongoStore({url: db.url, auto_reconnect: true})
+  , arr = require('./public/src/arr.js');
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -103,7 +104,10 @@ sessionSockets.on('connection', function (err, socket, session) {
 			socket.emit('fChangedPlayerName');	
 		} else {
 			delete clients[session.playerName];
-			io.sockets.emit('removePlayerName', session.playerName);
+			socket.broadcast.emit('removePlayerName', {playerName:
+				session.playerName, isSelf: false});
+			socket.emit('removePlayerName', {playerName:
+				session.playerName, isSelf: true});
 
 			session.playerName = data.playerName;
 			session.save();
@@ -118,13 +122,31 @@ sessionSockets.on('connection', function (err, socket, session) {
 	socket.on('requestGame', function(data) {
 		try {	
 			opponentSocket = clients[data.playerName].socket;
-			opponentSocket.emit('requestGame', data);
+			opponentSocket.emit('requestGame', {playerName:
+				session.playerName});
+			if (typeof session.invites === 'undefined')
+				session.invites = [];
+			session.invites.pushIfNotExist(clients[data.playerName].sid);
+			session.save();
 		} catch(e) {
 			console.log(e);
 		}
 	});
+	
+	socket.on('acceptGame', function(data){
+		opponentSid = clients[data.playerName].sid;
+		if (session.invites.indexOf(opponentSid) !== -1) {
+			// I have invited this player!
+			opponentSocket = clients[data.playerName].socket;
+			opponentSocket.join('room');
+			socket.join('room');
+		}
+		
+	});
+
 	socket.on('disconnect', function(socket) {
-		io.sockets.emit('removePlayerName', session.playerName);
+		io.sockets.emit('removePlayerName', {playerName:
+			session.playerName, isSelf: false});
 	});
 
 	}

@@ -17,6 +17,12 @@ function setPlayerName(name) {
 function requestGame(playerName) {
     socket.emit('requestGame', {playerName: playerName});
 }
+
+function acceptGame() {
+    var playerName = decodeURI($("#__playerName").val());
+    socket.emit('acceptGame', {playerName: playerName});
+}
+
 socket.on('listOfGames', function(data) {
 	$("#gamesList").empty();
 	data.forEach(function(entry) {
@@ -34,27 +40,37 @@ socket.on('listOfPlayers', function(data) {
 socket.on('requestGame', function(data) {
 	$.pnotify({
 		title: 'Game Request',
-		text: data.playerName + ' requested a game'
+		text: encodeURI(data.playerName) + ' requested a game. ' +
+		'<a href="#" id="acc' + encodeURI(data.playerName) + '">Accept</a>.'
 	});
+	$("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
+	acceptGame();
+	return false;});
+
 });
 
 socket.on('addNewPlayer', function(data) {
 	if(data.isSelf === false) {
-		$("#playersList").append('<li id="' + data.playerName + '">' +
-			data.playerName + '&nbsp;<a href="#" id="' +
-			data.playerName + '">Request</a></li>');
-		$("a[id=" + data.playerName + "]").click(function(){
+		$("#playersList").append('<li id="p' + encodeURI(data.playerName) + '">' +
+			encodeURI(data.playerName) + '&nbsp;<a href="#" id="req' +
+			encodeURI(data.playerName) + '">Request</a></li>');
+		$("a[id=req" + encodeURI(data.playerName) + "]").click(function(){
 		requestGame(data.playerName);
 		return false;});
 	} else {
-		$("#playersList").append('<li id="' + data.playerName + '">' +
-			data.playerName + ' (You)</li>');
-		$("#playerName").val(data.playerName);
+		$("#playersList").append('<li id="___self">' +
+			encodeURI(data.playerName) + ' (You)</li>');
+		$("#playerName").val(encodeURI(data.playerName));
+		$("#__playerName").val(encodeURI(data.playerName));
 	}
 });
 
 socket.on('removePlayerName', function(data) {
-	$('#' + data).remove();
+	if(data.isSelf === false) {
+		$('#p' + encodeURI(data.playerName)).remove();
+	} else {
+		$('#___self').remove();
+	}
 });
 
 socket.on('fChangedPlayerName', function() {

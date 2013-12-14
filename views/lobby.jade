@@ -3,8 +3,9 @@ html
    head
       title Game Lobby
       link(type='text/css', media='all', rel='stylesheet', href='/pnotify/jquery.pnotify.default.css')
-      link(type='text/css', media='all', rel='stylesheet', href='/pnotify/jquery.pnotify.default.icons.css')
+      //-link(type='text/css', media='all', rel='stylesheet', href='/pnotify/jquery.pnotify.default.icons.css')
       script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+      link(type='text/css', media='all', rel='stylesheet', href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css')
       script(src="/pnotify/jquery.pnotify.min.js")
       script(src="/src/socket.io.js")
       script(src="/src/lobbyutil.js")
@@ -14,7 +15,8 @@ html
          header
             h1 Our game lobby
          p Name:
-           input#playerName(type='text')#playerName
+           input#playerName(type='text')
+           input#__playerName(type='hidden')
            div#playerNameErr
            button#setPlayerName Set my name
          div.players
