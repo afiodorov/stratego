@@ -1,3 +1,4 @@
+"use strict";
 var secret = process.env.SESSION_SECRET || 'someThinWeirdAsdflk';
 var jade = require('jade')
   , http = require('http')
@@ -5,7 +6,7 @@ var jade = require('jade')
   , app = express()
   , port = process.env.PORT || 5000
   , cookieParser = express.cookieParser(secret)
-  , MyString = require('./models/String.js')
+  , Game = require('./models/Game.js')
   , MongoStore = require('connect-mongo')(express)
   , db = require('./lib/db.js')
   , mongoStore = new MongoStore({url: db.url, auto_reconnect: true})
@@ -121,12 +122,13 @@ sessionSockets.on('connection', function (err, socket, session) {
 
 	socket.on('requestGame', function(data) {
 		try {	
-			opponentSocket = clients[data.playerName].socket;
-			opponentSocket.emit('requestGame', {playerName:
+			var opponent = clients[data.playerName];
+			opponent.socket.emit('requestGame', {playerName:
 				session.playerName});
 			if (typeof session.invites === 'undefined')
 				session.invites = [];
-			session.invites.pushIfNotExist(clients[data.playerName].sid);
+			// I am inviting the opponent to the game
+			session.invites.pushIfNotExist(opponent.sid);
 			session.save();
 		} catch(e) {
 			console.log(e);
@@ -134,14 +136,20 @@ sessionSockets.on('connection', function (err, socket, session) {
 	});
 	
 	socket.on('acceptGame', function(data){
-		opponentSid = clients[data.playerName].sid;
-		if (session.invites.indexOf(opponentSid) !== -1) {
-			// I have invited this player!
-			opponentSocket = clients[data.playerName].socket;
-			opponentSocket.join('room');
-			socket.join('room');
-		}
-		
+		var opponent = clients[data.playerName];
+		mongoStore.get(opponent.sid, function (err, opsession) {
+                  if (opsession.invites.indexOf(socket.sid) !== -1) {
+                  	// I was invited by the opponent to this game!
+                  	Game.addPlayers(opponent.sid, socket.sid, function(err, game) {
+                  		opponent.socket.join(game.id);
+                  		socket.join(game.id);
+                  		// io.sockets.in(game.id).emit('gameJoined');
+                  		socket.emit('gameStarted', {playerName: opsession.playerName});
+				opponent.socket.emit('gameStarted',
+				  {playerName: session.playerName});
+	                });
+	         }
+	       });
 	});
 
 	socket.on('disconnect', function(socket) {

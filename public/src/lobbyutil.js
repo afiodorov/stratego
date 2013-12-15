@@ -18,8 +18,7 @@ function requestGame(playerName) {
     socket.emit('requestGame', {playerName: playerName});
 }
 
-function acceptGame() {
-    var playerName = decodeURI($("#__playerName").val());
+function acceptGame(playerName) {
     socket.emit('acceptGame', {playerName: playerName});
 }
 
@@ -27,6 +26,13 @@ socket.on('listOfGames', function(data) {
 	$("#gamesList").empty();
 	data.forEach(function(entry) {
 		$("#gamesList").append('<li>' + entry + '</li>');
+	});
+});
+
+socket.on('gameStarted', function(data) {
+	$.pnotify({
+		title: 'New Game started',
+		text: encodeURI(data.playerName) + ' started a game with you!'
 	});
 });
 
@@ -44,7 +50,7 @@ socket.on('requestGame', function(data) {
 		'<a href="#" id="acc' + encodeURI(data.playerName) + '">Accept</a>.'
 	});
 	$("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
-	acceptGame();
+	acceptGame(data.playerName);
 	return false;});
 
 });
