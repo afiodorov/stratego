@@ -41,6 +41,9 @@ io.set('log level', 1);
 console.log('http server listening on %d', port);
 
 var lobby = require('./lib/lobby.js');
-lobby.setio(io);
+var clientsettings = require('./lib/client.js');
 
-sessionSockets.on('connection', lobby.main);
+sessionSockets.on('connection', function(err, socket, session) {
+	var client = new clientsettings.Client(io, socket, session);
+	lobby.main(client, err);
+});

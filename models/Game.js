@@ -12,8 +12,7 @@ function addPlayers(player1, player2, callback) {
   instance.save(function (err) {
     if (err) {
       callback(err);
-    }
-    else {
+    } else {
       callback(null, instance);
     }
   });
@@ -23,10 +22,15 @@ function getInstance(player1, player2, callback) {
 	Game.findOne({players: [player1, player2].sort()}).exec(callback);
 }
 
+function getInstances(player, callback) {
+  Game.find({players: player}).exec(callback);
+}
+
 module.exports = {
   addPlayers : addPlayers,
   find: function(callback) {
     Game.find().sort('_id', 'descending').limit(5).exec(callback);
   },
   getInstance : getInstance,
+  getInstances : getInstances,
 };

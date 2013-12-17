@@ -4,11 +4,15 @@
     "public/lib/**/*.js",
     "public/src/**/*.js",
     "models/**/*.js",
+    "node_modules/connect-mongo/*.js",
     "node_modules/connect/*.js",
     "node_modules/express/*.js",
+    "node_modules/jade/*.js",
     "node_modules/mongodb/*.js",
     "node_modules/mongoose/*.js",
-    "node_modules/ws/*.js"
+    "node_modules/optimist/*.js",
+    "node_modules/session.socket.io/*.js",
+    "node_modules/socket.io/*.js"
   ],
   "plugins": {
     "node": {"load": false}
