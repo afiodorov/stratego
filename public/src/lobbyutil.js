@@ -79,7 +79,7 @@ socket.on('removePlayerName', function(data) {
   }
 });
 
-socket.on('fChangedPlayerName', function() {
+socket.on('failChangingName', function() {
   $('#playerNameErr').text("Such user already exists"); 
 });
 
