@@ -41,9 +41,9 @@ io.set('log level', 1);
 console.log('http server listening on %d', port);
 
 var lobby = require('./lib/lobby.js');
-var clientsettings = require('./lib/client.js');
+var makeStruct = require('./structs/factory.js').makeStruct;
 
 sessionSockets.on('connection', function(err, socket, session) {
-	var client = new clientsettings.Client(io, socket, session);
-	lobby.main(client, err);
+	var ActiveConnection = makeStruct("io socket session");
+	lobby.main(new ActiveConnection(io, socket, session), err);
 });
