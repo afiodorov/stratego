@@ -81,20 +81,35 @@ $(function() {
   $("#startGame").click(function() {startGame($("#gameStartPass").val());});
   $("#setPlayerName").click(function() {setPlayerName($("#playerName").val());});
 
+  var counter = 0;
+  var ItemViewModel = function(title, text) {
+    counter += 1;
+    this.id = 'tab' + counter.toString();
+    this.href = '#tab' + counter.toString();
+    this.title = title;
+    this.text = text;
+  };
+
   function AppViewModel() {
       var self = this;
       self.games = ko.observableArray();
       self.shouldShowPage = ko.observable(true);
+      self.items = ko.observableArray();
   }
+
   AppViewModel.prototype.getGames = function() {return this.games;};
   AppViewModel.prototype.setShouldShowPage = function(show) {this.shouldShowPage(show);};
+  AppViewModel.prototype.onAdd = function(title, data) {
+    this.items.push(new ItemViewModel(title, data));
+  };
 
   var appViewModel = new AppViewModel();
   ko.applyBindings(appViewModel);
 
   socket.on('addShortGame', function(game) {
-    appViewModel.getGames().push(game);
+    appViewModel.onAdd(game.opponentName, game.id);
   });
+
   socket.on('setShouldShowPage', function(data) {
     appViewModel.setShouldShowPage(data.bool);
     $("#blockingMsg").text(data.err);
@@ -103,5 +118,4 @@ $(function() {
        open: function(event, ui) {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
     });
   });
-
 });
