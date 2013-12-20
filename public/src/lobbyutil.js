@@ -90,8 +90,8 @@ $(function() {
   var appViewModel = new AppViewModel();
   ko.applyBindings(appViewModel);
 
-  socket.on('listOfGames', function(games) {
-    appViewModel.getGames()(games);
+  socket.on('addShortGame', function(game) {
+    appViewModel.getGames().push(game);
   });
 
 });
