@@ -5,14 +5,16 @@ html
       link(type='text/css', media='all', rel='stylesheet', href='/pnotify/jquery.pnotify.default.css')
       //-link(type='text/css', media='all', rel='stylesheet', href='/pnotify/jquery.pnotify.default.icons.css')
       script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
-      link(type='text/css', media='all', rel='stylesheet', href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css')
+      script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
+      link(type='text/css', media='all', rel='stylesheet', href='/css/ui-lightness/jquery-ui-1.10.3.custom.min.css')
       script(src="/src/knockout-3.0.0.js")
       script(src="/pnotify/jquery.pnotify.min.js")
       script(src="/src/socket.io.js")
       script(src="/src/lobbyutil.js")
 
-   body(data-bind='visible: shouldShowPage')
-      .container
+   body
+      div#blockingMsg
+      .container(data-bind='visible: shouldShowPage')
         p Name:
           input#playerName(type='text')
           input#__playerName(type='hidden')
@@ -21,8 +23,8 @@ html
         .players
           p List of online players
           ul#playersList
-      .linksToGames
-         ul#gamesList(data-bind='foreach: games')
-           li#gameLi
-             span#spanGame(data-bind='text: $index')
-             span#opponentName(data-bind='text: opponentName')
+        .linksToGames
+           ul#gamesList(data-bind='foreach: games')
+             li#gameLi
+               span#spanGame(data-bind='text: $index')
+               span#opponentName(data-bind='text: opponentName')

@@ -95,9 +95,13 @@ $(function() {
   socket.on('addShortGame', function(game) {
     appViewModel.getGames().push(game);
   });
-
   socket.on('setShouldShowPage', function(data) {
-    appViewModel.setShouldShowPage(data);
+    appViewModel.setShouldShowPage(data.bool);
+    $("#blockingMsg").text(data.err);
+    $("#blockingMsg").dialog({
+       closeOnEscape: false,
+       open: function(event, ui) {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
+    });
   });
 
 });
