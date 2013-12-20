@@ -44,6 +44,9 @@ var lobby = require('./lib/lobby.js');
 var makeStruct = require('./structs/factory.js').makeStruct;
 
 sessionSockets.on('connection', function(err, socket, session) {
-	var ActiveConnection = makeStruct("io socket session");
-	lobby.main(new ActiveConnection(io, socket, session), err);
+    var ActiveConnection = makeStruct("io socket session");
+    var activeConnection = new ActiveConnection(io, socket, session);
+  (function() {
+    (lobby.main.bind(activeConnection))(err);
+  }());
 });

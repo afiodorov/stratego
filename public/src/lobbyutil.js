@@ -84,14 +84,20 @@ $(function() {
   function AppViewModel() {
       var self = this;
       self.games = ko.observableArray();
+      self.shouldShowPage = ko.observable(true);
   }
   AppViewModel.prototype.getGames = function() {return this.games;};
+  AppViewModel.prototype.setShouldShowPage = function(show) {this.shouldShowPage(show);};
 
   var appViewModel = new AppViewModel();
   ko.applyBindings(appViewModel);
 
   socket.on('addShortGame', function(game) {
     appViewModel.getGames().push(game);
+  });
+
+  socket.on('setShouldShowPage', function(data) {
+    appViewModel.setShouldShowPage(data);
   });
 
 });

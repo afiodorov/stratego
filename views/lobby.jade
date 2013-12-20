@@ -11,7 +11,7 @@ html
       script(src="/src/socket.io.js")
       script(src="/src/lobbyutil.js")
 
-   body
+   body(data-bind='visible: shouldShowPage')
       .container
         p Name:
           input#playerName(type='text')
