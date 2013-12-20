@@ -1,4 +1,4 @@
-/*global location, WebSocket, io, $*/
+/*global location, WebSocket, io, $, ko*/
 "use strict";
 var socket = io.connect(location.origin);
 
@@ -21,13 +21,6 @@ function requestGame(playerName) {
 function acceptGame(playerName) {
   socket.emit('acceptGame', {playerName: playerName});
 }
-
-socket.on('listOfGames', function(data) {
-  $("#gamesList").empty();
-  data.forEach(function(entry) {
-    $("#gamesList").append('<li>' + entry + '</li>');
-  });
-});
 
 socket.on('gameStarted', function(data) {
   $.pnotify({
@@ -87,4 +80,18 @@ $(function() {
   $.pnotify.defaults.styling = "jqueryui";
   $("#startGame").click(function() {startGame($("#gameStartPass").val());});
   $("#setPlayerName").click(function() {setPlayerName($("#playerName").val());});
+
+  function AppViewModel() {
+      var self = this;
+      self.games = ko.observableArray();
+  }
+  AppViewModel.prototype.getGames = function() {return this.games;};
+
+  var appViewModel = new AppViewModel();
+  ko.applyBindings(appViewModel);
+
+  socket.on('listOfGames', function(games) {
+    appViewModel.getGames()(games);
+  });
+
 });
