@@ -86,7 +86,7 @@ $(function() {
       self.shouldShowPage = ko.observable(true);
       self.games = ko.observableArray();
       self.switchToGame = function(game) {
-        $("#gameCanvas").text(game.id);
+        socket.emit('requestGameStatus', game);
       };
   }
 

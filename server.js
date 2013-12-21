@@ -41,6 +41,7 @@ io.set('log level', 1);
 console.log('http server listening on %d', port);
 
 var lobby = require('./lib/lobby.js');
+var game = require('./lib/game.js');
 var makeStruct = require('./structs/factory.js').makeStruct;
 
 sessionSockets.on('connection', function(err, socket, session) {
@@ -48,5 +49,6 @@ sessionSockets.on('connection', function(err, socket, session) {
     var activeConnection = new ActiveConnection(io, socket, session);
   (function() {
     (lobby.main.bind(activeConnection))(err);
+    (game.main.bind(activeConnection))(err);
   }());
 });
