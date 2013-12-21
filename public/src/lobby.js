@@ -1,42 +1,42 @@
-/*global location, WebSocket, io, $, ko*/
+/*global location, Weblobby, io, $, ko*/
 "use strict";
-var socket = io.connect(location.origin);
+var lobby = io.connect(location.origin + '/lobby');
 
 function startGame(pass) {
-  socket.emit('startGame', {pass: pass});
+  lobby.emit('startGame', {pass: pass});
 }
 
 function getListOfGames(){
-  socket.emit('getListOfGames');
+  lobby.emit('getListOfGames');
 }
 
 function setPlayerName(name) {
-  socket.emit('setPlayerName', {playerName : name});
+  lobby.emit('setPlayerName', {playerName : name});
 }
 
 function requestGame(playerName) {
-  socket.emit('requestGame', {playerName: playerName});
+  lobby.emit('requestGame', {playerName: playerName});
 }
 
 function acceptGame(playerName) {
-  socket.emit('acceptGame', {playerName: playerName});
+  lobby.emit('acceptGame', {playerName: playerName});
 }
 
-socket.on('gameStarted', function(data) {
+lobby.on('gameStarted', function(data) {
   $.pnotify({
     title: 'New Game started',
     text: encodeURI(data.playerName) + ' started a game with you!'
   });
 });
 
-socket.on('listOfPlayers', function(data) {
+lobby.on('listOfPlayers', function(data) {
   $("#playersList").empty();
   data.forEach(function(entry) {
     $("#playersList").append('<li>' + entry + '</li>');
   });
 });
 
-socket.on('requestGame', function(data) {
+lobby.on('requestGame', function(data) {
   $.pnotify({
     title: 'Game Request',
     text: encodeURI(data.playerName) + ' requested a game. ' +
@@ -48,7 +48,7 @@ socket.on('requestGame', function(data) {
 
 });
 
-socket.on('addNewPlayer', function(data) {
+lobby.on('addNewPlayer', function(data) {
   if(data.isSelf === false) {
     $("#playersList").append('<li id="p' + encodeURI(data.playerName) + '">' +
       encodeURI(data.playerName) + '&nbsp;<a href="#" id="req' +
@@ -64,7 +64,7 @@ socket.on('addNewPlayer', function(data) {
   }
 });
 
-socket.on('removePlayerName', function(data) {
+lobby.on('removePlayerName', function(data) {
   if(data.isSelf === false) {
     $('#p' + encodeURI(data.playerName)).remove();
   } else {
@@ -72,7 +72,7 @@ socket.on('removePlayerName', function(data) {
   }
 });
 
-socket.on('failChangingName', function() {
+lobby.on('failChangingName', function() {
   $('#playerNameErr').text("Such user already exists"); 
 });
 
@@ -86,7 +86,7 @@ $(function() {
       self.shouldShowPage = ko.observable(true);
       self.games = ko.observableArray();
       self.switchToGame = function(game) {
-        socket.emit('requestGameStatus', game);
+        lobby.emit('requestGameStatus', game);
       };
   }
 
@@ -96,11 +96,11 @@ $(function() {
   var appViewModel = new AppViewModel();
   ko.applyBindings(appViewModel);
 
-  socket.on('addShortGame', function(game) {
+  lobby.on('addShortGame', function(game) {
     appViewModel.onAdd(game);
   });
 
-  socket.on('setShouldShowPage', function(data) {
+  lobby.on('setShouldShowPage', function(data) {
     appViewModel.setShouldShowPage(data.bool);
     $("#blockingMsg").text(data.err);
     $("#blockingMsg").dialog({

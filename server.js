@@ -44,11 +44,22 @@ var lobby = require('./lib/lobby.js');
 var game = require('./lib/game.js');
 var makeStruct = require('./structs/factory.js').makeStruct;
 
-sessionSockets.on('connection', function(err, socket, session) {
-    var ActiveConnection = makeStruct("io socket session");
-    var activeConnection = new ActiveConnection(io, socket, session);
+sessionSockets.of('/lobby').on('connection', function(err, socket, session) {
+  if(err) {
+    console.log("bad session");
+    console.log(err);
+    return;
+  }
+
+  if (!session) {
+    console.log("no session present");
+    return;
+  }
+  
+  var ActiveConnection = makeStruct("io socket session");
+  var activeConnection = new ActiveConnection(io, socket, session);
   (function() {
-    (lobby.main.bind(activeConnection))(err);
-    (game.main.bind(activeConnection))(err);
+    (lobby.main.bind(activeConnection))();
+    (game.main.bind(activeConnection))();
   }());
 });
