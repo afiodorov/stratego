@@ -17,16 +17,13 @@ html
    body
       div#blockingMsg
       .container(data-bind='visible: shouldShowPage')
-        div(data-bind='tabs: { refreshOn: items }')
+        div(data-bind='tabs: { refreshOn: games }')
           ul
-            // ko foreach: items
+            // ko foreach: games
             li(data-bind='attr: { \'aria-controls\': id }')
-              a(data-bind='attr: {title: title, href: href}, text: title')
+              a(href: #, data-bind='attr: {title: opponentName}, text: opponentName, click: $parent.switchToGame ')
             // /ko
-          // ko foreach: items
-          div(data-bind='attr: { id: id }')
-            p(data-bind='text: text')
-          // /ko
+          div#gameCanvas
         div
           input#playerName(type='text')
           input#__playerName(type='hidden')
