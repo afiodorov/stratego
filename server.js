@@ -8,6 +8,7 @@ var jade = require('jade')
   , cookieParser = express.cookieParser(secret)
   , db = require('./lib/db.js')
   , arr = require('./public/src/arr.js');
+var logger = require('./lib/logger.js');
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -21,7 +22,7 @@ app.configure('development', function(){
 
 app.configure('production', function(){
   process.on('uncaughtException', function(err) {
-      console.log(err);
+      logger.log('error', err);
   });
   app.use(express.errorHandler());
 });
@@ -38,7 +39,7 @@ var io = require('socket.io').listen(server)
   , SessionSockets = require('session.socket.io')
   , sessionSockets = new SessionSockets(io, db.mongoStore, cookieParser);
 io.set('log level', 1);
-console.log('http server listening on %d', port);
+logger.log('info', 'http server listening on %d', port);
 
 var lobby = require('./lib/lobby.js');
 var game = require('./lib/game.js');
@@ -46,20 +47,20 @@ var makeStruct = require('./structs/factory.js').makeStruct;
 
 sessionSockets.of('/lobby').on('connection', function(err, socket, session) {
   if(err) {
-    console.log("bad session");
-    console.log(err);
+    logger.log('error', "bad session");
+    logger.log('error', err);
     return;
   }
 
   if (!session) {
-    console.log("no session present");
+    logger.log('error', "no session present");
     return;
   }
   
   var ActiveConnection = makeStruct("io socket session");
   var activeConnection = new ActiveConnection(io, socket, session);
   (function() {
-    (lobby.main.bind(activeConnection))();
-    (game.main.bind(activeConnection))();
+    lobby.main.call(activeConnection);
+    game.main.call(activeConnection);
   }());
 });
