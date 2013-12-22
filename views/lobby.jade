@@ -5,14 +5,17 @@ html
       link(type='text/css', media='all', rel='stylesheet', href='/pnotify/jquery.pnotify.default.css')
       //-link(type='text/css', media='all', rel='stylesheet', href='/pnotify/jquery.pnotify.default.icons.css')
       //-script(src="/src/knockout-3.0.0.js")
+      link(type='text/css', media='all', rel='stylesheet', href='/css/ui-lightness/jquery-ui-1.10.3.custom.min.css')
+      link(type='text/css', media='all', rel='stylesheet', href="/css/lobby.css")
+
       script(src='//ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js')
       script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
       script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
-      link(type='text/css', media='all', rel='stylesheet', href='/css/ui-lightness/jquery-ui-1.10.3.custom.min.css')
       script(src="/pnotify/jquery.pnotify.min.js")
       script(src="/src/socket.io.js")
       script(src="/src/lobby.js")
       script(src="/src/knockout-jqueryui.min.js")
+      script(src="/src/moment.min.js")
 
    body
       div#blockingMsg
@@ -24,13 +27,21 @@ html
               a(href: #, data-bind='attr: {title: opponentName}, text: opponentName, click: $parent.switchToGame ')
             // /ko
           div#gameCanvas
+            .messages(data-bind='foreach: messages')
+              .message
+                span(data-bind='text: \'[\' + moment(date).format(\'HH:mm:ss\') + \'] \'')
+                span(data-bind='text: playerName + \': \'')
+                span(data-bind='text: message')
+            .chat
+              form(data-bind='submit: sendChatInput')
+                input(data-bind='value: chatInput', placeholder='enter message')
+                button Send
         div
           input#playerName(type='text')
           input#__playerName(type='hidden')
-          div#playerNameErr
           button#setPlayerName Set my name
+          div#playerNameErr
         .players
           p List of online players
           ul#playersList
         .linksToGames
-        .chat

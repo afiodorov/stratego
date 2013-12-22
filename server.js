@@ -43,6 +43,7 @@ logger.log('info', 'http server listening on %d', port);
 
 var lobby = require('./lib/lobby.js');
 var game = require('./lib/game.js');
+var chat = require('./lib/chat.js');
 var makeStruct = require('./structs/factory.js').makeStruct;
 
 sessionSockets.of('/lobby').on('connection', function(err, socket, session) {
@@ -62,5 +63,6 @@ sessionSockets.of('/lobby').on('connection', function(err, socket, session) {
   (function() {
     lobby.main.call(activeConnection);
     game.main.call(activeConnection);
+    chat.main.call(activeConnection);
   }());
 });

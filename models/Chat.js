@@ -1,9 +1,10 @@
 var db = require('../lib/db.js');
 var ChatSchema = new db.Schema({
-    game : {type: String},
+    gameid : {type: String},
     player : {type: String},
     message : {type: String},
-    date : {type: Date}
+    date : {type: Date},
+    playerName : {type: String}
 });
 
 var Chat = db.mongoose.model('Chat', ChatSchema);
@@ -11,9 +12,10 @@ var Chat = db.mongoose.model('Chat', ChatSchema);
 function pushMessage(chatStruct, callback) {
   var instance = new Chat();
   instance.date = new Date();
-  instance.game = chatStruct.game;
+  instance.gameid = chatStruct.gameid;
   instance.player = chatStruct.player;
   instance.message = chatStruct.message;
+  instance.playerName = chatStruct.playerName;
 
   instance.save(function (err) {
     if (err) {
@@ -24,12 +26,13 @@ function pushMessage(chatStruct, callback) {
   });
 }
 
-function getMessages(game, limit, callback) {
-  Chat.find({game: game})
-    .sort('_id', 'descending').limit(limit).exec(callback);
+function getMessages(gameid, limit, callback) {
+  Chat.find({gameid: gameid})
+    .sort('_id', 'ascending').limit(limit).exec(callback);
 }
 
 module.exports = {
-  Chat : Chat,
+  Model : Chat,
+  getMessages : getMessages,
   pushMessage : pushMessage
 };

@@ -85,19 +85,46 @@ $(function() {
       var self = this;
       self.shouldShowPage = ko.observable(true);
       self.games = ko.observableArray();
+      self.chatInput = ko.observable();
+      self.currentGame = null;
+      self.messages = ko.observableArray([]);
+
       self.switchToGame = function(game) {
+        self.currentGame = game;
+        self.messages([]);
         lobby.emit('requestGameStatus', game);
+        lobby.emit('requestChatLog', game);
+      };
+      self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
+      self.onAddShortGame = function(game) {self.games.push(game);};
+      self.onAddChatMessage = function(chat) {self.messages.push(chat);};
+      self.sendChatInput = function() {
+        if(self.currentGame) {
+          lobby.emit('addChatMessage', {gameid: self.currentGame.id, message: self.chatInput()});
+        } else {
+          // TODO display error
+          console.log('no chat selected');
+        }
+      };
+      self.setChatLog = function(log) {
+        self.messages(log);
       };
   }
-
-  AppViewModel.prototype.setShouldShowPage = function(show) {this.shouldShowPage(show);};
-  AppViewModel.prototype.onAdd = function(game) {this.games.push(game);};
 
   var appViewModel = new AppViewModel();
   ko.applyBindings(appViewModel);
 
+  lobby.on('addChatMessage', function(chat) {
+    appViewModel.onAddChatMessage(chat);
+  });
+
+
   lobby.on('addShortGame', function(game) {
-    appViewModel.onAdd(game);
+    appViewModel.onAddShortGame(game);
+  });
+  
+  lobby.on('setChatLog', function(log){ 
+    appViewModel.setChatLog(log);
   });
 
   lobby.on('setShouldShowPage', function(data) {
@@ -105,7 +132,8 @@ $(function() {
     $("#blockingMsg").text(data.err);
     $("#blockingMsg").dialog({
        closeOnEscape: false,
-       open: function(event, ui) {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
+       open: function(event, ui) 
+              {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
     });
   });
 });
