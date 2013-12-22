@@ -88,13 +88,26 @@ $(function() {
       self.chatInput = ko.observable();
       self.currentGame = null;
       self.messages = ko.observableArray([]);
+      self.shouldShowMain = ko.observable(true);
+      self.shouldShowCanvas = ko.observable(false);
+      self.showMainTab = function(bool) {
+        self.shouldShowMain(bool);
+        self.shouldShowCanvas(!bool);
+      };
+      self.setShouldShowCanvas = function(bool) {
+        self.shouldShowCanvas(bool);
+      };
 
       self.switchToGame = function(game) {
-        self.currentGame = game;
-        self.messages([]);
-        lobby.emit('requestGameStatus', game);
-        lobby.emit('requestChatLog', game);
+        self.showMainTab(false);
+        if(game !== self.currentGame) {
+          self.currentGame = game;
+          self.messages([]);
+          lobby.emit('requestGameStatus', game);
+          lobby.emit('requestChatLog', game);
+        }
       };
+
       self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
       self.onAddShortGame = function(game) {self.games.push(game);};
       self.onAddChatMessage = function(chat) {

@@ -22,11 +22,16 @@ html
       .container(data-bind='visible: shouldShowPage')
         div(data-bind='tabs: { refreshOn: games }')
           ul
+            li
+              a(data-bind="click: showMainTab") Main
             // ko foreach: games
             li(data-bind='attr: { \'aria-controls\': id }')
               a(href: #, data-bind='attr: {title: opponentName}, text: opponentName, click: $parent.switchToGame ')
             // /ko
-          div#gameCanvas
+          div#main(data-bind='visible: shouldShowMain')
+            p Welcome to our Stratego Game.
+            p Long list of rules nicely presented here
+          div#gameCanvas(data-bind='visible: shouldShowCanvas')
             .messages(data-bind='foreach: messages')
               .message
                 span(data-bind='text: \'[\' + moment(date).format(\'HH:mm:ss\') + \'] \'')
