@@ -107,6 +107,7 @@ $(function() {
       self.sendChatInput = function() {
         if(self.currentGame) {
           lobby.emit('addChatMessage', {gameid: self.currentGame.id, message: self.chatInput()});
+          self.chatInput("");
         } else {
           // TODO display error
           console.log('no chat selected');
