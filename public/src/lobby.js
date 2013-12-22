@@ -97,7 +97,13 @@ $(function() {
       };
       self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
       self.onAddShortGame = function(game) {self.games.push(game);};
-      self.onAddChatMessage = function(chat) {self.messages.push(chat);};
+      self.onAddChatMessage = function(chat) {
+      console.log(self.messages().length);
+        if(self.messages().length > 20) {
+          self.messages.shift();
+        }
+        self.messages.push(chat);
+      };
       self.sendChatInput = function() {
         if(self.currentGame) {
           lobby.emit('addChatMessage', {gameid: self.currentGame.id, message: self.chatInput()});
