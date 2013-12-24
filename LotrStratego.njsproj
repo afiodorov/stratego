@@ -41,17 +41,24 @@
     <Compile Include="lib\db.js" />
     <Compile Include="models\String.js" />
     <Compile Include="models\String.js" />
+    <Compile Include="public\src\lobbyutil.js" />
     <Compile Include="server.js" />
+    <Content Include=".tern-project" />
     <Content Include="LICENSE" />
     <Content Include="package.json" />
     <Content Include="Procfile" />
     <Content Include="public\index.html" />
+    <Content Include="public\lobby.html" />
+    <Content Include="public\lobby.jade" />
     <Content Include="README.md" />
+    <Content Include="views\lobby.jade" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lib\" />
     <Folder Include="models\" />
     <Folder Include="public\" />
+    <Folder Include="public\src\" />
+    <Folder Include="views\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
   <ProjectExtensions>

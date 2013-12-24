@@ -10,9 +10,9 @@
     "express": "3.x",
     "mongodb": "1.1.11",
     "mongoose": "2.6.5",
-    "jade": "*",
+    "jade": "~0.35.0",
     "optimist": "0.6.x",
-    "connect-mongo": "0.4.x"
+    "connect-mongo": "~0.4.0"
   },
   "engines": {
     "node": "0.8.x",
