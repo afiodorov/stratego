@@ -2,15 +2,51 @@ doctype 5
 html
    head
       title Game Lobby
+      link(type='text/css', media='all', rel='stylesheet', href='/pnotify/jquery.pnotify.default.css')
+      //-link(type='text/css', media='all', rel='stylesheet', href='/pnotify/jquery.pnotify.default.icons.css')
+      //-script(src="/src/knockout-3.0.0.js")
+      link(type='text/css', media='all', rel='stylesheet', href='/css/ui-lightness/jquery-ui-1.10.3.custom.min.css')
+      link(type='text/css', media='all', rel='stylesheet', href="/css/lobby.css")
+
+      script(src='//ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js')
       script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
-      script(src="../src/lobbyutil.js")
+      script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
+      script(src="/pnotify/jquery.pnotify.min.js")
+      script(src="/src/socket.io.js")
+      script(src="/src/lobby.js")
+      script(src="/src/knockout-jqueryui.min.js")
+      script(src="/src/moment.min.js")
+
    body
-      div.container
-         header
-            h1 Our game lobby
-         input(type='text')#gameStartPass
-         button#startGame Start Game
-         div#chatControls
-            input(type='text')#gameJoinPass
-            button#joinGame Join game
-         div#gamesList
+      div#blockingMsg
+      .container(data-bind='visible: shouldShowPage')
+        div(data-bind='tabs: { refreshOn: games }')
+          ul
+            li
+              a(data-bind="click: showMainTab") Main
+            // ko foreach: games
+            li(data-bind='attr: { \'aria-controls\': id }')
+              a(href: #, data-bind='attr: {title: opponentName}, text: opponentName, click: $parent.switchToGame ')
+            // /ko
+          div#main(data-bind='visible: shouldShowMain')
+            p Welcome to our Stratego Game.
+            p Long list of rules nicely presented here
+          div#gameCanvas(data-bind='visible: shouldShowCanvas')
+            .messages(data-bind='foreach: messages')
+              .message
+                span(data-bind='text: \'[\' + moment(date).format(\'HH:mm:ss\') + \'] \'')
+                span(data-bind='text: playerName + \': \'')
+                span(data-bind='text: message')
+            .chat
+              form(data-bind='submit: sendChatInput')
+                input(data-bind='value: chatInput', placeholder='enter message')
+                button Send
+        div
+          input#playerName(type='text')
+          input#__playerName(type='hidden')
+          button#setPlayerName Set my name
+          div#playerNameErr
+        .players
+          p List of online players
+          ul#playersList
+        .linksToGames

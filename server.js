@@ -1,29 +1,29 @@
+"use strict";
 var secret = process.env.SESSION_SECRET || 'someThinWeirdAsdflk';
 var jade = require('jade')
-  , WebSocketServer = require('ws').Server
   , http = require('http')
   , express = require('express')
   , app = express()
   , port = process.env.PORT || 5000
-  , parseCookie = express.cookieParser(secret)
-  , MyString = require('./models/String.js')
-  , MongoStore = require('connect-mongo')(express)
-  , db = require('./lib/db.js');
-
+  , cookieParser = express.cookieParser(secret)
+  , db = require('./lib/db.js')
+  , arr = require('./public/src/arr.js');
+var logger = require('./lib/logger.js');
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.bodyParser());
-app.use(express.cookieParser(''));
-app.use(express.session(
-	{store: new MongoStore({url: db.url}), secret: secret})); 
-
+app.use(cookieParser);
+app.use(express.session({store: db.mongoStore, secret: secret})); 
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 app.configure('production', function(){
+  process.on('uncaughtException', function(err) {
+      logger.log('error', err);
+  });
   app.use(express.errorHandler());
 });
 
@@ -33,51 +33,36 @@ app.get('/lobby', function(req, res){
   res.render('lobby');
 });
 
-app.post('/newgame', function(req, res) {
-  req.session.games.push([req.body.gamepass]);
-  res.redirect('/');
-}
-);
-
 var server = http.createServer(app);
 server.listen(port);
+var io = require('socket.io').listen(server)
+  , SessionSockets = require('session.socket.io')
+  , sessionSockets = new SessionSockets(io, db.mongoStore, cookieParser);
+io.set('log level', 1);
+logger.log('info', 'http server listening on %d', port);
 
-console.log('http server listening on %d', port);
+var lobby = require('./lib/lobby.js');
+var game = require('./lib/game.js');
+var chat = require('./lib/chat.js');
+var makeStruct = require('./structs/factory.js').makeStruct;
 
-var wss = new WebSocketServer({server: server});
-console.log('websocket server created');
-wss.on('connection', function(ws) {
+sessionSockets.of('/lobby').on('connection', function(err, socket, session) {
+  if(err) {
+    logger.log('error', "bad session");
+    logger.log('error', err);
+    return;
+  }
 
-    parseCookie(ws.upgradeReq, null, function(err) {
-        var sessionID = ws.upgradeReq.signedCookies['connect.sid'];
-        var MyMongoStore = new MongoStore({url: db.url}); 
-
-        MyMongoStore.get(sessionID, function(err, session) {
-			if(session.games) {
-				session.games.forEach(function(entry){ws.send(JSON.stringify(entry));});
-			} else {
-				ws.send(JSON.stringify("no games"));
-			}
-		});
-    });
-
-    MyString.find(function(err, strings){
-    	if(err) {throw err;}
-    	if(strings) {
-    	  strings.forEach(function(string) {
-	    ws.send(JSON.stringify(string.string));
-    	  });
-	}
-    });
-
-    console.log('websocket connection open');
-
-    ws.on('message', function(data, flags) {
-
-
-    });
-    
-    ws.on('close', function() {
-        console.log('websocket connection close');
-    });
+  if (!session) {
+    logger.log('error', "no session present");
+    return;
+  }
+  
+  var ActiveConnection = makeStruct("io socket session");
+  var activeConnection = new ActiveConnection(io, socket, session);
+  (function() {
+    lobby.main.call(activeConnection);
+    game.main.call(activeConnection);
+    chat.main.call(activeConnection);
+  }());
 });
