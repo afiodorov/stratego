@@ -44,6 +44,7 @@ lobby.on('failChangingName', function(data) {
 $(function() {
   $.pnotify.defaults.styling = "jqueryui";
   $("#startGame").click(function() {startGame($("#gameStartPass").val());});
+  $("#mytabs").tabs();
 
   function AppViewModel() {
       var self = this;
@@ -53,19 +54,9 @@ $(function() {
       self.chatInput = ko.observable();
       self.currentGame = null;
       self.messages = ko.observableArray([]);
-      self.shouldShowMain = ko.observable(true);
-      self.shouldShowCanvas = ko.observable(false);
       self.myPlayerName = ko.observable("");
-      self.showMainTab = function(bool) {
-        self.shouldShowMain(bool);
-        self.shouldShowCanvas(!bool);
-      };
-      self.setShouldShowCanvas = function(bool) {
-        self.shouldShowCanvas(bool);
-      };
 
       self.switchToGame = function(game) {
-        self.showMainTab(false);
         if(game !== self.currentGame) {
           self.currentGame = game;
           self.messages([]);
