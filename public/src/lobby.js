@@ -10,14 +10,6 @@ function getListOfGames(){
   lobby.emit('getListOfGames');
 }
 
-function setPlayerName(name) {
-  lobby.emit('setPlayerName', {playerName : name});
-}
-
-function requestGame(playerName) {
-  lobby.emit('requestGame', {playerName: playerName});
-}
-
 function acceptGame(playerName) {
   lobby.emit('acceptGame', {playerName: playerName});
 }
@@ -26,13 +18,6 @@ lobby.on('gameStarted', function(data) {
   $.pnotify({
     title: 'New Game started',
     text: encodeURI(data.playerName) + ' started a game with you!'
-  });
-});
-
-lobby.on('listOfPlayers', function(data) {
-  $("#playersList").empty();
-  data.forEach(function(entry) {
-    $("#playersList").append('<li>' + entry + '</li>');
   });
 });
 
@@ -45,51 +30,32 @@ lobby.on('requestGame', function(data) {
   $("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
   acceptGame(data.playerName);
   return false;});
-
 });
 
-lobby.on('addNewPlayer', function(data) {
-  if(data.isSelf === false) {
-    $("#playersList").append('<li id="p' + encodeURI(data.playerName) + '">' +
-      encodeURI(data.playerName) + '&nbsp;<a href="#" id="req' +
-      encodeURI(data.playerName) + '">Request</a></li>');
-    $("a[id=req" + encodeURI(data.playerName) + "]").click(function(){
-    requestGame(data.playerName);
-    return false;});
-  } else {
-    $("#playersList").append('<li id="___self">' +
-      encodeURI(data.playerName) + ' (You)</li>');
-    $("#playerName").val(encodeURI(data.playerName));
-    $("#__playerName").val(encodeURI(data.playerName));
-  }
-});
-
-lobby.on('removePlayerName', function(data) {
-  if(data.isSelf === false) {
-    $('#p' + encodeURI(data.playerName)).remove();
-  } else {
-    $('#___self').remove();
-  }
-});
-
-lobby.on('failChangingName', function() {
-  $('#playerNameErr').text("Such user already exists"); 
+lobby.on('failChangingName', function(data) {
+  $.pnotify({
+    title: 'Couldn\'t change user name',
+    text: data,
+    type: 'error',
+    icon: false
+  });
 });
 
 $(function() {
   $.pnotify.defaults.styling = "jqueryui";
   $("#startGame").click(function() {startGame($("#gameStartPass").val());});
-  $("#setPlayerName").click(function() {setPlayerName($("#playerName").val());});
 
   function AppViewModel() {
       var self = this;
       self.shouldShowPage = ko.observable(true);
       self.games = ko.observableArray();
+      self.players = ko.observableArray();
       self.chatInput = ko.observable();
       self.currentGame = null;
       self.messages = ko.observableArray([]);
       self.shouldShowMain = ko.observable(true);
       self.shouldShowCanvas = ko.observable(false);
+      self.myPlayerName = ko.observable("");
       self.showMainTab = function(bool) {
         self.shouldShowMain(bool);
         self.shouldShowCanvas(!bool);
@@ -129,6 +95,23 @@ $(function() {
       self.setChatLog = function(log) {
         self.messages(log);
       };
+      self.onAddPlayerName = function(player) {self.players.push(player);};
+      self.onRemovePlayerName = function(player) {
+        self.players.remove(
+          function(playerIt) {
+            return playerIt.playerName === player.playerName;
+          }
+        );
+      };
+      self.requestGame = function(player) {
+        lobby.emit('requestGame', {playerName: player.playerName});
+      };
+      self.onSetMyPlayerName = function(player) {
+        self.myPlayerName(player.playerName);
+      };
+      self.onChangeMyPlayerName = function() {
+        lobby.emit('setPlayerName', {playerName: self.myPlayerName()});
+      };
   }
 
   var appViewModel = new AppViewModel();
@@ -140,6 +123,7 @@ $(function() {
 
 
   lobby.on('addShortGame', function(game) {
+    console.log(game)
     appViewModel.onAddShortGame(game);
   });
   
@@ -155,5 +139,16 @@ $(function() {
        open: function(event, ui) 
               {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
     });
+  });
+
+  lobby.on('addNewPlayer', function(data) {
+    if(data.isSelf === false) {
+      appViewModel.onAddPlayerName(data);
+    } else {
+      appViewModel.onSetMyPlayerName(data);
+    }
+  });
+  lobby.on('removePlayerName', function(data) {
+    appViewModel.onRemovePlayerName(data);
   });
 });

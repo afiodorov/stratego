@@ -17,20 +17,31 @@ html
       script(src="/src/knockout-jqueryui.min.js")
       script(src="/src/moment.min.js")
 
-   body
-      div#blockingMsg
+    body
+      #blockingMsg
       .container(data-bind='visible: shouldShowPage')
-        div(data-bind='tabs: { refreshOn: games }')
+        #tabs(data-bind='tabs: { refreshOn: games }')
           ul
             li
               a(data-bind="click: showMainTab") Main
             // ko foreach: games
-            li(data-bind='attr: { \'aria-controls\': id }')
-              a(href: #, data-bind='attr: {title: opponentName}, text: opponentName, click: $parent.switchToGame ')
+            li(data-bind='attr: { \'aria-controls\': opponentName }')
+              a(data-bind='attr: {title: opponentName}, text: opponentName, click: $parent.switchToGame')
             // /ko
           div#main(data-bind='visible: shouldShowMain')
             p Welcome to our Stratego Game.
             p Long list of rules nicely presented here
+            button#showPlayers Invite a player
+            #players
+              ul
+                // ko foreach: players
+                li
+                  a(href='#', data-bind='text: playerName, click: $parent.requestGame')
+                // /ko
+            #myName
+              form(data-bind='submit: onChangeMyPlayerName')
+                input#playerName(type='text', data-bind='value: myPlayerName')
+                button#setPlayerName Set my name
           div#gameCanvas(data-bind='visible: shouldShowCanvas')
             .messages(data-bind='foreach: messages')
               .message
@@ -41,12 +52,3 @@ html
               form(data-bind='submit: sendChatInput')
                 input(data-bind='value: chatInput', placeholder='enter message')
                 button Send
-        div
-          input#playerName(type='text')
-          input#__playerName(type='hidden')
-          button#setPlayerName Set my name
-          div#playerNameErr
-        .players
-          p List of online players
-          ul#playersList
-        .linksToGames
