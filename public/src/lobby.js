@@ -123,7 +123,6 @@ $(function() {
 
 
   lobby.on('addShortGame', function(game) {
-    console.log(game)
     appViewModel.onAddShortGame(game);
   });
   
@@ -152,3 +151,4 @@ $(function() {
     appViewModel.onRemovePlayerName(data);
   });
 });
+

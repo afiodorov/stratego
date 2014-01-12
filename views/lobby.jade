@@ -32,12 +32,11 @@ html
             p Welcome to our Stratego Game.
             p Long list of rules nicely presented here
             button#showPlayers Invite a player
-            #players
-              ul
-                // ko foreach: players
-                li
-                  a(href='#', data-bind='text: playerName, click: $parent.requestGame')
-                // /ko
+            ul.dropdown
+              // ko foreach: players
+              li
+                a(href='#', data-bind='text: playerName, click: $parent.requestGame')
+              // /ko
             #myName
               form(data-bind='submit: onChangeMyPlayerName')
                 input#playerName(type='text', data-bind='value: myPlayerName')
