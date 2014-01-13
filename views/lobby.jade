@@ -13,9 +13,9 @@ html
       script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
       script(src="/pnotify/jquery.pnotify.min.js")
       script(src="/src/socket.io.js")
-      script(src="/src/lobby.js")
       script(src="/src/knockout-jqueryui.min.js")
       script(src="/src/moment.min.js")
+      script(src="/src/lobby.js")
 
     body
       #blockingMsg
@@ -26,7 +26,9 @@ html
               a(href='#main') Main
             // ko foreach: games
             li
-              a(data-bind='attr: {title: opponentName, href: \'#\' + opponentName}, text: opponentName, click: $parent.switchToGame')
+              a(data-bind='attr: {title: opponentName, href: \'#\' + opponentName}, click: $parent.switchToGame') 
+                span.mytabs-text(data-bind='text: \'playing \' + opponentName')
+                span.ui-icon.ui-icon-bullet.mytabs-text(data-bind='playerOnline: $parent.players')
             // /ko
           div#main
             p Welcome to our Stratego Game.

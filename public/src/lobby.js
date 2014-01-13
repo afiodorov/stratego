@@ -43,8 +43,6 @@ lobby.on('failChangingName', function(data) {
 
 $(function() {
   $.pnotify.defaults.styling = "jqueryui";
-  $("#startGame").click(function() {startGame($("#gameStartPass").val());});
-  $("#mytabs").tabs();
 
   function AppViewModel() {
       var self = this;
@@ -52,13 +50,13 @@ $(function() {
       self.games = ko.observableArray();
       self.players = ko.observableArray();
       self.chatInput = ko.observable();
-      self.currentGame = null;
       self.messages = ko.observableArray([]);
       self.myPlayerName = ko.observable("");
+      var currentGame = null;
 
       self.switchToGame = function(game) {
-        if(game !== self.currentGame) {
-          self.currentGame = game;
+        if(game !== currentGame) {
+          currentGame = game;
           self.messages([]);
           lobby.emit('requestGameStatus', game);
           lobby.emit('requestChatLog', game);
@@ -68,15 +66,14 @@ $(function() {
       self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
       self.onAddShortGame = function(game) {self.games.push(game);};
       self.onAddChatMessage = function(chat) {
-      console.log(self.messages().length);
         if(self.messages().length > 20) {
           self.messages.shift();
         }
         self.messages.push(chat);
       };
       self.sendChatInput = function() {
-        if(self.currentGame) {
-          lobby.emit('addChatMessage', {gameid: self.currentGame.id, message: self.chatInput()});
+        if(currentGame) {
+          lobby.emit('addChatMessage', {gameid: currentGame.id, message: self.chatInput()});
           self.chatInput("");
         } else {
           // TODO display error
@@ -103,7 +100,27 @@ $(function() {
       self.onChangeMyPlayerName = function() {
         lobby.emit('setPlayerName', {playerName: self.myPlayerName()});
       };
+      self.isPlayerOnline = function(playerName) {
+        return self.players.indexOf({player: playerName, isSelf: false}) !== -1;
+      };
   }
+
+  ko.bindingHandlers.playerOnline = {
+      update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        var players = ko.utils.unwrapObservable(valueAccessor());
+        var found = false;
+        players.forEach(function(player) {
+          if(player.playerName === bindingContext.$data.opponentName) {
+            found = true;
+          }
+        });
+        if(!found) {
+          element.style.visibility="hidden";
+        } else {
+          element.style.visibility="visible";
+        }
+      }
+  };
 
   var appViewModel = new AppViewModel();
   ko.applyBindings(appViewModel);

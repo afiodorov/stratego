@@ -32,3 +32,7 @@ button#showPlayers{
   right: 0px;
   bottom: 0px;
 }
+
+.mytabs-text{
+  display: inline-block;
+}
