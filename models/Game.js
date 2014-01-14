@@ -24,6 +24,10 @@ function getInstances(player, callback) {
   Game.find({players: player}).exec(callback);
 }
 
+function resignPlayer(player, game, callback) {
+ Game.findOne({'_id': game.id, players: player}).remove().exec(callback);
+}
+
 module.exports = {
   addPlayers : addPlayers,
   find: function(callback) {
@@ -31,5 +35,6 @@ module.exports = {
   },
   getInstance : getInstance,
   getInstances : getInstances,
+  resignPlayer: resignPlayer,
   Model : Game
 };

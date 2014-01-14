@@ -36,3 +36,18 @@ button#showPlayers{
 .mytabs-text{
   display: inline-block;
 }
+
+.chat{
+  position: absolute;
+  width: 100%;
+  left: 0px;
+  bottom: 0px;
+}
+
+input.sending-message{
+  width: 90%;
+}
+
+.cursor-hand{
+  cursor: pointer;
+}

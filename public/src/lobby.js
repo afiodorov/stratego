@@ -17,18 +17,18 @@ function acceptGame(playerName) {
 lobby.on('gameStarted', function(data) {
   $.pnotify({
     title: 'New Game started',
-    text: encodeURI(data.playerName) + ' started a game with you!'
+    text: data.playerName + ' started a game with you!'
   });
 });
 
 lobby.on('requestGame', function(data) {
   $.pnotify({
     title: 'Game Request',
-    text: encodeURI(data.playerName) + ' requested a game. ' +
+    text: data.playerName + ' requested a game. ' +
     '<a href="#" id="acc' + encodeURI(data.playerName) + '">Accept</a>.'
   });
   $("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
-  acceptGame(data.playerName);
+    acceptGame(data.playerName);
   return false;});
 });
 
@@ -41,17 +41,30 @@ lobby.on('failChangingName', function(data) {
   });
 });
 
+lobby.on('opponentResigned', function(opponentName) {
+  $.pnotify({
+    title: 'Game finished',
+    text: opponentName + ' has quit the game.',
+    type: 'success',
+    icon: 'ui-icon ui-icon-flag'
+    });
+});
+
 $(function() {
   $.pnotify.defaults.styling = "jqueryui";
 
   function AppViewModel() {
       var self = this;
+      var gameToBeClosed = null;
       self.shouldShowPage = ko.observable(true);
       self.games = ko.observableArray();
       self.players = ko.observableArray();
       self.chatInput = ko.observable();
       self.messages = ko.observableArray([]);
       self.myPlayerName = ko.observable("");
+      self.isCloseGameDialogOpen = ko.observable(false);
+      self.opponentNameOfGameToBeClosed = ko.observable("");
+
       var currentGame = null;
 
       self.switchToGame = function(game) {
@@ -102,6 +115,21 @@ $(function() {
       };
       self.isPlayerOnline = function(playerName) {
         return self.players.indexOf({player: playerName, isSelf: false}) !== -1;
+      };
+      self.openCloseGameDialog = function() {
+        self.isCloseGameDialogOpen(true);
+        gameToBeClosed = this;
+        self.opponentNameOfGameToBeClosed(this.opponentName);
+      };
+      self.resignGame = function() {
+        lobby.emit('resignGame', gameToBeClosed);
+      };
+      self.onRemoveGame = function(game) {
+        self.games.remove(
+          function(gameIt) {
+            return gameIt.id === game.id;
+          }
+        );  
       };
   }
 
@@ -155,8 +183,13 @@ $(function() {
       appViewModel.onSetMyPlayerName(data);
     }
   });
+
   lobby.on('removePlayerName', function(data) {
     appViewModel.onRemovePlayerName(data);
+  });
+
+  lobby.on('removeGame', function(game) {
+    appViewModel.onRemoveGame(game);
   });
 });
 

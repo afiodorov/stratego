@@ -26,9 +26,10 @@ html
               a(href='#main') Main
             // ko foreach: games
             li
-              a(data-bind='attr: {title: opponentName, href: \'#\' + opponentName}, click: $parent.switchToGame') 
+              a(data-bind='attr: {title: opponentName, href: \'#\' + id}, click: $parent.switchToGame') 
                 span.mytabs-text(data-bind='text: \'playing \' + opponentName')
                 span.ui-icon.ui-icon-bullet.mytabs-text(data-bind='playerOnline: $parent.players')
+              span.ui-icon.ui-icon-close.mytabs-text.cursor-hand(data-bind="click: $parent.openCloseGameDialog, disable: $parent.isCloseGameDialogOpen.bind(this)", href='#')
             // /ko
           div#main
             p Welcome to our Stratego Game.
@@ -44,14 +45,19 @@ html
                 input#playerName(type='text', data-bind='value: myPlayerName')
                 button#setPlayerName Set my name
           // ko foreach: games
-          div(data-bind='attr: {id: opponentName}')
-            .messages(data-bind='foreach: $parent.messages')
-              .message
-                span(data-bind='text: \'[\' + moment(date).format(\'HH:mm:ss\') + \'] \'')
-                span(data-bind='text: playerName + \': \'')
-                span(data-bind='text: message')
+          div(data-bind='attr: {id: id}')
             .chat
-              form(data-bind='submit: $parent.sendChatInput')
-                input(data-bind='value: $parent.chatInput', placeholder='enter message')
-                button Send
+              .messages(data-bind='foreach: $parent.messages')
+                .message
+                  span(data-bind='text: \'[\' + moment(date).format(\'HH:mm:ss\') + \'] \'')
+                  span(data-bind='text: playerName + \': \'')
+                  span(data-bind='text: message')
+              .sending-message
+                form(data-bind='submit: $parent.sendChatInput')
+                  input.sending-message(data-bind='value: $parent.chatInput, attr: {placeholder: $parent.myPlayerName}')
+                  button Send
           // /ko
+          div(data-bind="dialog: {isOpen: isCloseGameDialogOpen, resizable: false, modal: true, buttons: {Yes: function() {resignGame(); $(this).dialog(\"close\");}, Cancel: function() { $( this ).dialog(\"close\") } } }")
+            span Are you sure you want to finish a game with 
+            span(data-bind="text: opponentNameOfGameToBeClosed")
+            span ?
