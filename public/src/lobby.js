@@ -2,14 +2,6 @@
 "use strict";
 var lobby = io.connect(location.origin + '/lobby');
 
-function startGame(pass) {
-  lobby.emit('startGame', {pass: pass});
-}
-
-function getListOfGames(){
-  lobby.emit('getListOfGames');
-}
-
 function acceptGame(playerName) {
   lobby.emit('acceptGame', {playerName: playerName});
 }
@@ -52,86 +44,6 @@ lobby.on('opponentResigned', function(opponentName) {
 
 $(function() {
   $.pnotify.defaults.styling = "jqueryui";
-
-  function AppViewModel() {
-      var self = this;
-      var gameToBeClosed = null;
-      self.shouldShowPage = ko.observable(true);
-      self.games = ko.observableArray();
-      self.players = ko.observableArray();
-      self.chatInput = ko.observable();
-      self.messages = ko.observableArray([]);
-      self.myPlayerName = ko.observable("");
-      self.isCloseGameDialogOpen = ko.observable(false);
-      self.opponentNameOfGameToBeClosed = ko.observable("");
-
-      var currentGame = null;
-
-      self.switchToGame = function(game) {
-        if(game !== currentGame) {
-          currentGame = game;
-          self.messages([]);
-          lobby.emit('requestGameStatus', game);
-          lobby.emit('requestChatLog', game);
-        }
-      };
-
-      self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
-      self.onAddShortGame = function(game) {self.games.push(game);};
-      self.onAddChatMessage = function(chat) {
-        if(self.messages().length > 20) {
-          self.messages.shift();
-        }
-        self.messages.push(chat);
-      };
-      self.sendChatInput = function() {
-        if(currentGame) {
-          lobby.emit('addChatMessage', {gameid: currentGame.id, message: self.chatInput()});
-          self.chatInput("");
-        } else {
-          // TODO display error
-          console.log('no chat selected');
-        }
-      };
-      self.setChatLog = function(log) {
-        self.messages(log);
-      };
-      self.onAddPlayerName = function(player) {self.players.push(player);};
-      self.onRemovePlayerName = function(player) {
-        self.players.remove(
-          function(playerIt) {
-            return playerIt.playerName === player.playerName;
-          }
-        );
-      };
-      self.requestGame = function(player) {
-        lobby.emit('requestGame', {playerName: player.playerName});
-      };
-      self.onSetMyPlayerName = function(player) {
-        self.myPlayerName(player.playerName);
-      };
-      self.onChangeMyPlayerName = function() {
-        lobby.emit('setPlayerName', {playerName: self.myPlayerName()});
-      };
-      self.isPlayerOnline = function(playerName) {
-        return self.players.indexOf({player: playerName, isSelf: false}) !== -1;
-      };
-      self.openCloseGameDialog = function() {
-        self.isCloseGameDialogOpen(true);
-        gameToBeClosed = this;
-        self.opponentNameOfGameToBeClosed(this.opponentName);
-      };
-      self.resignGame = function() {
-        lobby.emit('resignGame', gameToBeClosed);
-      };
-      self.onRemoveGame = function(game) {
-        self.games.remove(
-          function(gameIt) {
-            return gameIt.id === game.id;
-          }
-        );  
-      };
-  }
 
   ko.bindingHandlers.playerOnline = {
       update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -192,4 +104,85 @@ $(function() {
     appViewModel.onRemoveGame(game);
   });
 });
+
+function AppViewModel() {
+    var self = this;
+    var gameToBeClosed = null;
+    self.shouldShowPage = ko.observable(true);
+    self.games = ko.observableArray();
+    self.players = ko.observableArray();
+    self.chatInput = ko.observable();
+    self.messages = ko.observableArray([]);
+    self.myPlayerName = ko.observable("");
+    self.isCloseGameDialogOpen = ko.observable(false);
+    self.opponentNameOfGameToBeClosed = ko.observable("");
+
+    var currentGame = null;
+
+    self.switchToGame = function(game) {
+      if(game !== currentGame) {
+        currentGame = game;
+        self.messages([]);
+        lobby.emit('requestGameStatus', game);
+        lobby.emit('requestChatLog', game);
+      }
+    };
+
+    self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
+    self.onAddShortGame = function(game) {self.games.push(game);};
+    self.onAddChatMessage = function(chat) {
+      if(self.messages().length > 20) {
+        self.messages.shift();
+      }
+      self.messages.push(chat);
+    };
+    self.sendChatInput = function() {
+      if(currentGame) {
+        lobby.emit('addChatMessage', {gameid: currentGame.id, message: self.chatInput()});
+        self.chatInput("");
+      } else {
+        // TODO display error
+        console.log('no chat selected');
+      }
+    };
+    self.setChatLog = function(log) {
+      self.messages(log);
+    };
+    self.onAddPlayerName = function(player) {self.players.push(player);};
+    self.onRemovePlayerName = function(player) {
+      self.players.remove(
+        function(playerIt) {
+          return playerIt.playerName === player.playerName;
+        }
+      );
+    };
+    self.requestGame = function(player) {
+      lobby.emit('requestGame', {playerName: player.playerName});
+    };
+    self.onSetMyPlayerName = function(player) {
+      self.myPlayerName(player.playerName);
+    };
+    self.onChangeMyPlayerName = function() {
+      lobby.emit('setPlayerName', {playerName: self.myPlayerName()});
+    };
+    self.isPlayerOnline = function(playerName) {
+      return self.players.indexOf({player: playerName, isSelf: false}) !== -1;
+    };
+    self.openCloseGameDialog = function() {
+      self.isCloseGameDialogOpen(true);
+      gameToBeClosed = this;
+      self.opponentNameOfGameToBeClosed(this.opponentName);
+    };
+    self.resignGame = function() {
+      lobby.emit('resignGame', gameToBeClosed);
+    };
+    self.onRemoveGame = function(game) {
+      self.games.remove(
+        function(gameIt) {
+          return gameIt.id === game.id;
+        }
+      );  
+    };
+}
+
 
