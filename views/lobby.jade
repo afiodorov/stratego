@@ -48,7 +48,7 @@ html
           div(data-bind='attr: {id: id}')
             canvas.game-canvas(width='750', height='500', id='game') Canvas not supported
             .chat
-              .messages(data-bind='foreach: $parent.messages[$index]')
+              .messages(data-bind='foreach: messages')
                 .message
                   span(data-bind='text: \'[\' + moment(date).format(\'HH:mm:ss\') + \'] \'')
                   span(data-bind='text: playerName + \': \'')
