@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git://github.com/einaros/ws.git"
+    "url": "git://github.com/afiodorv/stratego.git"
   },
   "dependencies": {
     "socket.io": "0.9.16",

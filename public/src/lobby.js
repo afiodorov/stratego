@@ -14,11 +14,7 @@ $(function() {
             found = true;
           }
         });
-        if(!found) {
-          element.style.visibility="hidden";
-        } else {
-          element.style.visibility="visible";
-        }
+        element.style.visibility = found ? "visible" : "hidden";
       }
   };
 
@@ -33,6 +29,8 @@ function AppViewModel(lobby_) {
     var self = this;
     var lobby = lobby_;
     var _gameToBeClosed = null;
+    var TAB_LIMIT = 5;
+    var gameToTabMap = {};
 
     Object.defineProperty(self, "gameToBeClosed", 
       {get : function(){ return _gameToBeClosed; }});
@@ -45,7 +43,14 @@ function AppViewModel(lobby_) {
     self.games = ko.observableArray();
     self.players = ko.observableArray();
     self.chatInput = ko.observable();
-    self.messages = ko.observableArray([]);
+    self.messages = (function() {
+        var ret = [];
+        var i;
+        for(i=0;i<TAB_LIMIT;i++) {
+          ret.push(ko.observableArray([]));
+        }
+        return ret;
+      }());
     self.myPlayerName = ko.observable("");
     self.isCloseGameDialogOpen = ko.observable(false);
     self.opponentNameOfGameToBeClosed = ko.observable("");
@@ -53,7 +58,8 @@ function AppViewModel(lobby_) {
     self.switchToGame = function(game) {
       if(game !== _currentGame) {
         _currentGame = game;
-        self.messages([]);
+        var tabIndex = gameToTabMap[game.id];
+        self.messages[tabIndex]([]);
         lobby.emit('requestGameStatus', game);
         lobby.emit('requestChatLog', game);
       }
@@ -89,19 +95,51 @@ function AppViewModel(lobby_) {
     self.emitChangeMyPlayerName = null;
 
     self.onSetChatLog = function(log) {
-      self.messages(log);
+      var tabIndex = gameToTabMap[log.gameid];
+      self.messages[tabIndex](log.log);
+      return self.onSetChatLog;
     };
 
-    self.onAddShortGame = function(game) {self.games.push(game);};
+    var findFreeSlot = function() {
+      var i;
+      var takenTabs = [];
+      var prop;
+      for(prop in gameToTabMap) {
+        if(gameToTabMap.hasOwnProperty(prop)) {
+          takenTabs.push(gameToTabMap[prop]);
+        }
+      }
+      for(i=0; i<TAB_LIMIT; i++) {
+        if(takenTabs.indexOf(i) === -1) {
+          return i;
+        }
+      }
+    };
+
+    self.onAddShortGame = function(game) {
+      var freeSlot = findFreeSlot();
+      if(typeof freeSlot !== "undefined" && freeSlot < TAB_LIMIT) {
+        self.games.push(game);
+        gameToTabMap[game.id] = freeSlot;
+      } else {
+        console.log("too many games started");
+      }
+    };
 
     self.onAddChatMessage = function(chat) {
-      if(self.messages().length > 20) {
-        self.messages.shift();
+      var tabIndex = gameToTabMap[chat.gameid];
+      if(self.messages[tabIndex]().length > 20) {
+        self.messages[tabIndex].shift();
       }
-      self.messages.push(chat);
+      self.messages[tabIndex].push(chat);
+      console.log(chat.message);
+      return self.onAddChatMessage;
     };
 
-    self.onAddPlayerName = function(player) {self.players.push(player);};
+    self.onAddPlayerName = function(player) {
+      self.players.push(player);
+      return self.onAddPlayerName;
+    };
 
     self.onRemovePlayerName = function(player) {
       self.players.remove(
@@ -109,10 +147,12 @@ function AppViewModel(lobby_) {
           return playerIt.playerName === player.playerName;
         }
       );
+      return self.onRemovePlayerName;
     };
 
     self.onSetMyPlayerName = function(player) {
       self.myPlayerName(player.playerName);
+      return self.onSetMyPlayerName;
     };
 
     self.onRemoveGame = function(game) {
@@ -121,6 +161,7 @@ function AppViewModel(lobby_) {
           return gameIt.id === game.id;
         }
       );  
+      return self.onRemoveGame;
     };
       
     self.onRequestGame = function(data) {
@@ -132,6 +173,7 @@ function AppViewModel(lobby_) {
       $("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
         lobby.emit('acceptGame', {playerName: data.playerName});
       return false;});
+      return self.onRemoveGame;
     };
 
     self.onGameStarted = function(game) {
@@ -139,6 +181,7 @@ function AppViewModel(lobby_) {
           title: 'New Game started',
           text: game.playerName + ' started a game with you!'
         });
+      return self.onGameStarted();
     };
 
     self.onFailChangingName = function(data) {
@@ -148,6 +191,7 @@ function AppViewModel(lobby_) {
         type: 'error',
         icon: false
       });
+      return self.onFailChangingName;
     };
 
     self.onOpponentResigned = function(opponentName) {
@@ -157,6 +201,7 @@ function AppViewModel(lobby_) {
         type: 'success',
         icon: 'ui-icon ui-icon-flag'
         });
+      return self.onOpponentResigned;
     };
 
     self.onAddNewPlayer = function(data) {
@@ -165,6 +210,7 @@ function AppViewModel(lobby_) {
       } else {
         self.onSetMyPlayerName(data);
       }
+      return self.onAddNewPlayer;
     };
 
     self.onSetShouldShowPage = function(data) {
@@ -175,6 +221,7 @@ function AppViewModel(lobby_) {
          open: function(event, ui) 
                 {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
       });
+      return self.onSetShouldShowPage;
     };
     
     self.bindSocketHandlers = function() {
