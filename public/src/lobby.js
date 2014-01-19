@@ -25,7 +25,7 @@ $(function() {
   var appViewModel = new AppViewModel(lobby);
   appViewModel.bindSocketEmitters();
   ko.applyBindings(appViewModel);
-  appViewModel.bindSocketIOHandlers();
+  appViewModel.bindSocketHandlers();
 
 });
 
@@ -81,16 +81,16 @@ function AppViewModel(lobby_) {
       self.opponentNameOfGameToBeClosed(this.opponentName);
     };
 
-    self.onSetChatLog = function(log) {
-      self.messages(log);
-    };
-
     self.requestGame = function(player) {
       lobby.emit('requestGame', {playerName: player.playerName});
     };
 
     self.emitResignGame = null;
     self.emitChangeMyPlayerName = null;
+
+    self.onSetChatLog = function(log) {
+      self.messages(log);
+    };
 
     self.onAddShortGame = function(game) {self.games.push(game);};
 
@@ -177,7 +177,7 @@ function AppViewModel(lobby_) {
       });
     };
     
-    self.bindSocketIOHandlers = function() {
+    self.bindSocketHandlers = function() {
       var prop;
       var eventName;
       for(prop in self) {
