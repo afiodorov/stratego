@@ -2,46 +2,6 @@
 "use strict";
 var lobby = io.connect(location.origin + '/lobby');
 
-function acceptGame(playerName) {
-  lobby.emit('acceptGame', {playerName: playerName});
-}
-
-lobby.on('gameStarted', function(data) {
-  $.pnotify({
-    title: 'New Game started',
-    text: data.playerName + ' started a game with you!'
-  });
-});
-
-lobby.on('requestGame', function(data) {
-  $.pnotify({
-    title: 'Game Request',
-    text: data.playerName + ' requested a game. ' +
-    '<a href="#" id="acc' + encodeURI(data.playerName) + '">Accept</a>.'
-  });
-  $("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
-    acceptGame(data.playerName);
-  return false;});
-});
-
-lobby.on('failChangingName', function(data) {
-  $.pnotify({
-    title: 'Couldn\'t change user name',
-    text: data,
-    type: 'error',
-    icon: false
-  });
-});
-
-lobby.on('opponentResigned', function(opponentName) {
-  $.pnotify({
-    title: 'Game finished',
-    text: opponentName + ' has quit the game.',
-    type: 'success',
-    icon: 'ui-icon ui-icon-flag'
-    });
-});
-
 $(function() {
   $.pnotify.defaults.styling = "jqueryui";
 
@@ -67,29 +27,13 @@ $(function() {
   ko.applyBindings(appViewModel);
   appViewModel.bindSocketIOHandlers();
 
-  lobby.on('setShouldShowPage', function(data) {
-    appViewModel.setShouldShowPage(data.bool);
-    $("#blockingMsg").text(data.err);
-    $("#blockingMsg").dialog({
-       closeOnEscape: false,
-       open: function(event, ui) 
-              {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
-    });
-  });
-
-  lobby.on('addNewPlayer', function(data) {
-    if(data.isSelf === false) {
-      appViewModel.onAddPlayerName(data);
-    } else {
-      appViewModel.onSetMyPlayerName(data);
-    }
-  });
 });
 
 function AppViewModel(lobby_) {
     var self = this;
     var lobby = lobby_;
     var _gameToBeClosed = null;
+
     Object.defineProperty(self, "gameToBeClosed", 
       {get : function(){ return _gameToBeClosed; }});
 
@@ -177,6 +121,60 @@ function AppViewModel(lobby_) {
           return gameIt.id === game.id;
         }
       );  
+    };
+      
+    self.onRequestGame = function(data) {
+      $.pnotify({
+        title: 'Game Request',
+        text: data.playerName + ' requested a game. ' +
+        '<a href="#" id="acc' + encodeURI(data.playerName) + '">Accept</a>.'
+      });
+      $("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
+        lobby.emit('acceptGame', {playerName: data.playerName});
+      return false;});
+    };
+
+    self.onGameStarted = function(game) {
+        $.pnotify({
+          title: 'New Game started',
+          text: game.playerName + ' started a game with you!'
+        });
+    };
+
+    self.onFailChangingName = function(data) {
+      $.pnotify({
+        title: 'Couldn\'t change user name',
+        text: data,
+        type: 'error',
+        icon: false
+      });
+    };
+
+    self.onOpponentResigned =  function(opponentName) {
+      $.pnotify({
+        title: 'Game finished',
+        text: opponentName + ' has quit the game.',
+        type: 'success',
+        icon: 'ui-icon ui-icon-flag'
+        });
+    };
+
+    self.onAddNewPlayer = function(data) {
+      if(data.isSelf === false) {
+        self.onAddPlayerName(data);
+      } else {
+        self.onSetMyPlayerName(data);
+      }
+    };
+
+    self.onSetShouldShowPage = function(data) {
+      self.setShouldShowPage(data.bool);
+      $("#blockingMsg").text(data.err);
+      $("#blockingMsg").dialog({
+         closeOnEscape: false,
+         open: function(event, ui) 
+                {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
+      });
     };
 
     self.bindSocketIOHandlers = function() {
