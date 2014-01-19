@@ -62,21 +62,10 @@ $(function() {
       }
   };
 
-  var appViewModel = new AppViewModel();
+  var appViewModel = new AppViewModel(lobby);
+  appViewModel.bindSocketEmitters();
   ko.applyBindings(appViewModel);
-
-  lobby.on('addChatMessage', function(chat) {
-    appViewModel.onAddChatMessage(chat);
-  });
-
-
-  lobby.on('addShortGame', function(game) {
-    appViewModel.onAddShortGame(game);
-  });
-  
-  lobby.on('setChatLog', function(log){ 
-    appViewModel.setChatLog(log);
-  });
+  appViewModel.bindSocketIOHandlers();
 
   lobby.on('setShouldShowPage', function(data) {
     appViewModel.setShouldShowPage(data.bool);
@@ -95,19 +84,19 @@ $(function() {
       appViewModel.onSetMyPlayerName(data);
     }
   });
-
-  lobby.on('removePlayerName', function(data) {
-    appViewModel.onRemovePlayerName(data);
-  });
-
-  lobby.on('removeGame', function(game) {
-    appViewModel.onRemoveGame(game);
-  });
 });
 
-function AppViewModel() {
+function AppViewModel(lobby_) {
     var self = this;
-    var gameToBeClosed = null;
+    var lobby = lobby_;
+    var _gameToBeClosed = null;
+    Object.defineProperty(self, "gameToBeClosed", 
+      {get : function(){ return _gameToBeClosed; }});
+
+    var _currentGame = null;
+    Object.defineProperty(self, "currentGame", 
+      {get : function(){ return _currentGame; }});
+
     self.shouldShowPage = ko.observable(true);
     self.games = ko.observableArray();
     self.players = ko.observableArray();
@@ -116,8 +105,6 @@ function AppViewModel() {
     self.myPlayerName = ko.observable("");
     self.isCloseGameDialogOpen = ko.observable(false);
     self.opponentNameOfGameToBeClosed = ko.observable("");
-
-    var currentGame = null;
 
     self.switchToGame = function(game) {
       if(game !== currentGame) {
@@ -129,13 +116,7 @@ function AppViewModel() {
     };
 
     self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
-    self.onAddShortGame = function(game) {self.games.push(game);};
-    self.onAddChatMessage = function(chat) {
-      if(self.messages().length > 20) {
-        self.messages.shift();
-      }
-      self.messages.push(chat);
-    };
+
     self.sendChatInput = function() {
       if(currentGame) {
         lobby.emit('addChatMessage', {gameid: currentGame.id, message: self.chatInput()});
@@ -145,10 +126,39 @@ function AppViewModel() {
         console.log('no chat selected');
       }
     };
+
+    self.isPlayerOnline = function(playerName) {
+      return self.players.indexOf({player: playerName, isSelf: false}) !== -1;
+    };
+
+    self.openCloseGameDialog = function() {
+      self.isCloseGameDialogOpen(true);
+      _gameToBeClosed = this;
+      self.opponentNameOfGameToBeClosed(this.opponentName);
+    };
+
     self.setChatLog = function(log) {
       self.messages(log);
     };
+
+    self.requestGame = function(player) {
+      lobby.emit('requestGame', {playerName: player.playerName});
+    };
+
+    self.emitResignGame = null;
+    self.emitChangeMyPlayerName = null;
+
+    self.onAddShortGame = function(game) {self.games.push(game);};
+
+    self.onAddChatMessage = function(chat) {
+      if(self.messages().length > 20) {
+        self.messages.shift();
+      }
+      self.messages.push(chat);
+    };
+
     self.onAddPlayerName = function(player) {self.players.push(player);};
+
     self.onRemovePlayerName = function(player) {
       self.players.remove(
         function(playerIt) {
@@ -156,26 +166,11 @@ function AppViewModel() {
         }
       );
     };
-    self.requestGame = function(player) {
-      lobby.emit('requestGame', {playerName: player.playerName});
-    };
+
     self.onSetMyPlayerName = function(player) {
       self.myPlayerName(player.playerName);
     };
-    self.onChangeMyPlayerName = function() {
-      lobby.emit('setPlayerName', {playerName: self.myPlayerName()});
-    };
-    self.isPlayerOnline = function(playerName) {
-      return self.players.indexOf({player: playerName, isSelf: false}) !== -1;
-    };
-    self.openCloseGameDialog = function() {
-      self.isCloseGameDialogOpen(true);
-      gameToBeClosed = this;
-      self.opponentNameOfGameToBeClosed(this.opponentName);
-    };
-    self.resignGame = function() {
-      lobby.emit('resignGame', gameToBeClosed);
-    };
+
     self.onRemoveGame = function(game) {
       self.games.remove(
         function(gameIt) {
@@ -183,6 +178,35 @@ function AppViewModel() {
         }
       );  
     };
+
+    self.bindSocketIOHandlers = function() {
+      var prop;
+      var eventName;
+      for(prop in self) {
+        if(self.hasOwnProperty(prop)) {
+          if(prop.match(/^on/) && typeof self[prop] === 'function') {
+            eventName = prop[2].toLowerCase() + prop.slice(3);
+            lobby.on(eventName, self[prop]);
+          }
+        }
+      }
+    };
+
+    self.bindSocketEmitters = function() {
+      var prop;
+      var eventName;
+      var makeSocketEmitter = function(eventName, objectToEmit) {
+        var _eventName = eventName;
+        (function(){lobby.emit(_eventName, objectToEmit);}());
+      };
+
+      for(prop in self) {
+        if(self.hasOwnProperty(prop)) {
+          if(prop.match(/^emit/)) {
+            eventName = prop[4].toLowerCase() + prop.slice(5);
+            self[prop] = makeSocketEmitter.bind(self, eventName);
+          }
+        }
+      }
+    };
 }
-
-

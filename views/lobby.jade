@@ -41,11 +41,12 @@ html
                 a(href='#', data-bind='text: playerName, click: $parent.requestGame')
               // /ko
             #myName
-              form(data-bind='submit: onChangeMyPlayerName')
+              form(data-bind='submit: emitChangeMyPlayerName.bind(this, myPlayerName())')
                 input#playerName(type='text', data-bind='value: myPlayerName')
                 button#setPlayerName Set my name
           // ko foreach: games
           div(data-bind='attr: {id: id}')
+            canvas.game-canvas(width='750', height='500', id='game') Canvas not supported
             .chat
               .messages(data-bind='foreach: $parent.messages')
                 .message
@@ -57,7 +58,7 @@ html
                   input.sending-message(data-bind='value: $parent.chatInput, attr: {placeholder: $parent.myPlayerName}')
                   button Send
           // /ko
-          div(data-bind="dialog: {isOpen: isCloseGameDialogOpen, resizable: false, modal: true, buttons: {Yes: function() {resignGame(); $(this).dialog(\"close\");}, Cancel: function() { $( this ).dialog(\"close\") } } }")
+          div(data-bind="dialog: {isOpen: isCloseGameDialogOpen, resizable: false, modal: true, buttons: {Yes: function() {emitResignGame(gameToBeClosed); $(this).dialog(\"close\");}, Cancel: function() { $( this ).dialog(\"close\") } } }")
             span Are you sure you want to finish a game with 
             span(data-bind="text: opponentNameOfGameToBeClosed")
             span ?
