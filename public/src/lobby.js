@@ -51,8 +51,8 @@ function AppViewModel(lobby_) {
     self.opponentNameOfGameToBeClosed = ko.observable("");
 
     self.switchToGame = function(game) {
-      if(game !== currentGame) {
-        currentGame = game;
+      if(game !== _currentGame) {
+        _currentGame = game;
         self.messages([]);
         lobby.emit('requestGameStatus', game);
         lobby.emit('requestChatLog', game);
@@ -62,8 +62,8 @@ function AppViewModel(lobby_) {
     self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
 
     self.sendChatInput = function() {
-      if(currentGame) {
-        lobby.emit('addChatMessage', {gameid: currentGame.id, message: self.chatInput()});
+      if(_currentGame) {
+        lobby.emit('addChatMessage', {gameid: _currentGame.id, message: self.chatInput()});
         self.chatInput("");
       } else {
         // TODO display error
@@ -81,7 +81,7 @@ function AppViewModel(lobby_) {
       self.opponentNameOfGameToBeClosed(this.opponentName);
     };
 
-    self.setChatLog = function(log) {
+    self.onSetChatLog = function(log) {
       self.messages(log);
     };
 
@@ -150,7 +150,7 @@ function AppViewModel(lobby_) {
       });
     };
 
-    self.onOpponentResigned =  function(opponentName) {
+    self.onOpponentResigned = function(opponentName) {
       $.pnotify({
         title: 'Game finished',
         text: opponentName + ' has quit the game.',
@@ -176,7 +176,7 @@ function AppViewModel(lobby_) {
                 {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
       });
     };
-
+    
     self.bindSocketIOHandlers = function() {
       var prop;
       var eventName;
