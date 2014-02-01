@@ -2,29 +2,6 @@
 "use strict";
 var lobby = io.connect(location.origin + '/lobby');
 
-$(function() {
-  $.pnotify.defaults.styling = "jqueryui";
-
-  ko.bindingHandlers.playerOnline = {
-      update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-        var players = ko.utils.unwrapObservable(valueAccessor());
-        var found = false;
-        players.forEach(function(player) {
-          if(player.playerName === bindingContext.$data.opponentName) {
-            found = true;
-          }
-        });
-        element.style.visibility = found ? "visible" : "hidden";
-      }
-  };
-
-  var appViewModel = new AppViewModel(lobby);
-  appViewModel.bindSocketEmitters();
-  ko.applyBindings(appViewModel);
-  appViewModel.bindSocketHandlers();
-
-});
-
 function AppViewModel(lobby_) {
     var self = this;
     var lobby = lobby_;
@@ -243,3 +220,27 @@ function AppViewModel(lobby_) {
       }
     };
 }
+
+$(function() {
+  $.pnotify.defaults.styling = "jqueryui";
+
+  ko.bindingHandlers.playerOnline = {
+      update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        var players = ko.utils.unwrapObservable(valueAccessor());
+        var found = false;
+        players.forEach(function(player) {
+          if(player.playerName === bindingContext.$data.opponentName) {
+            found = true;
+          }
+        });
+        element.style.visibility = found ? "visible" : "hidden";
+      }
+  };
+
+  var appViewModel = new AppViewModel(lobby);
+  appViewModel.bindSocketEmitters();
+  ko.applyBindings(appViewModel);
+  appViewModel.bindSocketHandlers();
+
+});
+
