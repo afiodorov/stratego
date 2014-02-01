@@ -39,7 +39,9 @@
   <ItemGroup>
     <Compile Include="lib\db.js" />
     <Compile Include="lib\db.js" />
-    <Compile Include="models\Board.js" />
+    <Compile Include="models\Board\Board.js" />
+    <Compile Include="models\Board\Pieces.js" />
+    <Compile Include="models\Board\Squares.js" />
     <Compile Include="models\String.js" />
     <Compile Include="models\String.js" />
     <Compile Include="public\pnotify\includes\beautify.js" />
@@ -1496,6 +1498,7 @@
   <ItemGroup>
     <Folder Include="lib\" />
     <Folder Include="models\" />
+    <Folder Include="models\Board\" />
     <Folder Include="public\" />
     <Folder Include="public\css\" />
     <Folder Include="public\css\ui-lightness\" />
