@@ -6,13 +6,13 @@
     "url": "git://github.com/einaros/ws.git"
   },
   "dependencies": {
-    "socket.io": "0.9.16",
+    "socket.io": "~0.9.16",
     "express": "3.x",
     "mongodb": "1.1.11",
     "mongoose": "2.6.5",
     "jade": "*",
     "optimist": "0.6.x",
-    "session.socket.io": "*",
+    "session.socket.io": "~0.1.6",
     "connect-mongo": "0.4.x"
   },
   "engines": {
