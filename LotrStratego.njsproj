@@ -39,7 +39,9 @@
   <ItemGroup>
     <Compile Include="lib\db.js" />
     <Compile Include="lib\db.js" />
+    <Compile Include="lib\kinetic-v5.0.1.min.js" />
     <Compile Include="models\Board\Board.js" />
+    <Compile Include="models\Board\CanvasBoardManager.js" />
     <Compile Include="models\Board\Pieces.js" />
     <Compile Include="models\Board\Squares.js" />
     <Compile Include="models\String.js" />
