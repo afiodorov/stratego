@@ -12,41 +12,53 @@ html
       script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
       script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
       script(src="/pnotify/jquery.pnotify.min.js")
-      script(src="/src/socket.io.js")
+      script(src="/lib/socket.io.js")
+      script(src="/lib/knockout-jqueryui.min.js")
+      script(src="/lib/moment.min.js")
       script(src="/src/lobby.js")
-      script(src="/src/knockout-jqueryui.min.js")
-      script(src="/src/moment.min.js")
 
-   body
-      div#blockingMsg
+    body
+      #blockingMsg
       .container(data-bind='visible: shouldShowPage')
-        div(data-bind='tabs: { refreshOn: games }')
+        #tabs(data-bind='tabs: { refreshOn: games }')
           ul
             li
-              a(data-bind="click: showMainTab") Main
+              a(href='#main') Main
             // ko foreach: games
-            li(data-bind='attr: { \'aria-controls\': id }')
-              a(href: #, data-bind='attr: {title: opponentName}, text: opponentName, click: $parent.switchToGame ')
+            li
+              a(data-bind='attr: {title: opponentName, href: \'#\' + id}, click: $parent.switchToGame') 
+                span.mytabs-text(data-bind='text: \'playing \' + opponentName')
+                span.ui-icon.ui-icon-bullet.mytabs-text(data-bind='playerOnline: $parent.players')
+              span.ui-icon.ui-icon-close.mytabs-text.cursor-hand(data-bind="click: $parent.openCloseGameDialog, disable: $parent.isCloseGameDialogOpen.bind(this)", href='#')
             // /ko
-          div#main(data-bind='visible: shouldShowMain')
+          div#main
             p Welcome to our Stratego Game.
-            p Long list of rules nicely presented here
-          div#gameCanvas(data-bind='visible: shouldShowCanvas')
-            .messages(data-bind='foreach: messages')
-              .message
-                span(data-bind='text: \'[\' + moment(date).format(\'HH:mm:ss\') + \'] \'')
-                span(data-bind='text: playerName + \': \'')
-                span(data-bind='text: message')
+            p The following features are working: viewing who is online (just open this page in 2 browsers), inviting players to a game and chat. The actual game in canvas in on its way.
+            button#showPlayers Invite a player
+            ul.dropdown
+              // ko foreach: players
+              li
+                a(href='#', data-bind='text: playerName, click: $parent.requestGame')
+              // /ko
+            #myName
+              form(data-bind='submit: emitChangeMyPlayerName.bind(this, myPlayerName())')
+                input#playerName(type='text', data-bind='value: myPlayerName')
+                button#setPlayerName Set my name
+          // ko foreach: games
+          div(data-bind='attr: {id: id}')
+            canvas.game-canvas(width='750', height='500', id='game') Canvas not supported
             .chat
-              form(data-bind='submit: sendChatInput')
-                input(data-bind='value: chatInput', placeholder='enter message')
-                button Send
-        div
-          input#playerName(type='text')
-          input#__playerName(type='hidden')
-          button#setPlayerName Set my name
-          div#playerNameErr
-        .players
-          p List of online players
-          ul#playersList
-        .linksToGames
+              .messages(data-bind='foreach: messages')
+                .message
+                  span(data-bind='text: \'[\' + moment(date).format(\'HH:mm:ss\') + \'] \'')
+                  span(data-bind='text: playerName + \': \'')
+                  span(data-bind='text: message')
+              .sending-message
+                form(data-bind='submit: $parent.sendChatInput')
+                  input.sending-message(data-bind='value: $parent.chatInput, attr: {placeholder: $parent.myPlayerName}')
+                  button Send
+          // /ko
+          div(data-bind="dialog: {isOpen: isCloseGameDialogOpen, resizable: false, modal: true, buttons: {Yes: function() {emitResignGame(gameToBeClosed); $(this).dialog(\"close\");}, Cancel: function() { $( this ).dialog(\"close\") } } }")
+            span Are you sure you want to finish a game with 
+            span(data-bind="text: opponentNameOfGameToBeClosed")
+            span ?

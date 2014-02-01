@@ -31,8 +31,13 @@ function getMessages(gameid, limit, callback) {
     .sort('_id', 'descending').limit(limit).exec(callback);
 }
 
+function removeMessages(gameid, callback) {
+  Chat.find({gameid: gameid}).remove().exec(callback);
+}
+
 module.exports = {
   Model : Chat,
   getMessages : getMessages,
-  pushMessage : pushMessage
+  pushMessage : pushMessage,
+  removeMessages: removeMessages
 };

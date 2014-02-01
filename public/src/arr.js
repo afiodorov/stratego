@@ -16,4 +16,3 @@ Array.prototype.pushIfNotExist = function(element) {
         this.push(element);
     }
 };
-
