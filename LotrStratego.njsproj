@@ -1493,6 +1493,7 @@
     <Content Include="public\pnotify\oxygen\AUTHORS" />
     <Content Include="public\pnotify\oxygen\COPYING" />
     <Content Include="public\pnotify\oxygen\icons.css" />
+    <Content Include="public\CanvasScratchpad.html" />
     <Content Include="public\test.html" />
     <Content Include="README.md" />
     <Content Include="views\lobby.jade" />
