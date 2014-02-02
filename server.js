@@ -41,9 +41,9 @@ var io = require('socket.io').listen(server)
 io.set('log level', 1);
 logger.log('info', 'http server listening on %d', port);
 
-var lobby = require('./lib/lobby.js');
-var game = require('./lib/game.js');
-var chat = require('./lib/chat.js');
+var lobby = require('./server/lobby.js');
+var game = require('./server/game.js');
+var chat = require('./server/chat.js');
 var makeStruct = require('./structs/factory.js').makeStruct;
 
 sessionSockets.of('/lobby').on('connection', function(err, socket, session) {

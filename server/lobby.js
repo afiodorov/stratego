@@ -1,12 +1,12 @@
-var clients = Object.create(null)
-  , db = require('./db.js')
-  , lobbyutils = require('./lobbyutils.js')
-  , makeStruct = require('../structs/factory.js').makeStruct
+var clients = []
+  , db = require('../lib/db')
+  , lobbyutils = require('../lib/lobbyutils')
+  , makeStruct = require('../structs/factory').makeStruct
   , Client = makeStruct("socket sid")
-  , Game = require('../models/Game.js')
-  , gameutils = require('../models/utils/gameutils.js');
+  , Game = require('../models/Game')
+  , gameutils = require('../models/utils/gameutils');
 
-var logger = require('./logger');
+var logger = require('../lib/logger');
 
 function connect() {
   var socket = this.socket
@@ -34,6 +34,9 @@ function disconnect() {
 }
 
 function resignGame(game) {
+  if(!game || typeof game.id === "undefined") {
+    return;
+  }
   this.io.of('/lobby').in(game.id).emit('removeGame', game);
   this.socket.broadcast.to(game.id).emit('opponentResigned', this.session.playerName);
   Game.resignPlayer(this.session.id, game, function(err) {
@@ -53,7 +56,7 @@ function changeMyPlayerName(playerName) {
       return;
     }
 
-    if(playerName in clients) {
+    if(clients.indexOf(playerName) !== -1) {
       socket.emit('failChangingName', 'Duplicate player name');  
       return;
     }
@@ -74,14 +77,16 @@ function changeMyPlayerName(playerName) {
 }
 
 function requestGame(data) {
-  var socket = this.socket
-    , session = this.session;
+    var session = this.session;
 
-    try {  
+    try {
       var opponent = clients[data.playerName];
+      if(!opponent) {
+        return;
+      }
       opponent.socket.emit('requestGame', {playerName:
         session.playerName});
-      if (session.invites === undefined) {
+      if (typeof session.invites === "undefined") {
         session.invites = [];
       }
       // I am inviting the opponent to the game
@@ -94,6 +99,9 @@ function requestGame(data) {
 }
 
 function acceptGame(data){
+  if(!data || typeof data.playerName === "undefined") {
+    return;
+  }
   var socket = this.socket
     , session = this.session
     , self = this;
@@ -177,7 +185,7 @@ function _joinRooms() {
 function _setSocketPlayerName(clients) {
   if((this.session.playerName === undefined) ||
         // check for duplicate name in the db of sessions
-        ((this.session.playerName in clients) 
+        ((clients.indexOf(this.session.playerName) !== -1) 
        && (this.socket.sid !== clients[this.session.playerName].sid))) {
     this.session.playerName = lobbyutils.genUniquePlayerName(clients);
     this.session.save();
