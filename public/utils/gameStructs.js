@@ -1,20 +1,57 @@
+var NUM_OF_ROWS = 7;
+var NUM_OF_COLS = 4;
+var columnLimit = function(colNumber) {
+  return (colNumber > NUM_OF_ROWS / 2) ? NUM_OF_ROWS - colNumber : colNumber;
+};
+
 var tiles = [];
-tiles[0]  = { capacity: 4, name: "The Shire" };
-tiles[1]  = { capacity: 2, name: "Arthedam" };
-tiles[2]  = { capacity: 2, name: "Cardolan" };
-tiles[3]  = { capacity: 2, name: "Rhudaur" };
-tiles[4]  = { capacity: 2, name: "Eregion" };
-tiles[5]  = { capacity: 2, name: "Enedwaith" };
-tiles[6]  = { capacity: 1, name: "The High Pass" };
-tiles[7]  = { capacity: 1, name: "Misty Mountains" };
-tiles[8]  = { capacity: 1, name: "Caradoras" };
-tiles[9]  = { capacity: 1, name: "Gap Of Rohan" };
-tiles[10] = { capacity: 2, name: "Mirkwood" };
-tiles[11] = { capacity: 2, name: "Fangorn" };
-tiles[12] = { capacity: 2, name: "Rohan" };
-tiles[13] = { capacity: 2, name: "Gondor" };
-tiles[14] = { capacity: 2, name: "Dagorlad" };
-tiles[15] = { capacity: 4, name: "Mordor" };
+var i;
+for(i=1; i <= NUM_OF_ROWS; i++) {
+  tiles[i] = [];
+}
+tiles[1][1]  = { capacity: 4, name: "The Shire" };
+tiles[2][1]  = { capacity: 2, name: "Arthedam" };
+tiles[2][2]  = { capacity: 2, name: "Cardolan" };
+tiles[3][1]  = { capacity: 2, name: "Rhudaur" };
+tiles[3][2]  = { capacity: 2, name: "Eregion" };
+tiles[3][3]  = { capacity: 2, name: "Enedwaith" };
+tiles[4][1]  = { capacity: 1, name: "The High Pass" };
+tiles[4][2]  = { capacity: 1, name: "Misty Mountains" };
+tiles[4][3]  = { capacity: 1, name: "Caradoras" };
+tiles[4][4]  = { capacity: 1, name: "Gap Of Rohan" };
+tiles[5][1] = { capacity: 2, name: "Mirkwood" };
+tiles[5][2] = { capacity: 2, name: "Fangorn" };
+tiles[5][3] = { capacity: 2, name: "Rohan" };
+tiles[6][1] = { capacity: 2, name: "Gondor" };
+tiles[6][2] = { capacity: 2, name: "Dagorlad" };
+tiles[7][1] = { capacity: 4, name: "Mordor" };
+
+var isWithinGrid = function(row_, col_) {
+  var row = row_;
+  var col = col_;
+  if (arguments.length === 0 || arguments.length > 2) {
+    throw new TypeError("Call with coordinates");
+  }
+
+  if(arguments.length === 1) {
+    if( Object.prototype.toString.call( row_ ) !== "[object Array]" 
+      || row_.length !== 2) {
+      throw new TypeError("Call with coordinates array of length 2");
+    }
+    row = row_[0];
+    col = row_[1];
+  }
+
+  if(isNaN(row) || row < 1 || row > NUM_OF_ROWS) {
+    return false;
+  }
+
+  if(isNaN(col) || col < 1 || col > columnLimit(col)) {
+    return false;
+  }
+
+  return true;
+};
 
 var pieces = Object.create();
 pieces.light = Object.create();
@@ -118,4 +155,5 @@ pieces.dark = {
 module.exports = {
   tiles : Object.freeze(tiles),
   pieces : Object.freeze(pieces),
+  isWithinGrid : isWithinGrid,
 };
