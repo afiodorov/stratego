@@ -1,12 +1,12 @@
 var clients = []
-  , db = require('./db.js')
-  , lobbyutils = require('./lobbyutils.js')
-  , makeStruct = require('../structs/factory.js').makeStruct
+  , db = require('../lib/db')
+  , lobbyutils = require('../lib/lobbyutils')
+  , makeStruct = require('../structs/factory').makeStruct
   , Client = makeStruct("socket sid")
-  , Game = require('../models/Game.js')
-  , gameutils = require('../models/utils/gameutils.js');
+  , Game = require('../models/Game')
+  , gameutils = require('../models/utils/gameutils');
 
-var logger = require('./logger');
+var logger = require('../lib/logger');
 
 function connect() {
   var socket = this.socket

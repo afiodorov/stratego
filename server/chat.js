@@ -1,8 +1,8 @@
-var db = require('./db.js');
-var makeStruct = require('../structs/factory.js').makeStruct;
-var Chat = require('../models/Chat.js');
+var db = require('../lib/db');
+var makeStruct = require('../structs/factory').makeStruct;
+var Chat = require('../models/Chat');
 var ChatStruct = makeStruct("gameid player message playerName");
-var logger = require('./logger');
+var logger = require('../lib/logger');
 var INITIAL_CHAT_SIZE = 20;
 
 function addChatMessage(data) {
