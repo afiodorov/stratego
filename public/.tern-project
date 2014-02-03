@@ -7,5 +7,6 @@
     "src/**/*.js"
   ],
   "plugins": {
+    "node": {}
   }
 }
