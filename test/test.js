@@ -2,9 +2,9 @@
 var assert = require("assert");
 var gameStructs = require("../public/utils/gameStructs.js");
 
-describe('Test', function(){
-  describe('access', function(){
-    it('myTiles', function(){
+describe('GameStruct', function(){
+  describe('tiles', function() {
+    it('can access through a double index', function(){
       assert.equal("The Shire",       gameStructs.tiles[[1,1]].name);
       assert.equal("Arthedam",        gameStructs.tiles[[2,1]].name);
       assert.equal("Cardolan",        gameStructs.tiles[[2,2]].name);
@@ -21,6 +21,12 @@ describe('Test', function(){
       assert.equal("Gondor",          gameStructs.tiles[[6,1]].name);
       assert.equal("Dagorlad",        gameStructs.tiles[[6,2]].name);
       assert.equal("Mordor",          gameStructs.tiles[[7,1]].name);
+    });
+  });
+
+  describe('tiles', function(){
+    it('is array', function() {
+      assert.equal('[object Array]', Object.prototype.toString.call(gameStructs.tiles));
     });
   });
 });
