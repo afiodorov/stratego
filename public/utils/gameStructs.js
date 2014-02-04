@@ -1,30 +1,49 @@
 var NUM_OF_ROWS = 7;
 var NUM_OF_COLS = 4;
 var columnLimit = function(colNumber) {
-  return (colNumber > NUM_OF_ROWS / 2) ? NUM_OF_ROWS - colNumber : colNumber;
+  return (colNumber > NUM_OF_ROWS / 2) ? NUM_OF_ROWS + 1 - colNumber : colNumber;
 };
+
+var test = Object.create(null);
+test[[0,1]] = "his";
 
 var tiles = [];
 var i;
 for(i=1; i <= NUM_OF_ROWS; i++) {
   tiles[i] = [];
 }
-tiles[1][1]  = { capacity: 4, name: "The Shire" };
-tiles[2][1]  = { capacity: 2, name: "Arthedam" };
-tiles[2][2]  = { capacity: 2, name: "Cardolan" };
-tiles[3][1]  = { capacity: 2, name: "Rhudaur" };
-tiles[3][2]  = { capacity: 2, name: "Eregion" };
-tiles[3][3]  = { capacity: 2, name: "Enedwaith" };
-tiles[4][1]  = { capacity: 1, name: "The High Pass" };
-tiles[4][2]  = { capacity: 1, name: "Misty Mountains" };
-tiles[4][3]  = { capacity: 1, name: "Caradoras" };
-tiles[4][4]  = { capacity: 1, name: "Gap Of Rohan" };
+tiles[1][1] = { capacity: 4, name: "The Shire" };
+tiles[2][1] = { capacity: 2, name: "Arthedam" };
+tiles[2][2] = { capacity: 2, name: "Cardolan" };
+tiles[3][1] = { capacity: 2, name: "Rhudaur" };
+tiles[3][2] = { capacity: 2, name: "Eregion" };
+tiles[3][3] = { capacity: 2, name: "Enedwaith" };
+tiles[4][1] = { capacity: 1, name: "The High Pass" };
+tiles[4][2] = { capacity: 1, name: "Misty Mountains" };
+tiles[4][3] = { capacity: 1, name: "Caradoras" };
+tiles[4][4] = { capacity: 1, name: "Gap Of Rohan" };
 tiles[5][1] = { capacity: 2, name: "Mirkwood" };
 tiles[5][2] = { capacity: 2, name: "Fangorn" };
 tiles[5][3] = { capacity: 2, name: "Rohan" };
 tiles[6][1] = { capacity: 2, name: "Gondor" };
 tiles[6][2] = { capacity: 2, name: "Dagorlad" };
 tiles[7][1] = { capacity: 4, name: "Mordor" };
+
+var makeTiles = function(tiles) {
+  var mytiles = [];
+  var j;
+  var i;
+  for(i=1; i <= NUM_OF_ROWS; i++) {
+    for(j=1; j<=columnLimit(i); j++) {
+      mytiles.push(tiles[i][j]);
+      Object.defineProperty(mytiles, [i,j], {
+        enumerable: false,
+        value: tiles[i][j]
+      });
+    }
+  }
+  return mytiles;
+};
 
 var isWithinGrid = function(row_, col_) {
   var row = row_;
@@ -53,8 +72,8 @@ var isWithinGrid = function(row_, col_) {
   return true;
 };
 
-var pieces = Object.create();
-pieces.light = Object.create();
+var pieces = Object.create(null);
+pieces.light = Object.create(null);
 pieces.light = { 
   "gandalf" :
     {
@@ -103,7 +122,7 @@ pieces.light = {
    }
 };
 
-pieces.dark = Object.create();
+pieces.dark = Object.create(null);
 pieces.dark = {
   "orcs" : 
   {
@@ -153,7 +172,8 @@ pieces.dark = {
 };
 
 module.exports = {
-  tiles : Object.freeze(tiles),
+  tiles : Object.freeze(makeTiles(tiles)),
   pieces : Object.freeze(pieces),
   isWithinGrid : isWithinGrid,
+  test : test
 };
