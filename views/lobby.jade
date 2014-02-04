@@ -1,4 +1,4 @@
-doctype 5
+doctype html
 html
    head
       title Game Lobby
@@ -8,6 +8,7 @@ html
       link(type='text/css', media='all', rel='stylesheet', href='/css/ui-lightness/jquery-ui-1.10.3.custom.min.css')
       link(type='text/css', media='all', rel='stylesheet', href="/css/lobby.css")
 
+      script(src="/lib/require.js")
       script(src='//ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js')
       script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
       script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
@@ -15,6 +16,7 @@ html
       script(src="/lib/socket.io.js")
       script(src="/lib/knockout-jqueryui.min.js")
       script(src="/lib/moment.min.js")
+      script(src="/lib/linq.min.js")
       script(src="/src/lobby.js")
 
     body
