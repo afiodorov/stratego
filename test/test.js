@@ -40,4 +40,36 @@ describe('GameStruct', function(){
       assert.equal(correctTilesCount, gameStructs.tiles.length);
     });
   });
+
+  describe('tile', function() {
+    it('#isWithin', function() {
+      assert.equal(true, gameStructs.tiles.isWithin(1,1));
+      assert.equal(true, gameStructs.tiles.isWithin([1,1]));
+      assert.equal(true, gameStructs.tiles.isWithin([2,1]));
+      assert.equal(true, gameStructs.tiles.isWithin([2,2]));
+      assert.equal(true, gameStructs.tiles.isWithin([3,1]));
+      assert.equal(true, gameStructs.tiles.isWithin([3,2]));
+      assert.equal(true, gameStructs.tiles.isWithin([3,3]));
+      assert.equal(true, gameStructs.tiles.isWithin([4,1]));
+      assert.equal(true, gameStructs.tiles.isWithin([4,2]));
+      assert.equal(true, gameStructs.tiles.isWithin([4,3]));
+      assert.equal(true, gameStructs.tiles.isWithin([4,4]));
+      assert.equal(true, gameStructs.tiles.isWithin([5,1]));
+      assert.equal(true, gameStructs.tiles.isWithin([5,2]));
+      assert.equal(true, gameStructs.tiles.isWithin([5,3]));
+      assert.equal(true, gameStructs.tiles.isWithin([6,1]));
+      assert.equal(true, gameStructs.tiles.isWithin([6,2]));
+      assert.equal(true, gameStructs.tiles.isWithin([7,1]));
+      assert.equal(false, gameStructs.tiles.isWithin([-1,1]));
+      assert.equal(false, gameStructs.tiles.isWithin([5,4]));
+    });
+  });
+
+  describe('tile', function() {
+    it('#getBackward', function() {
+      assert.deepEqual([], gameStructs.tiles[[1,1]].getBackward());
+      assert.deepEqual([[3,1], [3,2]], gameStructs.tiles[[2,1]].getForward());
+      assert.deepEqual([[5,3]], gameStructs.tiles[[4,4]].getForward());
+    });
+  });
 });

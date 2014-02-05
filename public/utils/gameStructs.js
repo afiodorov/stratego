@@ -1,3 +1,4 @@
+"use strict";
 var _ = require('../lib/underscore.js');
 
 var tiles = (function() {
@@ -15,13 +16,9 @@ var tiles = (function() {
   var isWithinGrid = function(row_, col_) {
     var row = row_;
     var col = col_;
-    if (arguments.length === 0 || arguments.length > 2) {
-      throw new TypeError("Call with coordinates");
-    }
 
-    if(arguments.length === 1) {
-      if( Object.prototype.toString.call( row_ ) !== "[object Array]" 
-        || row_.length !== 2) {
+    if( Object.prototype.toString.call( row_ ) === "[object Array]" ) {
+      if( row_.length !== 2 ) {
         throw new TypeError("Call with coordinates array of length 2");
       }
       row = row_[0];
@@ -44,22 +41,43 @@ var tiles = (function() {
   for(i=1; i <= NUM_OF_ROWS; i++) {
     tiles[i] = [];
   }
-  tiles[1][1] = { capacity: 4, name: "The Shire" };
-  tiles[2][1] = { capacity: 2, name: "Arthedam" };
-  tiles[2][2] = { capacity: 2, name: "Cardolan" };
-  tiles[3][1] = { capacity: 2, name: "Rhudaur" };
-  tiles[3][2] = { capacity: 2, name: "Eregion" };
-  tiles[3][3] = { capacity: 2, name: "Enedwaith" };
-  tiles[4][1] = { capacity: 1, name: "The High Pass" };
-  tiles[4][2] = { capacity: 1, name: "Misty Mountains" };
-  tiles[4][3] = { capacity: 1, name: "Caradoras" };
-  tiles[4][4] = { capacity: 1, name: "Gap Of Rohan" };
-  tiles[5][1] = { capacity: 2, name: "Mirkwood" };
-  tiles[5][2] = { capacity: 2, name: "Fangorn" };
-  tiles[5][3] = { capacity: 2, name: "Rohan" };
-  tiles[6][1] = { capacity: 2, name: "Gondor" };
-  tiles[6][2] = { capacity: 2, name: "Dagorlad" };
-  tiles[7][1] = { capacity: 4, name: "Mordor" };
+
+  var Tile = function(name, capacity, index) {
+    this.name = name;
+    this.capacity = capacity;
+    this.index = index;
+  };
+
+  Tile.prototype.getForward = function() {
+    var res = new Array(0);
+    res.push([this.index[0]+1, this.index[1]]);
+    res.push([this.index[0]+1, this.index[1]+1]);
+    return res.filter(isWithinGrid);
+  };
+
+  Tile.prototype.getBackward = function() {
+    var res = new Array(0);
+    res.push([this.index[0]-1, this.index[1]]);
+    res.push([this.index[0]-1, this.index[1]-1]);
+    return res.filter(isWithinGrid);
+  };
+
+  tiles[1][1] = new Tile( "The Shire"       , 4, [1, 1] );
+  tiles[2][1] = new Tile( "Arthedam"        , 2, [2, 1] );
+  tiles[2][2] = new Tile( "Cardolan"        , 2, [2, 2] );
+  tiles[3][1] = new Tile( "Rhudaur"         , 2, [3, 1] );
+  tiles[3][2] = new Tile( "Eregion"         , 2, [3, 2] );
+  tiles[3][3] = new Tile( "Enedwaith"       , 2, [3, 3] );
+  tiles[4][1] = new Tile( "The High Pass"   , 1, [4, 1] );
+  tiles[4][2] = new Tile( "Misty Mountains" , 1, [4, 2] );
+  tiles[4][3] = new Tile( "Caradoras"       , 1, [4, 3] );
+  tiles[4][4] = new Tile( "Gap Of Rohan"    , 1, [4, 4] );
+  tiles[5][1] = new Tile( "Mirkwood"        , 2, [5, 1] );
+  tiles[5][2] = new Tile( "Fangorn"         , 2, [5, 2] );
+  tiles[5][3] = new Tile( "Rohan"           , 2, [5, 3] );
+  tiles[6][1] = new Tile( "Gondor"          , 2, [6, 1] );
+  tiles[6][2] = new Tile( "Dagorlad"        , 2, [6, 2] );
+  tiles[7][1] = new Tile( "Mordor"          , 4, [7, 1] );
 
   var makeTiles = function(tiles) {
     var mytiles = new Array(0);
