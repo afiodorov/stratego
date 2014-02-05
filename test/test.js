@@ -23,13 +23,21 @@ describe('GameStruct', function(){
       assert.equal("Dagorlad",        gameStructs.tiles[[6,2]].name);
       assert.equal("Mordor",          gameStructs.tiles[[7,1]].name);
     });
-  });
 
-  var tilesCount = _.range(1, gameStructs.tiles.NUM_OF_ROWS);
-
-  describe('tiles', function(){
+    var correctTilesCount = _.range(1, gameStructs.tiles.NUM_OF_ROWS + 1).reduceRight(
+          function(res, i) {return res + gameStructs.tiles.columnLimit(i); },
+          0);
+    var tilesCount = gameStructs.tiles.reduceRight(function(res) {return res + 1;}, 0);
     it('is array', function() {
       assert.equal('[object Array]', Object.prototype.toString.call(gameStructs.tiles));
+    });
+
+    it('correct number of tiles through forEach', function() {
+      assert.equal(correctTilesCount, tilesCount);
+    });
+
+    it('correct number of tiles through for', function() {
+      assert.equal(correctTilesCount, gameStructs.tiles.length);
     });
   });
 });
