@@ -1,11 +1,11 @@
+var _ = require('../lib/underscore.js');
+
 var NUM_OF_ROWS = 7;
 var NUM_OF_COLS = 4;
+
 var columnLimit = function(colNumber) {
   return (colNumber > NUM_OF_ROWS / 2) ? NUM_OF_ROWS + 1 - colNumber : colNumber;
 };
-
-var test = Object.create(null);
-test[[0,1]] = "his";
 
 var tiles = [];
 var i;
@@ -42,6 +42,17 @@ var makeTiles = function(tiles) {
       });
     }
   }
+
+  Object.defineProperty(mytiles, "NUM_OF_ROWS", {
+    enumerable: false,
+    value: NUM_OF_ROWS
+  });
+
+  Object.defineProperty(mytiles, "NUM_OF_COLS", {
+    enumerable: false,
+    value: NUM_OF_COLS
+  });
+
   return mytiles;
 };
 
@@ -175,5 +186,4 @@ module.exports = {
   tiles : Object.freeze(makeTiles(tiles)),
   pieces : Object.freeze(pieces),
   isWithinGrid : isWithinGrid,
-  test : test
 };

@@ -1,5 +1,6 @@
 /*global describe, it*/
 var assert = require("assert");
+var _ = require("../public/lib/underscore.js");
 var gameStructs = require("../public/utils/gameStructs.js");
 
 describe('GameStruct', function(){
@@ -23,6 +24,8 @@ describe('GameStruct', function(){
       assert.equal("Mordor",          gameStructs.tiles[[7,1]].name);
     });
   });
+
+  var tilesCount = _.range(1, gameStructs.tiles.NUM_OF_ROWS);
 
   describe('tiles', function(){
     it('is array', function() {
