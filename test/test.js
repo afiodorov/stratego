@@ -42,6 +42,14 @@ describe('GameStruct', function(){
   });
 
   describe('tile', function() {
+    it('#columnLimit', function() {
+      assert.equal(3, gameStructs.tiles.columnLimit(3));
+      assert.equal(4, gameStructs.tiles.columnLimit(4));
+      assert.equal(3, gameStructs.tiles.columnLimit(5));
+      assert.equal(2, gameStructs.tiles.columnLimit(6));
+      assert.equal(1, gameStructs.tiles.columnLimit(7));
+    });
+
     it('#isWithin', function() {
       assert.equal(true, gameStructs.tiles.isWithin(1,1));
       assert.equal(true, gameStructs.tiles.isWithin([1,1]));
@@ -68,8 +76,18 @@ describe('GameStruct', function(){
   describe('tile', function() {
     it('#getBackward', function() {
       assert.deepEqual([], gameStructs.tiles[[1,1]].getBackward());
+      assert.deepEqual([[3,3]], gameStructs.tiles[[4,4]].getBackward());
+      assert.deepEqual([[4,2],[4,3]], gameStructs.tiles[[5,2]].getBackward());
+      assert.deepEqual([[6,1],[6,2]], gameStructs.tiles[[7,1]].getBackward());
+    });
+    it('#getForward', function() {
+      assert.deepEqual([[2,1], [2,2]], gameStructs.tiles[[1,1]].getForward());
       assert.deepEqual([[3,1], [3,2]], gameStructs.tiles[[2,1]].getForward());
+      assert.deepEqual([[5,2], [5,3]], gameStructs.tiles[[4,3]].getForward());
       assert.deepEqual([[5,3]], gameStructs.tiles[[4,4]].getForward());
+      assert.deepEqual([[6,1], [6,2]], gameStructs.tiles[[5,2]].getForward());
+      assert.deepEqual([[6,1]], gameStructs.tiles[[5,1]].getForward());
+      assert.deepEqual([], gameStructs.tiles[[7,1]].getForward());
     });
   });
 });

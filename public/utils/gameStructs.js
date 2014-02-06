@@ -29,7 +29,7 @@ var tiles = (function() {
       return false;
     }
 
-    if(isNaN(col) || col < 1 || col > columnLimit(col)) {
+    if(isNaN(col) || col < 1 || col > columnLimit(row)) {
       return false;
     }
 
@@ -37,10 +37,7 @@ var tiles = (function() {
   };
 
   var tiles = [];
-  var i;
-  for(i=1; i <= NUM_OF_ROWS; i++) {
-    tiles[i] = [];
-  }
+  _.range(1, NUM_OF_ROWS + 1).forEach(function(i) { tiles[i] = []; });
 
   var Tile = function(name, capacity, index) {
     this.name = name;
@@ -51,15 +48,23 @@ var tiles = (function() {
   Tile.prototype.getForward = function() {
     var res = new Array(0);
     res.push([this.index[0]+1, this.index[1]]);
-    res.push([this.index[0]+1, this.index[1]+1]);
-    return res.filter(isWithinGrid);
+    if(this.index[0] > NUM_OF_ROWS / 2) {
+      res.push([this.index[0]+1, this.index[1]-1]);
+    } else {
+      res.push([this.index[0]+1, this.index[1]+1]);
+    }
+    return res.filter(isWithinGrid).sort();
   };
 
   Tile.prototype.getBackward = function() {
     var res = new Array(0);
     res.push([this.index[0]-1, this.index[1]]);
-    res.push([this.index[0]-1, this.index[1]-1]);
-    return res.filter(isWithinGrid);
+    if(this.index[0] > Math.ceil(NUM_OF_ROWS / 2)) {
+      res.push([this.index[0]-1, this.index[1]+1]);
+    } else {
+      res.push([this.index[0]-1, this.index[1]-1]);
+    }
+    return res.filter(isWithinGrid).sort();
   };
 
   tiles[1][1] = new Tile( "The Shire"       , 4, [1, 1] );
@@ -81,16 +86,15 @@ var tiles = (function() {
 
   var makeTiles = function(tiles) {
     var mytiles = new Array(0);
-    var j;
-    for(i=1; i <= NUM_OF_ROWS; i++) {
-      for(j=1; j<=columnLimit(i); j++) {
+    _.range(1, NUM_OF_ROWS + 1).forEach(function(i){
+      _.range(1, columnLimit(i) + 1).forEach(function(j) {
         mytiles.push(tiles[i][j]);
-        Object.defineProperty(mytiles, [i,j], {
+        Object.defineProperty(mytiles, [[i,j]], {
           enumerable: false,
           value: tiles[i][j]
         });
-      }
-    }
+      });
+    });
 
     mytiles.NUM_OF_ROWS = NUM_OF_ROWS;
     Object.defineProperty(mytiles, "NUM_OF_ROWS", {
