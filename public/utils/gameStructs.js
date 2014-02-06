@@ -236,21 +236,7 @@ var pieces = (function(){
   return pieces;
 }());
 
-var getOppositeSide = function(side) {
-  if(side === "light") {
-    return "dark";
-  } 
-
-  if(side === "dark") {
-    return "light";
-  }
-
-  throw new TypeError("Can't get opposite side");
-};
-
-
 module.exports = {
   tiles : tiles,
-  pieces : pieces,
-  getOppositeSide : getOppositeSide
+  pieces : pieces
 };
