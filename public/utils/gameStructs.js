@@ -45,6 +45,7 @@ var tiles = (function() {
     this.index = index;
   };
 
+  /* get all forward tiles */
   Tile.prototype.getForward = function() {
     var res = new Array(0);
     res.push([this.index[0]+1, this.index[1]]);
@@ -56,6 +57,7 @@ var tiles = (function() {
     return res.filter(isWithinGrid).sort();
   };
 
+  /* get all backward tiles */
   Tile.prototype.getBackward = function() {
     var res = new Array(0);
     res.push([this.index[0]-1, this.index[1]]);
@@ -65,6 +67,14 @@ var tiles = (function() {
       res.push([this.index[0]-1, this.index[1]-1]);
     }
     return res.filter(isWithinGrid).sort();
+  };
+
+  /* get all side tiles */
+  Tile.prototype.getSide = function() {
+    var res = new Array(0);
+    res.push([this.index[0], this.index[1]-1]);
+    res.push([this.index[0], this.index[1]+1]);
+    return res.filter(isWithinGrid);
   };
 
   tiles[1][1] = new Tile( "The Shire"       , 4, [1, 1] );
@@ -226,7 +236,21 @@ var pieces = (function(){
   return pieces;
 }());
 
+var getOppositeSide = function(side) {
+  if(side === "light") {
+    return "dark";
+  } 
+
+  if(side === "dark") {
+    return "light";
+  }
+
+  throw new TypeError("Can't get opposite side");
+};
+
+
 module.exports = {
   tiles : tiles,
-  pieces : pieces
+  pieces : pieces,
+  getOppositeSide : getOppositeSide
 };

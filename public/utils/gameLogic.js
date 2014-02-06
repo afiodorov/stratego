@@ -1,5 +1,7 @@
 /*global Enumerable*/
+"use strict";
 var gameStructs = require("./gameStructs");
+var linq = require("../lib/linq.js");
 
 var hasRequiredFields = function (o, requiredFields) {
   return requiredFields.reduce(function(res, prop) {
@@ -50,6 +52,7 @@ var isMoveObjectValid = function(move) {
 
 var isAttack = function(gameState, side, piece, rowTo, columnTo) {
   return true;
+  Enumerable.From(gameState[getOppositeSide[gameState.mySide]].piecesLeft)
 };
 
 var getPieceLocation = function(gameState, side, piece) {
@@ -96,4 +99,5 @@ var isMoveValid = function(gameState, move) {
 
 module.exports = {
   isMoveValid : isMoveValid,
+  getOppositeSide : getOppositeSide
 };
