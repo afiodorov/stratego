@@ -2,13 +2,13 @@
 "use strict";
 var assert = require("assert");
 var _ = require("../../public/js/lib/underscore.js");
-var GameState = require("../../public/js/game/stateWrapper.js").GameState;
+var stateHolder = require("../../public/js/game/stateHolder.js");
 
 describe('GameState', function() {
-  var darkState = new GameState(
+  var darkState = new stateHolder(
     {mySide: "dark",
       light: {
-        piecesLeft: 
+        pieces: 
         [
           {position: [2,2]},
           {position: [2,2]},
@@ -16,7 +16,7 @@ describe('GameState', function() {
         ]
       },
       dark: {
-        piecesLeft: 
+        pieces: 
         [
           {name: "witch king", position: [7,1]},
           {name: "black rider", position: [7,1]},
@@ -31,7 +31,7 @@ describe('GameState', function() {
       }
     }
   );
-  var lightState = new GameState({mySide: "light"});
+  var lightState = new stateHolder({mySide: "light"});
 
   describe('#getSide', function() {
     it('should return side', function() {
