@@ -5,9 +5,8 @@ var jade = require('jade')
   , express = require('express')
   , app = express()
   , port = process.env.PORT || 5000
-  , cookieParser = express.cookieParser(secret)
-  , db = require('./lib/db.js')
-  , arr = require('./public/src/arr.js');
+, cookieParser = express.cookieParser(secret)
+  , db = require('./lib/db.js');
 var logger = require('./lib/logger.js');
 
 app.set('views', __dirname + '/views');
@@ -36,17 +35,18 @@ app.get('/lobby', function(req, res){
 var server = http.createServer(app);
 server.listen(port);
 var io = require('socket.io').listen(server)
-  , SessionSockets = require('session.socket.io')
-  , sessionSockets = new SessionSockets(io, db.mongoStore, cookieParser);
+  , SessionSocket = require('session.socket.io')
+  , sessionSocket = new SessionSocket(io, db.mongoStore, cookieParser);
 io.set('log level', 1);
 logger.log('info', 'http server listening on %d', port);
 
-var lobby = require('./server/lobby.js');
-var game = require('./server/game.js');
-var chat = require('./server/chat.js');
-var makeStruct = require('./structs/factory.js').makeStruct;
+var lobby = require('./socketHandlers/lobby.js');
+var game = require('./socketHandlers/game.js');
+var chat = require('./socketHandlers/chat.js');
+var makeStruct = require('./lib/structFactory.js').makeStruct;
 
-sessionSockets.of('/lobby').on('connection', function(err, socket, session) {
+var ActiveConnection = makeStruct("io socket session");
+sessionSocket.of('/lobby').on('connection', function(err, socket, session) {
   if(err) {
     logger.log('error', "bad session");
     logger.log('error', err);
@@ -58,7 +58,6 @@ sessionSockets.of('/lobby').on('connection', function(err, socket, session) {
     return;
   }
   
-  var ActiveConnection = makeStruct("io socket session");
   var activeConnection = new ActiveConnection(io, socket, session);
   (function() {
     lobby.main.call(activeConnection);

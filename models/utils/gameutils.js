@@ -1,7 +1,7 @@
 var db = require('../../lib/db.js');
 var Game = require('../Game.js').Model;
 
-var makeStruct = require('../../structs/factory.js').makeStruct;
+var makeStruct = require('../../lib/structFactory.js').makeStruct;
 var ShortSummary = makeStruct("id opponentName");
 
 function _getOpponent(player, game) {

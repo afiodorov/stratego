@@ -1,8 +1,8 @@
 /*global describe, it*/
 "use strict";
 var assert = require("assert");
-var _ = require("../public/lib/underscore.js");
-var GameState = require("../public/utils/gameState.js").GameState;
+var _ = require("../public/js/lib/underscore.js");
+var GameState = require("../public/js/game/stateWrapper.js").GameState;
 
 describe('GameState', function() {
   var darkState = new GameState(

@@ -1,8 +1,8 @@
 /*global describe, it*/
 "use strict";
 var assert = require("assert");
-var _ = require("../public/lib/underscore.js");
-var gameStructs = require("../public/utils/gameStructs.js");
+var _ = require("../public/js/lib/underscore.js");
+var gameStructs = require("../public/js/game/structs.js");
 
 describe('GameStruct', function(){
   describe('tiles', function() {
