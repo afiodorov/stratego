@@ -10,11 +10,11 @@ var GameState = function() {
   self.stage = "game"; // start, game, battle
   self.turn = "light";
   self.light =  {
-    piecesLeft: [{name: "gandalf", position: [2,2]}],
+    pieces: [{name: "gandalf", position: [2,2]}],
     cardsLeft: ["3", "retreat"]
   };
   self.dark = {
-    piecesLeft: [{position: [3,1]}],
+    pieces: [{position: [3,1]}],
     cardsLeft: ["1", "magic"]
   };
   // each Observer must implement update() function
@@ -31,7 +31,7 @@ GameState.prototype.getSide = function() {
 };
 
 GameState.prototype.piecesCount = function(tile) {
-  return this._json[this.getSide()].piecesLeft.filter(function(piece) {
+  return this._json[this.getSide()].pieces.filter(function(piece) {
     return _.isEqual(piece.position, tile);
   }).length;
 };
@@ -48,7 +48,7 @@ GameState.prototype.isTileFull = function(tile) {
 /* Checks if tile [int, int] has an enemy piece */
 GameState.prototype.isTileWithEnemy = function(tile) {
   var oppositeSide = GameLogic.getOppositeSide(this.getSide());
-  return this._json[oppositeSide].piecesLeft.filter(
+  return this._json[oppositeSide].pieces.filter(
       function(piece) {
         return _.isEqual(piece.position, tile);
       }).length !== 0;

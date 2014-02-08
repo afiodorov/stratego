@@ -8,7 +8,7 @@ describe('GameState', function() {
   var darkState = new GameState(
     {mySide: "dark",
       light: {
-        piecesLeft: 
+        pieces: 
         [
           {position: [2,2]},
           {position: [2,2]},
@@ -16,7 +16,7 @@ describe('GameState', function() {
         ]
       },
       dark: {
-        piecesLeft: 
+        pieces: 
         [
           {name: "witch king", position: [7,1]},
           {name: "black rider", position: [7,1]},
