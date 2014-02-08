@@ -133,6 +133,4 @@ var tiles = (function() {
   return makeTiles(tiles);
 }());
 
-module.exports = {
-  tiles : tiles
-};
+module.exports = tiles;

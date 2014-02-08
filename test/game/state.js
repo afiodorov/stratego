@@ -2,10 +2,10 @@
 "use strict";
 var assert = require("assert");
 var _ = require("../../public/js/lib/underscore.js");
-var GameState = require("../../public/js/game/stateHolder.js");
+var stateHolder = require("../../public/js/game/stateHolder.js");
 
 describe('GameState', function() {
-  var darkState = new GameState(
+  var darkState = new stateHolder(
     {mySide: "dark",
       light: {
         pieces: 
@@ -31,7 +31,7 @@ describe('GameState', function() {
       }
     }
   );
-  var lightState = new GameState({mySide: "light"});
+  var lightState = new stateHolder({mySide: "light"});
 
   describe('#getSide', function() {
     it('should return side', function() {

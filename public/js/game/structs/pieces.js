@@ -103,6 +103,4 @@ var pieces = (function(){
   return pieces;
 }());
 
-module.exports = {
-  pieces : pieces
-};
+module.exports = pieces;
