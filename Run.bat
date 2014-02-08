@@ -1,1 +1,0 @@
-node server.js --MONGOLAB_URI=mongodb://heroku_app18656806:dl1osncs38e7rmmsclk6t2l170@ds057548.mongolab.com:57548/heroku_app18656806
