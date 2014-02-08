@@ -2,7 +2,7 @@
 "use strict";
 var assert = require("assert");
 var _ = require("../../public/js/lib/underscore.js");
-var GameState = require("../../public/js/game/stateWrapper.js").GameState;
+var GameState = require("../../public/js/game/stateHolder.js");
 
 describe('GameState', function() {
   var darkState = new GameState(

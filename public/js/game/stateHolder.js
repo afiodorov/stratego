@@ -22,31 +22,31 @@ var GameState = function() {
 };
  */
 
-var GameState = function(gameStateJson) {
+var stateHolder = function(gameStateJson) {
   this.update(gameStateJson);
 };
 
-GameState.prototype.getSide = function() {
+stateHolder.prototype.getSide = function() {
   return this._json.mySide;
 };
 
-GameState.prototype.piecesCount = function(tile) {
+stateHolder.prototype.piecesCount = function(tile) {
   return this._json[this.getSide()].pieces.filter(function(piece) {
     return _.isEqual(piece.position, tile);
   }).length;
 };
 
-GameState.prototype.update = function(gameStateJson) {
+stateHolder.prototype.update = function(gameStateJson) {
   this._json = gameStateJson;
 };
 
 /* Checks if board tile out of space */
-GameState.prototype.isTileFull = function(tile) {
+stateHolder.prototype.isTileFull = function(tile) {
   return this.piecesCount(tile) >= GameStructs.tiles[tile].capacity;
 };
 
 /* Checks if tile [int, int] has an enemy piece */
-GameState.prototype.isTileWithEnemy = function(tile) {
+stateHolder.prototype.isTileWithEnemy = function(tile) {
   var oppositeSide = GameLogic.getOppositeSide(this.getSide());
   return this._json[oppositeSide].pieces.filter(
       function(piece) {
@@ -55,11 +55,9 @@ GameState.prototype.isTileWithEnemy = function(tile) {
 };
 
 /* Checks if client player has a card */
-GameState.prototype.hasCard = function(card) {
+stateHolder.prototype.hasCard = function(card) {
   var side = this.getSide();
   return this._json[side].cardsLeft.indexOf(card) !== -1;
 };
 
-module.exports = {
-  GameState : GameState
-};
+module.exports = stateHolder;
