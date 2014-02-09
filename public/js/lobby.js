@@ -21,7 +21,7 @@ function AppViewModel(lobby_) {
 
     self.activeTab = ko.observable();
     self.shouldShowPage = ko.observable(true);
-    self.invites = ko.observable('all');
+    self.invitesAccepted = ko.observable('all');
     self.games = ko.observableArray();
     self.players = ko.observableArray();
     self.chatInput = ko.observable();
@@ -33,6 +33,10 @@ function AppViewModel(lobby_) {
       console.log(game);
       _currentGame = game;
       localStorage.setItem('currentGameId', game.id);
+    };
+
+    self.changeInvitesAccepted = function() {
+      lobby.emit('setInvitesAccepted', self.invitesAccepted());
     };
 
     self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
@@ -76,6 +80,11 @@ function AppViewModel(lobby_) {
       }
       return correspondingGame;
     };
+
+    self.onSetInvitesAccepted = function(invitesAccepted) {
+      self.invitesAccepted(invitesAccepted);
+      return self.onSetInvitesAccepted;
+    }
 
     self.onSetChatLog = function(log) {
       var correspondingGame = findGame(log.gameid);

@@ -5,8 +5,9 @@ var tiles = (function() {
   var NUM_OF_ROWS = 7;
   var NUM_OF_COLS = 4;
 
-  var columnLimit = function (rowNumber) {
-      return (rowNumber > NUM_OF_ROWS / 2) ? NUM_OF_ROWS + 1 - rowNumber : rowNumber;
+  /* gets the number of columns in a row */
+  var columnLimit = function(rowNumber) {
+    return (rowNumber > NUM_OF_ROWS / 2) ? NUM_OF_ROWS + 1 - rowNumber : rowNumber;
   };
 
   /**
@@ -81,7 +82,7 @@ var tiles = (function() {
   tiles[2][1] = new Tile('Arthedam'        , 2, [2, 1]);
   tiles[2][2] = new Tile('Cardolan'        , 2, [2, 2]);
   tiles[3][1] = new Tile('Rhudaur'         , 2, [3, 1]);
-  tiles[3][2] = new Tile('Eregion'         , 2, [3, 2]);
+  tile[3][2] = new Tile('Eregion'         , 2, [3, 2]);
   tiles[3][3] = new Tile('Enedwaith'       , 2, [3, 3]);
   tiles[4][1] = new Tile('The High Pass'   , 1, [4, 1]);
   tiles[4][2] = new Tile('Misty Mountains' , 1, [4, 2]);
@@ -106,17 +107,12 @@ var tiles = (function() {
       });
     });
 
-    mytiles.NUM_OF_ROWS = NUM_OF_ROWS;
+    mytiles.numRows = NUM_OF_ROWS;
     Object.defineProperty(mytiles, 'NUM_OF_ROWS', {
       enumerable: false
     });
 
-    mytiles.NUM_OF_COLS = NUM_OF_COLS;
-    Object.defineProperty(mytiles, 'NUM_OF_COLS', {
-      enumerable: false
-    });
-
-    mytiles.columnLimit = columnLimit;
+    mytiles.numCols = columnLimit;
     Object.defineProperty(mytiles, 'columnLimit', {
       enumerable: false
     });

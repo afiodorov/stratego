@@ -1,11 +1,15 @@
-var clients = []
-  , db = require('../lib/db')
-  , lobbyutils = require('../lib/lobbyutils')
-  , makeStruct = require('../lib/structFactory').makeStruct
-  , Client = makeStruct("socket sid")
-  , Game = require('../models/Game')
-  , arr = require('../public/js/arr.js')
-  , gameutils = require('../models/utils/gameutils');
+var q = require('q');
+var clients = [];
+var db = require('../lib/db');
+var lobbyutils = require('../lib/lobbyutils');
+var makeStruct = require('../lib/structFactory').makeStruct;
+var Client = makeStruct("socket sid");
+var Game = require('../models/Game');
+var arr = require('../public/js/arr.js');
+var gameutils = require('../models/utils/gameutils');
+
+// first one is default
+var invitesAllowed = ['all', 'light', 'dark', 'none'];
 
 var logger = require('../lib/logger');
 
@@ -20,13 +24,14 @@ function connect() {
   _joinRooms.call(this);
   _checkForDuplicateSession.call(this, onlineClients);
   _setSocketPlayerName.call(this, clients);
+  _initialisePlayer.call(this);
   _sendListOfGames.call(this);
   _sendListOfPlayers.call(this, onlineClients);
 
   clients[session.playerName] = new Client(socket, session.id);
   
   socket.broadcast.emit('addNewPlayer', {playerName:
-  session.playerName, isSelf: false});
+  session.playerName, invitesAccepted: session.invitesAccepted, isSelf: false});
 }
 
 function disconnect() {
@@ -99,6 +104,14 @@ function requestGame(data) {
     }
 }
 
+function changeInvitesAccepted(invitesAccepted) {
+  if(invitesAccepted && invitesAllowed.indexOf(invitesAccepted) === -1) {
+    this.session.invitesAccepted = invitesAccepted;
+    this.session.save();
+    this.socket.emit("setInvitesAccepted", invitesAccepted);
+  }
+}
+
 function acceptGame(data){
   if(!data || typeof data.playerName === "undefined") {
     return;
@@ -161,6 +174,13 @@ function _addNewGame(opponent, opsession) {
       logger.log('warn', err);
     }
   });
+}
+
+function _initialisePlayer() {
+  if(!this.session.invitesAccepted) {
+    this.session.invitesAccepted = invitesAllowed[0];
+    this.session.save();
+  }
 }
 
 function _isNewClient() {
@@ -229,10 +249,15 @@ function _sendListOfPlayers(onlineClients) {
   var socket = this.socket;
   onlineClients.forEach(function(client) {
     var isSelf = (client.sid === socket.sid);
-    db.mongoStore.get(client.sid, function(err, session) {
+    var getSession = q.denodeify(db.mongoStore.get);
+    getSession(client.sid).done(function(err, session) {
       if(!err) {
-        socket.emit('addNewPlayer', {playerName:
-        session.playerName, isSelf: isSelf});
+        socket.emit('addNewPlayer',
+        {
+          playerName: session.playerName,
+          invitesAccepted: session.invitesAccepted,
+          isSelf: isSelf
+        });
       } else {
         logger.log('warn', "can't fetch client");
         logger.log('warn', err);
@@ -247,6 +272,7 @@ function main() {
   this.socket.on('requestGame', requestGame.bind(this));
   this.socket.on('acceptGame', acceptGame.bind(this));
   this.socket.on('resignGame', resignGame.bind(this));
+  this.socket.on('setInvitesAccepted', changeInvitesAccepted.bind(this));
   this.socket.on('disconnect', disconnect.bind(this));
 }
 
