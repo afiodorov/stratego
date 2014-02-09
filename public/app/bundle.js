@@ -5187,7 +5187,7 @@ var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');
 var lobby = io.connect(location.origin + '/lobby');
-require('knockout-jquery')
+require('knockout-jquery');
 
 function AppViewModel(lobby_) {
     var self = this;

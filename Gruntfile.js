@@ -39,9 +39,6 @@ module.exports = function(grunt) {
             'knockout-jquery' : {
                path: './public/vendor/knockout-jqueryui.min.js',
                exports: null,
-               depends: {
-                 knockout : 'knockout'
-              }
             }
           }
         }
