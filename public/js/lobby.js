@@ -2,6 +2,7 @@
 'use strict';
 var io = require('./lib/socket.io.js');
 var $ = require('jquery');
+$.pnotify = require('pnotify');
 var ko = require('knockout');
 var lobby = io.connect(location.origin + '/lobby');
 
@@ -244,5 +245,4 @@ $(function() {
   appViewModel.bindSocketEmitters();
   ko.applyBindings(appViewModel);
   appViewModel.bindSocketHandlers();
-
 });

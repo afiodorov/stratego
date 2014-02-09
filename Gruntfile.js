@@ -10,29 +10,27 @@ module.exports = function(grunt) {
     },
     browserify: {
       build: {
-        dist: {
-          files: {
-            'public/app/bundle.js': ['public/js/**/*.js']
-          }
-        },
+        src: ['./public/js/**/*.js'],
+        dest: 'public/app/bundle.js',
         options: {
           shim: {
             jquery: {
-              path: './public/vendor/jquery.min.js',
+              path: 'public/vendor/jquery.min.js',
               exports: '$'
             },
             'jquery-ui': {
-              path: './public/vendor/jquery-ui.min.js',
+              path: 'public/vendor/jquery-ui.min.js',
+              exports: null,
               depends: {
                 jquery: '$'
               }
             },
             pnotify: {
-              path: './public/vendor/pnotify/jquery.pnotify.min.js',
+              path: 'public/vendor/pnotify/jquery.pnotify.min.js',
               exports: '$.pnotify'
             },
             knockout: {
-              path: './public/vendor/knockout-2.2.1.js',
+              path: 'public/vendor/knockout-2.2.1.js',
               exports: 'ko',
               depends: {
                   jquery: '$'
@@ -40,6 +38,7 @@ module.exports = function(grunt) {
             },
             'knockout-jquery' : {
                path: './public/vendor/knockout-jqueryui.min.js',
+               exports: null,
                depends: {
                  knockout : 'knockout'
               }
