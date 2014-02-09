@@ -1,5 +1,7 @@
-/*global location, Weblobby, io, $, ko*/
-"use strict";
+/*global location, Weblobby, io*/
+'use strict';
+var ko = require('knockout');
+var $ = require('jquery');
 var lobby = io.connect(location.origin + '/lobby');
 
 function AppViewModel(lobby_) {

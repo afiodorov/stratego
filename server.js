@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var secret = process.env.SESSION_SECRET || 'someThinWeirdAsdflk';
 var jade = require('jade')
   , http = require('http')
@@ -49,7 +49,7 @@ var game = require('./socketHandlers/game.js');
 var chat = require('./socketHandlers/chat.js');
 var makeStruct = require('./lib/structFactory.js').makeStruct;
 
-var ActiveConnection = makeStruct("io socket session");
+var ActiveConnection = makeStruct('io socket session');
 sessionSocket.of('/lobby').on('connection', function(err, socket, session) {
   if(err) {
     logger.log('error', "bad session");

@@ -12,6 +12,7 @@ iisnode/
 bin/
 bld/
 tags
+.screenrc
 
 pids
 logs
@@ -20,4 +21,4 @@ build
 
 node_modules
 lib-cov
-.screenrc
+.grunt/
