@@ -22,3 +22,4 @@ build
 node_modules
 lib-cov
 .grunt/
+/public/app/bundle.js
