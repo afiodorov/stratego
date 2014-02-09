@@ -1,9 +1,8 @@
 /*global Enumerable*/
-"use strict";
+'use strict';
 var gameStructs = require("./structs.js");
-var linq = require("../lib/linq.js");
 
-var hasRequiredFields = function (o, requiredFields) {
+var hasRequiredFields = function(o, requiredFields) {
   return requiredFields.reduce(function(res, prop) {
     return res && o.hasOwnProperty(prop);
   }, true);
@@ -45,14 +44,13 @@ var isMoveObjectValid = function(move) {
     return false;
   }
 
-  if(!gameStructs.isWithinGrid(move.rowTo, move.columnTo)) {
+  if(!gameStructs.isWithinGrid(move.toTile)) {
     return false;
   }
 };
 
-var isAttack = function(stateHolder, side, piece, rowTo, columnTo) {
-  return true;
-  Enumerable.From(stateHolder[getOppositeSide[stateHolder.mySide]].piecesLeft)
+var isAttack = function(stateHolder, move) {
+  return stateHolder.isTileWithEnemy(move.toTile);
 };
 
 var getPieceLocation = function(stateHolder, side, piece) {
@@ -101,3 +99,11 @@ module.exports = {
   isMoveValid : isMoveValid,
   getOppositeSide : getOppositeSide
 };
+
+/* autcompletion now works */
+if(false) {
+  var StateHolder = require('./stateHolder.js');
+  var stateHolder = new StateHolder();
+  isAttack(stateHolder, {piece: 'gandalf', side: 'light', toTile: [1,1]});
+  isMoveValid(stateHolder, {piece: 'gandalf', side: 'light', toTile: [1,1]});
+}

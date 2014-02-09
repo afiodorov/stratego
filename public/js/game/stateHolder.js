@@ -1,7 +1,7 @@
-"use strict";
-var _ = require("../lib/underscore.js");
-var GameStructs = require("./structs.js");
-var GameLogic = require("./logic.js");
+'use strict';
+var _ = require('../lib/underscore.js');
+var GameStructs = require('./structs.js');
+var GameLogic = require('./logic.js');
 
 var stateHolder = function(stateJson) {
   this._observers = [];
@@ -21,7 +21,7 @@ stateHolder.prototype.piecesCount = function(tile) {
 stateHolder.prototype.update = function(stateJson) {
   this._stateJson = stateJson;
   this._observers.forEach(function(observer) {
-    if(typeof observer.update === "function") {
+    if (typeof observer.update === 'function') {
       observer.update.call(null, this._stateJson);
     }
   });
@@ -48,7 +48,7 @@ stateHolder.prototype.hasCard = function(card) {
 };
 
 stateHolder.prototype.addObserver = function(observer) {
-  if(this._observers.indexOf(observer) === -1) {
+  if (this._observers.indexOf(observer) === -1) {
     this._observers.push(observer);
   }
 };
