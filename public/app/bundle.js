@@ -5187,6 +5187,7 @@ var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');
 var lobby = io.connect(location.origin + '/lobby');
+require('knockout-jquery')
 
 function AppViewModel(lobby_) {
     var self = this;
@@ -5429,7 +5430,7 @@ $(function() {
   appViewModel.bindSocketHandlers();
 });
 
-},{"./lib/socket.io.js":3,"jquery":"aaarNY","knockout":"Hwveqo","pnotify":"h/SWuZ"}],"a8KSQE":[function(require,module,exports){
+},{"./lib/socket.io.js":3,"jquery":"aaarNY","knockout":"Hwveqo","knockout-jquery":"BHxK8g","pnotify":"h/SWuZ"}],"a8KSQE":[function(require,module,exports){
 (function (global){(function browserifyShim(module, define) {
 
 ; global.$ = require("jquery");
