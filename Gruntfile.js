@@ -9,24 +9,44 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
-      shim: {
-        jquery: {
-            path: './public/vendor/jquery.min.js',
-            exports: '$'
+      build: {
+        dist: {
+          files: {
+            'public/app/bundle.js': ['public/js/**/*.js']
+          }
         },
-        knockout: {
-            path: './public/vendor/knockout-2.2.1.js',
-            exports: 'ko',
-            depends: {
+        options: {
+          shim: {
+            jquery: {
+              path: './public/vendor/jquery.min.js',
+              exports: '$'
+            },
+            'jquery-ui': {
+              path: './public/vendor/jquery-ui.min.js',
+              depends: {
                 jquery: '$'
+              }
+            },
+            pnotify: {
+              path: './public/vendor/pnotify/jquery.pnotify.min.js',
+              exports: '$.pnotify'
+            },
+            knockout: {
+              path: './public/vendor/knockout-2.2.1.js',
+              exports: 'ko',
+              depends: {
+                  jquery: '$'
+              }
+            },
+            'knockout-jquery' : {
+               path: './public/vendor/knockout-jqueryui.min.js',
+               depends: {
+                 knockout : 'knockout'
+              }
             }
+          }
         }
-      },
-      dist: {
-        files: {
-          'public/app/bundle.js': ['public/js/**/*.js']
-        }
-      },
+      }
     },
     nodemon: {
       dev: {

@@ -1,7 +1,8 @@
-/*global location, Weblobby, io*/
+/*global location*/
 'use strict';
-var ko = require('knockout');
+var io = require('./lib/socket.io.js');
 var $ = require('jquery');
+var ko = require('knockout');
 var lobby = io.connect(location.origin + '/lobby');
 
 function AppViewModel(lobby_) {
@@ -245,4 +246,3 @@ $(function() {
   appViewModel.bindSocketHandlers();
 
 });
-
