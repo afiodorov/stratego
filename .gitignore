@@ -9,6 +9,8 @@
 *.gz
 *.suo
 iisnode/
+bin/
+bld/
 tags
 
 pids
