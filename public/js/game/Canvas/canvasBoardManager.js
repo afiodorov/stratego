@@ -1,4 +1,5 @@
-﻿var BOARD_WIDTH = 600;
+﻿/// <reference path="../structs/tiles.js" />
+var BOARD_WIDTH = 600;
 var BOARD_HEIGHT = 600;
 
 // Animation.....................................................
@@ -19,15 +20,25 @@ function draw() {
     //var tiles = require("./utils/gameStructs").tiles;//Will need to be made to work.
     //var _ = require('../lib/underscore.js');
 
-    //var tileRects = new Array();
+    
 
-    //var numTileColumns = tiles.length
-    //for(var w = 0; w < numTileColumns; w++){
-    //	var numTileRows = tiles[w].length;
-    //	for(var h=0; h < numTileRows; h++){
-    //			tileRects[w*numTileColumns + h] = new Kinetic.Rect
-    //		}
-    //		}
+    var tileRects = new Array();
+
+    var numTileColumns = tiles.length
+    for (var w = 0; w < numTileColumns; w++) {
+        var numTileRows = tiles[w].length;
+        for (var h = 0; h < numTileRows; h++) {
+            var rectWidth = BOARD_WIDTH /numTileColumns;
+            var rectHeight = BOARD_HEIGHT / numTileRows;
+            tileRects[w * numTileColumns + h] = new Kinetic.Rect({
+                width: rectWidth,
+                heith: rectHeight,
+                x: rectWidth * w,
+                y: rectHeight * h,
+                fill: '#FF00FF'
+                })
+        }
+    }
 
 
 
@@ -36,6 +47,7 @@ function draw() {
 
 
     layer.add(hex);
+    layer.add(tileRects);
     stage.add(layer);
     //context.clearRect(0,0,canvas.width,canvas.height);
     //update();
