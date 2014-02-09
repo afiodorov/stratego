@@ -100,7 +100,7 @@ module.exports = {
   getOppositeSide : getOppositeSide
 };
 
-/* autcompletion now works */
+/* autocompletion now works */
 if(false) {
   var StateHolder = require('./stateHolder.js');
   var stateHolder = new StateHolder();

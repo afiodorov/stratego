@@ -1,7 +1,8 @@
-div#myName {
+div#bottom {
   position: absolute;
   bottom: 0px;
   left: 0px;
+  display: inline;
 }
 
 div#players {

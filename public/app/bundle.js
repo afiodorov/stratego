@@ -28,6 +28,428 @@ var Game = function(gameId) {
 };
 
 },{}],3:[function(require,module,exports){
+/*global Enumerable*/
+'use strict';
+var gameStructs = require("./structs.js");
+
+var hasRequiredFields = function(o, requiredFields) {
+  return requiredFields.reduce(function(res, prop) {
+    return res && o.hasOwnProperty(prop);
+  }, true);
+};
+
+var isGameStateValid = function(stateHolder) {
+  var requiredFields = ["pieces", "cards"];
+  return hasRequiredFields(stateHolder, ["stage", "mySide", "turn"])
+    && hasRequiredFields(stateHolder.light, requiredFields) 
+    && hasRequiredFields(stateHolder.dark, requiredFields);
+};
+
+var isSideValid = function(side) {
+  return ["light", "dark"].indexOf(side) !== -1;
+};
+
+var getOppositeSide = function(side) {
+  if(side === "light") {
+    return "dark";
+  } 
+
+  if(side === "dark") {
+    return "light";
+  }
+
+  throw new TypeError("Can't get opposite side");
+};
+
+var isMoveObjectValid = function(move) {
+  if(!hasRequiredFields(move, ["piece", "side", "toTile"])) {
+    return false;
+  }
+
+  if(!isSideValid(move.side)) {
+    return false;
+  }
+
+  if(!gameStructs.pieces[move.side][move.piece]) {
+    return false;
+  }
+
+  if(!gameStructs.isWithinGrid(move.toTile)) {
+    return false;
+  }
+};
+
+var isAttack = function(stateHolder, move) {
+  return stateHolder.isTileWithEnemy(move.toTile);
+};
+
+var getPieceLocation = function(stateHolder, side, piece) {
+  var pieceLocArr =
+    Enumerable.From(stateHolder[side].piecesLeft).Where(
+    function(x) {return x.name === piece;}).Select(
+    function(x) {return x.position;}).Take(1).toArray();
+    if(pieceLocArr.length === 0) {
+      return -1;
+    }
+  return pieceLocArr[0];
+};
+
+var isMoveValid = function(stateHolder, move) {
+  /* 
+   * move {piece, side, toTile}
+  */
+
+  var newState = null;
+
+  if(!isGameStateValid(stateHolder)) {
+    return {err: "Invalid gaming state passed"};
+  }
+
+  if(!isMoveObjectValid(move)) {
+    return {err: "Invalid move passed"};
+  }
+
+  if(stateHolder.stage === "start" || "game") {
+    if(move.side !== stateHolder.turn) {
+      return {err: "Not your turn"};
+    }
+  }
+
+  var pieceLocation = getPieceLocation(stateHolder, move.side, move.piece);
+  if(pieceLocation === -1) {
+    return {err: "You don't have that piece"};
+  }
+
+  return {
+    newState : newState
+  };
+};
+
+module.exports = {
+  isMoveValid : isMoveValid,
+  getOppositeSide : getOppositeSide
+};
+
+/* autocompletion now works */
+if(false) {
+  var StateHolder = require('./stateHolder.js');
+  var stateHolder = new StateHolder();
+  isAttack(stateHolder, {piece: 'gandalf', side: 'light', toTile: [1,1]});
+  isMoveValid(stateHolder, {piece: 'gandalf', side: 'light', toTile: [1,1]});
+}
+
+},{"./stateHolder.js":4,"./structs.js":5}],4:[function(require,module,exports){
+'use strict';
+var _ = require('../lib/underscore.js');
+var GameStructs = require('./structs.js');
+var GameLogic = require('./logic.js');
+
+var stateHolder = function(stateJson) {
+  this._observers = [];
+  this.update(stateJson);
+};
+
+stateHolder.prototype.getSide = function() {
+  return this._stateJson.mySide;
+};
+
+stateHolder.prototype.piecesCount = function(tile) {
+  return this._stateJson[this.getSide()].pieces.filter(function(piece) {
+    return _.isEqual(piece.position, tile);
+  }).length;
+};
+
+stateHolder.prototype.update = function(stateJson) {
+  this._stateJson = stateJson;
+  this._observers.forEach(function(observer) {
+    if (typeof observer.update === 'function') {
+      observer.update.call(null, this._stateJson);
+    }
+  });
+};
+
+/* Checks if board tile out of space */
+stateHolder.prototype.isTileFull = function(tile) {
+  return this.piecesCount(tile) >= GameStructs.tiles[tile].capacity;
+};
+
+/* Checks if tile [int, int] has an enemy piece */
+stateHolder.prototype.isTileWithEnemy = function(tile) {
+  var oppositeSide = GameLogic.getOppositeSide(this.getSide());
+  return this._stateJson[oppositeSide].pieces.filter(
+      function(piece) {
+        return _.isEqual(piece.position, tile);
+      }).length !== 0;
+};
+
+/* Checks if client player has a card */
+stateHolder.prototype.hasCard = function(card) {
+  var side = this.getSide();
+  return this._stateJson[side].cardsLeft.indexOf(card) !== -1;
+};
+
+stateHolder.prototype.addObserver = function(observer) {
+  if (this._observers.indexOf(observer) === -1) {
+    this._observers.push(observer);
+  }
+};
+
+module.exports = stateHolder;
+
+},{"../lib/underscore.js":9,"./logic.js":3,"./structs.js":5}],5:[function(require,module,exports){
+"use strict";
+module.exports = {
+  tiles : require('./structs/tiles.js'),
+  pieces : require('./structs/pieces.js')
+};
+
+},{"./structs/pieces.js":6,"./structs/tiles.js":7}],6:[function(require,module,exports){
+'use strict';
+
+var pieces = (function() {
+  var pieces = Object.create(null);
+  pieces.light = Object.create(null);
+  pieces.light = {
+    'gandalf' :
+      {
+        strength: 5,
+        description: 'Dark Player must play his card first'
+      },
+    'aragorn' :
+      {
+        strength: 4,
+        description: 'May attack any adjacent region'
+      },
+    'boromir' :
+      {
+        strength: 0,
+        description: 'Both Boromir and Enemy character are instantly defeated'
+      },
+    'frodo' :
+      {
+        strength: 1,
+        description: 'When attacked, may retreat sideways'
+      },
+    'gimly' :
+     {
+       strength: 3,
+       description: 'Instantly defeats the Orcs'
+     },
+     'legolas' :
+     {
+      strength: 3,
+      description: 'Instantly defeats the Flying Nazgul'
+     },
+     'merry' :
+     {
+      strength: 2,
+      description: 'Instantly defeats the Witch King'
+     },
+     'pippin' :
+     {
+       strength: 1,
+       description: 'When attacking may retreat backwards'
+     },
+     'sam' :
+     {
+      strength: 2,
+      description: 'When with Frodo, is Strength 5 & may replace Frodo in battle'
+     }
+  };
+
+  pieces.dark = Object.create(null);
+  pieces.dark = {
+    'orcs' :
+    {
+      strength: 2,
+      description: 'When attacking instantly defeats the first character'
+    },
+    'shelob' :
+    {
+      strength: 5,
+      description: 'After Shelob defeats an Enemy character, she is immediately returned to Gondor'
+    },
+    'saruman' :
+    {
+      strength: 4,
+      description: 'May decide that no cards are played'
+    },
+    'flying nazgul' :
+    {
+      strength: 3,
+      description: 'May attack a single Light character anywhere on the board'
+    },
+    'barlog' :
+    {
+      strength: 5,
+      description: 'When in Moria instantly defeats any Character using the Tunnel'
+    },
+    'warg' :
+    {
+      strength: 2,
+      description: 'Enemy character\'s text is ignored'
+    },
+    'black rider':
+    {
+      strength: 4,
+      description: 'May move forward any number of regions to attack'
+    },
+    'witch king' :
+    {
+      strength: 5,
+      description: 'May attack sideways'
+    },
+    'cave troll' :
+    {
+      strength: 9,
+      description: 'The Dark Player\'s card has no value or effect'
+    }
+  };
+  Object.freeze(pieces);
+  return pieces;
+}());
+
+module.exports = pieces;
+
+},{}],7:[function(require,module,exports){
+'use strict';
+var _ = require('../../lib/underscore.js');
+
+var tiles = (function() {
+  var NUM_OF_ROWS = 7;
+  var NUM_OF_COLS = 4;
+
+  var columnLimit = function(colNumber) {
+    return (colNumber > NUM_OF_ROWS / 2) ? NUM_OF_ROWS + 1 - colNumber : colNumber;
+  };
+
+  /**
+   * Returns whether a grid index is valid
+   * Call with int, int or [int, int]
+   */
+  var isWithinGrid = function(row_, col_) {
+    var row = row_;
+    var col = col_;
+
+    if (Object.prototype.toString.call(row_) === '[object Array]') {
+      if (row_.length !== 2) {
+        throw new TypeError('Call wish coordinates array of length 2');
+      }
+      row = row_[0];
+      col = row_[1];
+    }
+
+    if (isNaN(row) || row < 1 || row > NUM_OF_ROWS) {
+      return false;
+    }
+
+    if (isNaN(col) || col < 1 || col > columnLimit(row)) {
+      return false;
+    }
+
+    return true;
+  };
+
+  var tiles = [];
+  _.range(1, NUM_OF_ROWS + 1).forEach(function(i) { tiles[i] = []; });
+
+  var Tile = function(name, capacity, index) {
+    this.name = name;
+    this.capacity = capacity;
+    this.index = index;
+  };
+
+  /* get all forward tiles */
+  Tile.prototype.getForward = function() {
+    var res = new Array(0);
+    res.push([this.index[0] + 1, this.index[1]]);
+    if (this.index[0] > NUM_OF_ROWS / 2) {
+      res.push([this.index[0] + 1, this.index[1] - 1]);
+    } else {
+      res.push([this.index[0] + 1, this.index[1] + 1]);
+    }
+    return res.filter(isWithinGrid).sort();
+  };
+
+  /* get all backward tiles */
+  Tile.prototype.getBackward = function() {
+    var res = new Array(0);
+    res.push([this.index[0] - 1, this.index[1]]);
+    if (this.index[0] > Math.ceil(NUM_OF_ROWS / 2)) {
+      res.push([this.index[0] - 1, this.index[1] + 1]);
+    } else {
+      res.push([this.index[0] - 1, this.index[1] - 1]);
+    }
+    return res.filter(isWithinGrid).sort();
+  };
+
+  /* get all side tiles */
+  Tile.prototype.getSide = function() {
+    var res = new Array(0);
+    res.push([this.index[0], this.index[1] - 1]);
+    res.push([this.index[0], this.index[1] + 1]);
+    return res.filter(isWithinGrid);
+  };
+
+  tiles[1][1] = new Tile('The Shire'       , 4, [1, 1]);
+  tiles[2][1] = new Tile('Arthedam'        , 2, [2, 1]);
+  tiles[2][2] = new Tile('Cardolan'        , 2, [2, 2]);
+  tiles[3][1] = new Tile('Rhudaur'         , 2, [3, 1]);
+  tiles[3][2] = new Tile('Eregion'         , 2, [3, 2]);
+  tiles[3][3] = new Tile('Enedwaith'       , 2, [3, 3]);
+  tiles[4][1] = new Tile('The High Pass'   , 1, [4, 1]);
+  tiles[4][2] = new Tile('Misty Mountains' , 1, [4, 2]);
+  tiles[4][3] = new Tile('Caradoras'       , 1, [4, 3]);
+  tiles[4][4] = new Tile('Gap Of Rohan'    , 1, [4, 4]);
+  tiles[5][1] = new Tile('Mirkwood'        , 2, [5, 1]);
+  tiles[5][2] = new Tile('Fangorn'         , 2, [5, 2]);
+  tiles[5][3] = new Tile('Rohan'           , 2, [5, 3]);
+  tiles[6][1] = new Tile('Gondor'          , 2, [6, 1]);
+  tiles[6][2] = new Tile('Dagorlad'        , 2, [6, 2]);
+  tiles[7][1] = new Tile('Mordor'          , 4, [7, 1]);
+
+  var makeTiles = function(tiles) {
+    var mytiles = new Array(0);
+    _.range(1, NUM_OF_ROWS + 1).forEach(function(i) {
+      _.range(1, columnLimit(i) + 1).forEach(function(j) {
+        mytiles.push(tiles[i][j]);
+        Object.defineProperty(mytiles, [[i, j]], {
+          enumerable: false,
+          value: tiles[i][j]
+        });
+      });
+    });
+
+    mytiles.NUM_OF_ROWS = NUM_OF_ROWS;
+    Object.defineProperty(mytiles, 'NUM_OF_ROWS', {
+      enumerable: false
+    });
+
+    mytiles.NUM_OF_COLS = NUM_OF_COLS;
+    Object.defineProperty(mytiles, 'NUM_OF_COLS', {
+      enumerable: false
+    });
+
+    mytiles.columnLimit = columnLimit;
+    Object.defineProperty(mytiles, 'columnLimit', {
+      enumerable: false
+    });
+
+    mytiles.isWithin = isWithinGrid;
+    Object.defineProperty(mytiles, 'isWithin', {
+      enumerable: false
+    });
+
+    Object.freeze(mytiles);
+    return mytiles;
+  };
+
+  return makeTiles(tiles);
+}());
+
+module.exports = tiles;
+
+},{"../../lib/underscore.js":9}],8:[function(require,module,exports){
 /*! Socket.IO.js build:0.9.16, development. Copyright(c) 2011 LearnBoost <dev@learnboost.com> MIT Licensed */
 
 var io = ('undefined' === typeof module ? {} : module.exports);
@@ -3901,7 +4323,7 @@ if (typeof define === "function" && define.amd) {
   define([], function () { return io; });
 }
 })();
-},{}],4:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -5179,8 +5601,8 @@ if (typeof define === "function" && define.amd) {
 
 }).call(this);
 
-},{}],5:[function(require,module,exports){
-/*global location*/
+},{}],10:[function(require,module,exports){
+/*global location, localStorage*/
 'use strict';
 var io = require('./lib/socket.io.js');
 var $ = require('jquery');
@@ -5201,7 +5623,9 @@ function AppViewModel(lobby_) {
     Object.defineProperty(self, "currentGame", 
       {get : function(){ return _currentGame; }});
 
+    self.activeTab = ko.observable();
     self.shouldShowPage = ko.observable(true);
+    self.invites = ko.observable('all');
     self.games = ko.observableArray();
     self.players = ko.observableArray();
     self.chatInput = ko.observable();
@@ -5210,7 +5634,9 @@ function AppViewModel(lobby_) {
     self.opponentNameOfGameToBeClosed = ko.observable("");
 
     self.switchToGame = function(game) {
+      console.log(game);
       _currentGame = game;
+      localStorage.setItem('currentGameId', game.id);
     };
 
     self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
@@ -5268,8 +5694,12 @@ function AppViewModel(lobby_) {
     self.onAddShortGame = function(game) {
         game.messages = ko.observableArray([]);
         self.games.push(game);
+        if(localStorage.getItem('currentGameId') === game.id) {
+          _currentGame = game;
+          self.activeTab(-1);
+        }
 
-        lobby.emit('requestGameStatus', game);
+        lobby.emit('gGetState', game);
         lobby.emit('requestChatLog', game);
     };
 
@@ -5312,7 +5742,11 @@ function AppViewModel(lobby_) {
         function(gameIt) {
           return gameIt.id === game.id;
         }
-      );  
+      );
+      if(game === _currentGame) {
+        _currentGame = null;
+        localStorage.removeItem('currentGameId');
+      }
       return self.onRemoveGame;
     };
       
@@ -5430,7 +5864,7 @@ $(function() {
   appViewModel.bindSocketHandlers();
 });
 
-},{"./lib/socket.io.js":3,"jquery":"aaarNY","knockout":"Hwveqo","knockout-jquery":"BHxK8g","pnotify":"h/SWuZ"}],"a8KSQE":[function(require,module,exports){
+},{"./lib/socket.io.js":8,"jquery":"aaarNY","knockout":"Hwveqo","knockout-jquery":"BHxK8g","pnotify":"h/SWuZ"}],"a8KSQE":[function(require,module,exports){
 (function (global){(function browserifyShim(module, define) {
 
 ; global.$ = require("jquery");
@@ -5450,8 +5884,6 @@ if(n){if(a=this._find(s),a.length)return a.find(".ui-tooltip-content").html(n),v
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"jquery":"aaarNY"}],"jquery-ui":[function(require,module,exports){
 module.exports=require('a8KSQE');
-},{}],"jquery":[function(require,module,exports){
-module.exports=require('aaarNY');
 },{}],"aaarNY":[function(require,module,exports){
 (function (global){(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*! jQuery v1.7.2 jquery.com | jquery.org/license */
@@ -5462,6 +5894,10 @@ a){var b=F.exec(a);b&&(b[1]=(b[1]||"").toLowerCase(),b[3]=b[3]&&new RegExp("(?:^
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],"jquery":[function(require,module,exports){
+module.exports=require('aaarNY');
+},{}],"knockout":[function(require,module,exports){
+module.exports=require('Hwveqo');
 },{}],"Hwveqo":[function(require,module,exports){
 (function (global){(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
@@ -5556,16 +5992,14 @@ var f=b.data("precompiled");f||(f=b.text()||"",f=F.template(p,"{{ko_with $item.k
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":"aaarNY"}],"knockout":[function(require,module,exports){
-module.exports=require('Hwveqo');
+},{"jquery":"aaarNY"}],"knockout-jquery":[function(require,module,exports){
+module.exports=require('BHxK8g');
 },{}],"BHxK8g":[function(require,module,exports){
 (function (global){(function browserifyShim(module, define) {
 !function(a,b){"use strict";"object"==typeof exports?b(exports,require("jquery"),require("knockout"),require("jquery-ui")):"function"==typeof define&&define.amd?define(["exports","jquery","knockout","jquery-ui"],b):b(a.kojqui={},a.jQuery,a.ko)}(this,function(a,b,c){"use strict";var d,e;d=function(){var a,d,e,f;return a=function(a){var b=(a||"").match(/^(\d\.\d+)\.\d+$/);return b?b[1]:null},d=b&&b.fn?a(b.fn.jquery):null,e=b&&b.ui?a(b.ui.version):null,f=c?a(c.version):null,{jQuery:d,jQueryUI:e,knockout:f}}(),function(){if(!d.jQuery)throw new Error("jQuery must be loaded before knockout-jquery.");if(!d.jQueryUI)throw new Error("jQuery UI must be loaded before knockout-jquery.");if(!d.knockout)throw new Error("knockout must be loaded before knockout-jquery.");if("1.8"!==d.jQueryUI&&"1.9"!==d.jQueryUI&&"1.10"!==d.jQueryUI)throw new Error("This version of the jQuery UI library is not supported.");if("2.2"!==d.knockout&&"2.3"!==d.knockout&&"3.0"!==d.knockout)throw new Error("This version of the knockout library is not supported.")}(),e=function(){var a,d,e,f,g,h;return a=function(a,b){var d={};return c.utils.arrayForEach(b,function(b){void 0!==a[b]&&(d[b]=a[b])}),d},d=function(a){var b,d;b={};for(d in a)a.hasOwnProperty(d)&&(b[d]=c.isObservable(a[d])?a[d].peek():a[d]);return b},e=function(a,d,e,f){b(d)[a]("option",e,c.utils.unwrapObservable(f))},f=function(a,b,d){var f;for(f in d)d.hasOwnProperty(f)&&c.isObservable(d[f])&&c.computed({read:e.bind(this,a,b,f,d[f]),disposeWhenNodeIsRemoved:b})},g=function(a,d,e){c.isObservable(e.refreshOn)&&c.computed({read:function(){e.refreshOn(),b(d)[a]("refresh")},disposeWhenNodeIsRemoved:d})},h=function(e){var h,i;h=e.name,b.fn[h]&&(i=function(i,j,k,l,m){var n,o,p,q,r,s;return n="ko_"+h+"_initialized",i[n]||(o=j(),p=a(o,e.options),q=a(o,e.events),e.preInit&&e.preInit.apply(this,arguments),c.applyBindingsToDescendants(m,i),s=d(q),b.each(s,function(a,b){s[a]=b.bind(l)}),r=d(p),b(i)[h](c.utils.extend(r,s)),f(h,i,p),e.hasRefresh&&g(h,i,o),c.isWriteableObservable(o.widget)&&o.widget(b(i)),c.utils.domNodeDisposal.addDisposeCallback(i,function(){b(i)[h]("destroy"),i[n]=null}),e.postInit&&e.postInit.apply(this,arguments),i[n]=!0),{controlsDescendantBindings:!0}},c.bindingHandlers[h]={init:i})},{create:h}}(),function(){var a,f,g,h,i;switch(f=function(d,e){var f=e();c.isWriteableObservable(f.active)&&b(d).on(a,function(){f.active(b(d).accordion("option","active"))}),c.utils.domNodeDisposal.addDisposeCallback(d,function(){b(d).off(".ko")})},d.jQueryUI){case"1.8":g=["active","animated","autoHeight","clearStyle","collapsible","disabled","event","fillSpace","header","icons","navigation","navigationFilter"],h=["change","changestart","create"],i=!1,a="accordionchange.ko";break;case"1.9":case"1.10":g=["active","animate","collapsible","disabled","event","header","heightStyle","icons"],h=["activate","beforeActivate","create"],i=!0,a="accordionactivate.ko"}e.create({name:"accordion",options:g,events:h,postInit:f,hasRefresh:i})}(),function(){var a;switch(d.jQueryUI){case"1.8":a=["change","close","create","focus","open","search","select"];break;case"1.9":case"1.10":a=["change","close","create","focus","open","response","search","select"]}e.create({name:"autocomplete",options:["appendTo","autoFocus","delay","disabled","minLength","position","source"],events:a})}(),function(){e.create({name:"button",options:["disabled","icons","label","text"],events:["create"],hasRefresh:!0})}(),function(){e.create({name:"buttonset",options:["items","disabled"],events:["create"],hasRefresh:!0})}(),function(){var a;a=function(a,d){var e,f,g,h;e=d(),f=c.utils.unwrapObservable(e.value),f&&b(a).datepicker("setDate",f),c.isObservable(e.value)&&(g=e.value.subscribe(function(c){b(a).datepicker("setDate",c)}),c.utils.domNodeDisposal.addDisposeCallback(a,function(){g.dispose()})),c.isWriteableObservable(e.value)&&(h=b(a).datepicker("option","onSelect"),b(a).datepicker("option","onSelect",function(c){var d,f;d=b(a).datepicker("option","dateFormat"),f=b.datepicker.parseDate(d,c),e.value(f),"function"==typeof h&&h.apply(this,Array.prototype.slice.call(arguments))}))},e.create({name:"datepicker",options:["altField","altFormat","appendText","autoSize","buttonImage","buttonImageOnly","buttonText","calculateWeek","changeMonth","changeYear","closeText","constrainInput","currentText","dateFormat","dayNames","dayNamesMin","dayNamesShort","defaultDate","duration","firstDay","gotoCurrent","hideIfNoPrevNext","isRTL","maxDate","minDate","monthNames","monthNamesShort","navigationAsDateFormat","nextText","numberOfMonths","prevText","selectOtherMonths","shortYearCutoff","showAnim","showButtonPanel","showCurrentAtPos","showMonthAfterYear","showOn","showOptions","showOtherMonths","showWeek","stepMonths","weekHeader","yearRange","yearSuffix","beforeShow","beforeShowDay","onChangeMonthYear","onClose","onSelect"],events:[],postInit:a})}(),function(){var a,f,g,h;switch(a=function(a){var b;b=document.createElement("DIV"),b.style.display="none",a.parentNode.insertBefore(b,a),c.utils.domNodeDisposal.addDisposeCallback(b,function(){c.removeNode(a)})},f=function(a,d){var e=d();e.isOpen&&c.computed({read:function(){c.utils.unwrapObservable(e.isOpen)?b(a).dialog("open"):b(a).dialog("close")},disposeWhenNodeIsRemoved:a}),c.isWriteableObservable(e.isOpen)&&(b(a).on("dialogopen.ko",function(){e.isOpen(!0)}),b(a).on("dialogclose.ko",function(){e.isOpen(!1)})),c.utils.domNodeDisposal.addDisposeCallback(a,function(){b(a).off(".ko")})},d.jQueryUI){case"1.8":g=["autoOpen","buttons","closeOnEscape","closeText","dialogClass","disabled","draggable","height","maxHeight","maxWidth","minHeight","minWidth","modal","position","resizable","show","stack","title","width","zIndex"],h=["beforeClose","create","open","focus","dragStart","drag","dragStop","resizeStart","resize","resizeStop","close"];break;case"1.9":g=["autoOpen","buttons","closeOnEscape","closeText","dialogClass","draggable","height","hide","maxHeight","maxWidth","minHeight","minWidth","modal","position","resizable","show","stack","title","width","zIndex"],h=["beforeClose","create","open","focus","dragStart","drag","dragStop","resizeStart","resize","resizeStop","close"];break;case"1.10":g=["appendTo","autoOpen","buttons","closeOnEscape","closeText","dialogClass","draggable","height","hide","maxHeight","maxWidth","minHeight","minWidth","modal","position","resizable","show","title","width"],h=["beforeClose","create","open","focus","dragStart","drag","dragStop","resizeStart","resize","resizeStop","close"]}e.create({name:"dialog",options:g,events:h,preInit:a,postInit:f})}(),function(){e.create({name:"menu",options:["disabled","icons","menus","position","role"],events:["blur","create","focus","select"],hasRefresh:!0})}(),function(){var a;switch(d.jQueryUI){case"1.8":a=["disabled","value"];break;case"1.9":case"1.10":a=["disabled","max","value"]}e.create({name:"progressbar",options:a,events:["change","create","complete"]})}(),function(){var a;a=function(a,d){var e=d();c.isWriteableObservable(e.value)&&b(a).on("slidechange.ko",function(c,d){var f=b(a).find(".ui-slider-handle");f[0]===d.handle&&e.value(d.value)}),c.utils.domNodeDisposal.addDisposeCallback(a,function(){b(a).off(".ko")})},e.create({name:"slider",options:["animate","disabled","max","min","orientation","range","step","value","values"],events:["create","start","slide","change","stop"],postInit:a})}(),function(){var a;a=function(a,d,e){var f=d();f.value&&c.computed({read:function(){b(a).spinner("value",c.utils.unwrapObservable(f.value))},disposeWhenNodeIsRemoved:a}),c.isWriteableObservable(f.value)&&(e().valueUpdate?b(a).on("spin.ko",function(a,b){f.value(b.value)}):b(a).on("spinchange.ko",function(){f.value(b(a).spinner("value"))})),c.utils.domNodeDisposal.addDisposeCallback(a,function(){b(a).off(".ko")})},e.create({name:"spinner",options:["culture","disabled","icons","incremental","max","min","numberFormat","page","step"],events:["create","start","spin","stop","change"],postInit:a})}(),function(){var a,f,g,h,i,j;switch(a=function(a,d){var e=d();c.isWriteableObservable(e.selected)&&b(a).on("tabsshow.ko",function(c,d){b(a)[0]===c.target&&e.selected(d.index)}),c.utils.domNodeDisposal.addDisposeCallback(a,function(){b(a).off(".ko")})},f=function(a,d){var e=d();c.isWriteableObservable(e.active)&&b(a).on("tabsactivate.ko",function(c,d){b(a)[0]===c.target&&e.active(d.newTab.index())}),c.utils.domNodeDisposal.addDisposeCallback(a,function(){b(a).off(".ko")})},d.jQueryUI){case"1.8":g=["ajaxOptions","cache","collapsible","cookie","disabled","event","fx","idPrefix","panelTemplate","selected","spinner","tabTemplate"],h=["add","create","disable","enable","load","remove","select","show"],j=a,i=!1;break;case"1.9":case"1.10":g=["active","collapsible","disabled","event","heightStyle","hide","show"],h=["activate","beforeActivate","beforeLoad","create","load"],j=f,i=!0}e.create({name:"tabs",options:g,events:h,postInit:j,hasRefresh:i})}(),function(){var a;a=function(a,d){var e=d();e.isOpen&&c.computed({read:function(){c.utils.unwrapObservable(e.isOpen)?b(a).tooltip("open"):b(a).tooltip("close")},disposeWhenNodeIsRemoved:a}),c.isWriteableObservable(e.isOpen)&&(b(a).on("tooltipopen.ko",function(){e.isOpen(!0)}),b(a).on("tooltipclose.ko",function(){e.isOpen(!1)})),c.utils.domNodeDisposal.addDisposeCallback(a,function(){b(a).off(".ko")})},e.create({name:"tooltip",options:["content","disabled","hide","items","position","show","tooltipClass","track"],events:["create","open","close"],postInit:a})}(),c.jqui={bindingFactory:e},a.version="0.6.0"});
 }).call(global, module, undefined);
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":"aaarNY","jquery-ui":"a8KSQE","knockout":"Hwveqo"}],"knockout-jquery":[function(require,module,exports){
-module.exports=require('BHxK8g');
-},{}],"h/SWuZ":[function(require,module,exports){
+},{"jquery":"aaarNY","jquery-ui":"a8KSQE","knockout":"Hwveqo"}],"h/SWuZ":[function(require,module,exports){
 (function (global){(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*
  * jQuery Pines Notify (pnotify) Plugin 1.2.2
@@ -5614,4 +6048,4 @@ auto_display:true,width:"300px",min_height:"16px",type:"notice",icon:true,animat
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],"pnotify":[function(require,module,exports){
 module.exports=require('h/SWuZ');
-},{}]},{},[1,2,3,4,5])
+},{}]},{},[1,2,3,4,5,6,7,8,9,10])

@@ -103,9 +103,8 @@ function acceptGame(data){
   if(!data || typeof data.playerName === "undefined") {
     return;
   }
-  var socket = this.socket
-    , session = this.session
-    , self = this;
+  var socket = this.socket;
+  var self = this;
 
     var opponent = clients[data.playerName];
     db.mongoStore.get(opponent.sid, function (err, opsession) {
@@ -128,8 +127,8 @@ function acceptGame(data){
   }
 
 function _addNewGame(opponent, opsession) {
-  var socket = this.socket
-    , session = this.session;
+  var socket = this.socket;
+  var session = this.session;
     
   Game.addPlayers(opponent.sid, socket.sid, function(err, game) {
     if(!err) {

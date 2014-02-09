@@ -1,4 +1,4 @@
-/*global location*/
+/*global location, localStorage*/
 'use strict';
 var io = require('./lib/socket.io.js');
 var $ = require('jquery');
@@ -19,7 +19,9 @@ function AppViewModel(lobby_) {
     Object.defineProperty(self, "currentGame", 
       {get : function(){ return _currentGame; }});
 
+    self.activeTab = ko.observable();
     self.shouldShowPage = ko.observable(true);
+    self.invites = ko.observable('all');
     self.games = ko.observableArray();
     self.players = ko.observableArray();
     self.chatInput = ko.observable();
@@ -28,7 +30,9 @@ function AppViewModel(lobby_) {
     self.opponentNameOfGameToBeClosed = ko.observable("");
 
     self.switchToGame = function(game) {
+      console.log(game);
       _currentGame = game;
+      localStorage.setItem('currentGameId', game.id);
     };
 
     self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
@@ -86,8 +90,12 @@ function AppViewModel(lobby_) {
     self.onAddShortGame = function(game) {
         game.messages = ko.observableArray([]);
         self.games.push(game);
+        if(localStorage.getItem('currentGameId') === game.id) {
+          _currentGame = game;
+          self.activeTab(-1);
+        }
 
-        lobby.emit('requestGameStatus', game);
+        lobby.emit('gGetState', game);
         lobby.emit('requestChatLog', game);
     };
 
@@ -130,7 +138,11 @@ function AppViewModel(lobby_) {
         function(gameIt) {
           return gameIt.id === game.id;
         }
-      );  
+      );
+      if(game === _currentGame) {
+        _currentGame = null;
+        localStorage.removeItem('currentGameId');
+      }
       return self.onRemoveGame;
     };
       

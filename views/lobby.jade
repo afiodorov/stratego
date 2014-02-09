@@ -12,7 +12,7 @@ html
     body
       #blockingMsg
       .container(data-bind='visible: shouldShowPage')
-        #tabs(data-bind='tabs: { refreshOn: games }')
+        #tabs(data-bind='tabs: { refreshOn: games, active: activeTab }')
           ul
             li
               a(href='#main') Main
@@ -32,10 +32,21 @@ html
               li
                 a(href='#', data-bind='text: playerName, click: $parent.requestGame')
               // /ko
-            #myName
-              form(data-bind='submit: emitChangeMyPlayerName.bind(this, myPlayerName())')
-                input#playerName(type='text', data-bind='value: myPlayerName')
-                button#setPlayerName Set my name
+            #bottom
+              span
+                form(data-bind='submit: emitChangeMyPlayerName.bind(this, myPlayerName())')
+                  input#playerName(type='text', data-bind='value: myPlayerName')
+                  button#setPlayerName Set my name
+              span
+                span Accept invites:
+                  span All
+                  input(type='radio' value='all' data-bind='checked: invites')
+                  span Dark Only
+                  input(type='radio' value='dark' data-bind='checked: invites')
+                  span Light Only
+                  input(type='radio' value='light' data-bind='checked: invites')
+                  span None
+                  input(type='radio' value='none' data-bind='checked: invites')
           // ko foreach: games
           div(data-bind='attr: {id: id}')
             canvas.game-canvas(width='750', height='500') Canvas not supported
