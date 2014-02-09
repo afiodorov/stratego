@@ -31,6 +31,7 @@ app.use(express.static(__dirname + '/public/'));
 app.get('/lobby', function(req, res){
   res.render('lobby');
 });
+
 app.get('/', function(req, res){
   res.render('canvasPlayground');
 });

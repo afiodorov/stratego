@@ -9,11 +9,11 @@ var hasRequiredFields = function (o, requiredFields) {
   }, true);
 };
 
-var isGameStateValid = function(gameState) {
-  var requiredFields = ["piecesLeft", "cardsLeft"];
-  return hasRequiredFields(gameState, ["stage", "mySide", "turn"])
-    && hasRequiredFields(gameState.light, requiredFields) 
-    && hasRequiredFields(gameState.dark, requiredFields);
+var isGameStateValid = function(stateHolder) {
+  var requiredFields = ["pieces", "cards"];
+  return hasRequiredFields(stateHolder, ["stage", "mySide", "turn"])
+    && hasRequiredFields(stateHolder.light, requiredFields) 
+    && hasRequiredFields(stateHolder.dark, requiredFields);
 };
 
 var isSideValid = function(side) {
@@ -33,7 +33,7 @@ var getOppositeSide = function(side) {
 };
 
 var isMoveObjectValid = function(move) {
-  if(!hasRequiredFields(move, ["piece", "side", "rowTo", "columnTo"])) {
+  if(!hasRequiredFields(move, ["piece", "side", "toTile"])) {
     return false;
   }
 
@@ -50,14 +50,14 @@ var isMoveObjectValid = function(move) {
   }
 };
 
-var isAttack = function(gameState, side, piece, rowTo, columnTo) {
+var isAttack = function(stateHolder, side, piece, rowTo, columnTo) {
   return true;
-  Enumerable.From(gameState[getOppositeSide[gameState.mySide]].piecesLeft)
+  Enumerable.From(stateHolder[getOppositeSide[stateHolder.mySide]].piecesLeft)
 };
 
-var getPieceLocation = function(gameState, side, piece) {
+var getPieceLocation = function(stateHolder, side, piece) {
   var pieceLocArr =
-    Enumerable.From(gameState[side].piecesLeft).Where(
+    Enumerable.From(stateHolder[side].piecesLeft).Where(
     function(x) {return x.name === piece;}).Select(
     function(x) {return x.position;}).Take(1).toArray();
     if(pieceLocArr.length === 0) {
@@ -66,14 +66,14 @@ var getPieceLocation = function(gameState, side, piece) {
   return pieceLocArr[0];
 };
 
-var isMoveValid = function(gameState, move) {
+var isMoveValid = function(stateHolder, move) {
   /* 
-   * move {piece, side, rowTo, columnTo}
+   * move {piece, side, toTile}
   */
 
   var newState = null;
 
-  if(!isGameStateValid(gameState)) {
+  if(!isGameStateValid(stateHolder)) {
     return {err: "Invalid gaming state passed"};
   }
 
@@ -81,13 +81,13 @@ var isMoveValid = function(gameState, move) {
     return {err: "Invalid move passed"};
   }
 
-  if(gameState.stage === "start" || "game") {
-    if(move.side !== gameState.turn) {
+  if(stateHolder.stage === "start" || "game") {
+    if(move.side !== stateHolder.turn) {
       return {err: "Not your turn"};
     }
   }
 
-  var pieceLocation = getPieceLocation(gameState, move.side, move.piece);
+  var pieceLocation = getPieceLocation(stateHolder, move.side, move.piece);
   if(pieceLocation === -1) {
     return {err: "You don't have that piece"};
   }
