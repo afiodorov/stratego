@@ -1,13 +1,13 @@
 var db = require('../lib/db.js');
 var GameSchema = new db.Schema({
-    players : [{type: String}],
+    players: [{type: String}]
 });
 var Game = db.mongoose.model('Game', GameSchema);
 
 function addPlayers(player1, player2, callback) {
   var instance = new Game();
   instance.players = [player1, player2].sort();
-  instance.save(function (err) {
+  instance.save(function(err) {
     if (err) {
       callback(err);
     } else {
@@ -17,7 +17,7 @@ function addPlayers(player1, player2, callback) {
 }
 
 function getInstance(player1, player2, callback) {
-	Game.findOne({players: [player1, player2].sort()}).exec(callback);
+  Game.findOne({players: [player1, player2].sort()}).exec(callback);
 }
 
 function getInstances(player, callback) {
@@ -29,12 +29,12 @@ function resignPlayer(player, game, callback) {
 }
 
 module.exports = {
-  addPlayers : addPlayers,
+  addPlayers: addPlayers,
   find: function(callback) {
     Game.find().sort('_id', 'descending').limit(5).exec(callback);
   },
-  getInstance : getInstance,
-  getInstances : getInstances,
+  getInstance: getInstance,
+  getInstances: getInstances,
   resignPlayer: resignPlayer,
-  Model : Game
+  Model: Game
 };

@@ -1,10 +1,10 @@
 var db = require('../lib/db.js');
 var ChatSchema = new db.Schema({
-    gameid : {type: String},
-    player : {type: String},
-    message : {type: String},
-    date : {type: Date},
-    playerName : {type: String}
+    gameid: {type: String},
+    player: {type: String},
+    message: {type: String},
+    date: {type: Date},
+    playerName: {type: String}
 });
 
 var Chat = db.mongoose.model('Chat', ChatSchema);
@@ -17,7 +17,7 @@ function pushMessage(chatStruct, callback) {
   instance.message = chatStruct.message;
   instance.playerName = chatStruct.playerName;
 
-  instance.save(function (err) {
+  instance.save(function(err) {
     if (err) {
       callback(err);
     } else {
@@ -36,8 +36,8 @@ function removeMessages(gameid, callback) {
 }
 
 module.exports = {
-  Model : Chat,
-  getMessages : getMessages,
-  pushMessage : pushMessage,
+  Model: Chat,
+  getMessages: getMessages,
+  pushMessage: pushMessage,
   removeMessages: removeMessages
 };
