@@ -1,4 +1,4 @@
-var q = require('q');
+var Q = require('q');
 var clients = [];
 var db = require('../lib/db');
 var lobbyutils = require('../lib/lobbyutils');
@@ -247,23 +247,23 @@ function _sendListOfGames() {
 
 function _sendListOfPlayers(onlineClients) {
   var socket = this.socket;
+  var self = this;
   onlineClients.forEach(function(client) {
     var isSelf = (client.sid === socket.sid);
-    var getSession = q.denodeify(db.mongoStore.get);
-    getSession(client.sid).done(function(err, session) {
-      if(!err) {
-        socket.emit('addNewPlayer',
-        {
-          playerName: session.playerName,
-          invitesAccepted: session.invitesAccepted,
-          isSelf: isSelf
-        });
-      } else {
-        logger.log('warn', "can't fetch client");
-        logger.log('warn', err);
-      }
+    var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
+    getSession(client.sid).then(function(session) {
+      _emitAddNewPlayer.call(self, session, isSelf);
     });
   });
+}
+
+function _emitAddNewPlayer(session, isSelf) {
+  this.socket.emit('addNewPlayer',
+    {
+      playerName: session.playerName,
+      invitesAccepted: session.invitesAccepted,
+      isSelf: isSelf
+    });
 }
 
 function main() {

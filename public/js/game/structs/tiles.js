@@ -82,7 +82,7 @@ var tiles = (function() {
   tiles[2][1] = new Tile('Arthedam'        , 2, [2, 1]);
   tiles[2][2] = new Tile('Cardolan'        , 2, [2, 2]);
   tiles[3][1] = new Tile('Rhudaur'         , 2, [3, 1]);
-  tile[3][2] = new Tile('Eregion'         , 2, [3, 2]);
+  tiles[3][2] = new Tile('Eregion'         , 2, [3, 2]);
   tiles[3][3] = new Tile('Enedwaith'       , 2, [3, 3]);
   tiles[4][1] = new Tile('The High Pass'   , 1, [4, 1]);
   tiles[4][2] = new Tile('Misty Mountains' , 1, [4, 2]);
@@ -108,12 +108,12 @@ var tiles = (function() {
     });
 
     mytiles.numRows = NUM_OF_ROWS;
-    Object.defineProperty(mytiles, 'NUM_OF_ROWS', {
+    Object.defineProperty(mytiles, 'numRows', {
       enumerable: false
     });
 
     mytiles.numCols = columnLimit;
-    Object.defineProperty(mytiles, 'columnLimit', {
+    Object.defineProperty(mytiles, 'numCols', {
       enumerable: false
     });
 
