@@ -84,7 +84,21 @@ function requestGame(data) {
       if(!opponent) {
         return;
       }
-      opponent.socket.emit('requestGame', _.extend(data, {playerName: session.playerName}));
+      var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
+      getSession(opponent.sid).then(function(session) {
+        if(session.acceptedInvites === 'none') {
+          return;
+        }
+        if(session.acceptedInvites === 'dark'
+          && data.invite !== 'light') {
+            return;
+        }
+        if(session.acceptedInvites === 'light'
+          && data.invite !== 'dark') {
+            return;
+        }
+        opponent.socket.emit('requestGame', _.extend(data, {playerName: session.playerName}));
+      });
       if (typeof session.invites === "undefined") {
         session.invites = [];
       }
