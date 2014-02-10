@@ -6,6 +6,7 @@ var makeStruct = require('../lib/structFactory').makeStruct;
 var Client = makeStruct("socket sid");
 var Game = require('../models/Game');
 var arr = require('../public/js/arr.js');
+var _ = require('../public/js/lib/underscore.js');
 var gameutils = require('../models/utils/gameutils');
 
 // first one is default
@@ -30,8 +31,7 @@ function connect() {
 
   clients[session.playerName] = new Client(socket, session.id);
   
-  socket.broadcast.emit('addNewPlayer', {playerName:
-  session.playerName, invitesAccepted: session.invitesAccepted, isSelf: false});
+  socket.broadcast.emit('addNewPlayer', _cNewPlayer(session, false));
 }
 
 function disconnect() {
@@ -68,35 +68,28 @@ function changeMyPlayerName(playerName) {
     }
 
     delete clients[session.playerName];
-    socket.broadcast.emit('removePlayerName', {playerName:
-      session.playerName, isSelf: false});
-    socket.emit('removePlayerName', {playerName:
-      session.playerName, isSelf: true});
-
+    socket.broadcast.emit('removePlayerName', _cNewPlayer(session, false));
+    socket.emit('removePlayerName', _cNewPlayer(session, true));
     session.playerName = playerName;
     session.save();
     clients[session.playerName] = new Client(socket, socket.sid);
-    socket.broadcast.emit('addNewPlayer', {playerName: session.playerName, 
-        isSelf: false});
-    socket.emit('addNewPlayer', {playerName:
-      session.playerName, isSelf: true});
+    socket.broadcast.emit('addNewPlayer', _cNewPlayer(session, false));
+    socket.emit('addNewPlayer', _cNewPlayer(session, true));
 }
 
 function requestGame(data) {
     var session = this.session;
-
     try {
       var opponent = clients[data.playerName];
       if(!opponent) {
         return;
       }
-      opponent.socket.emit('requestGame', {playerName:
-        session.playerName});
+      opponent.socket.emit('requestGame', _.extend(data, {playerName: session.playerName}));
       if (typeof session.invites === "undefined") {
         session.invites = [];
       }
       // I am inviting the opponent to the game
-      session.invites.pushIfNotExist(opponent.sid);
+      session.invites.pushIfNotExist({sid: opponent.sid, side: data.side});
       session.save();
     } catch(e) {
       logger.log('warn', "can't fetch the game");
@@ -105,14 +98,20 @@ function requestGame(data) {
 }
 
 function changeInvitesAccepted(invitesAccepted) {
-  if(invitesAccepted && invitesAllowed.indexOf(invitesAccepted) === -1) {
-    this.session.invitesAccepted = invitesAccepted;
-    this.session.save();
-    this.socket.emit("setInvitesAccepted", invitesAccepted);
+  var socket = this.socket;
+  var session = this.session;
+  if(invitesAccepted && invitesAllowed.indexOf(invitesAccepted) !== -1) {
+    session.invitesAccepted = invitesAccepted;
+    session.save();
+    socket.emit('setInvitesAccepted', invitesAccepted);
+    socket.broadcast.emit('removePlayerName', _cNewPlayer(session, false));
+    socket.emit('removePlayerName', _cNewPlayer(session, true));
+    socket.broadcast.emit('addNewPlayer', _cNewPlayer(session, false));
+    socket.emit('addNewPlayer', _cNewPlayer(session, true));
   }
 }
 
-function acceptGame(data){
+function acceptGame(data) {
   if(!data || typeof data.playerName === "undefined") {
     return;
   }
@@ -247,23 +246,21 @@ function _sendListOfGames() {
 
 function _sendListOfPlayers(onlineClients) {
   var socket = this.socket;
-  var self = this;
   onlineClients.forEach(function(client) {
     var isSelf = (client.sid === socket.sid);
     var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
     getSession(client.sid).then(function(session) {
-      _emitAddNewPlayer.call(self, session, isSelf);
+      socket.emit('addNewPlayer', _cNewPlayer(session, isSelf));
     });
   });
 }
 
-function _emitAddNewPlayer(session, isSelf) {
-  this.socket.emit('addNewPlayer',
-    {
+function _cNewPlayer(session, isSelf) {
+  return {
       playerName: session.playerName,
       invitesAccepted: session.invitesAccepted,
       isSelf: isSelf
-    });
+    };
 }
 
 function main() {

@@ -1,6 +1,7 @@
 /*global location, localStorage*/
 'use strict';
 var io = require('./lib/socket.io.js');
+var _ = require('./lib/underscore.js');
 var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');
@@ -10,8 +11,11 @@ require('knockout-jquery');
 function AppViewModel(lobby_) {
     var self = this;
     var lobby = lobby_;
-    var _gameToBeClosed = null;
+    var _playerInvited = null;
+    Object.defineProperty(self, "playerInvited", 
+      {get : function(){ return _playerInvited; }});
 
+    var _gameToBeClosed = null;
     Object.defineProperty(self, "gameToBeClosed", 
       {get : function(){ return _gameToBeClosed; }});
 
@@ -27,7 +31,11 @@ function AppViewModel(lobby_) {
     self.chatInput = ko.observable();
     self.myPlayerName = ko.observable("");
     self.isCloseGameDialogOpen = ko.observable(false);
+    self.isInviteGameDialogOpen = ko.observable(false);
+    self.openInviteGameDialog = ko.observable(false);
+    self.inviteGameDialogText = ko.observable("");
     self.opponentNameOfGameToBeClosed = ko.observable("");
+    self.invitesAvailable = ko.observableArray([]);
 
     self.switchToGame = function(game) {
       console.log(game);
@@ -61,11 +69,36 @@ function AppViewModel(lobby_) {
       self.opponentNameOfGameToBeClosed(this.opponentName);
     };
 
-    self.requestGame = function(player) {
-      lobby.emit('requestGame', {playerName: player.playerName});
+    self.openInviteGameDialog = function() {
+      self.invitesAvailable([]);
+      self.isInviteGameDialogOpen(true);
+      _playerInvited = this;
+      switch(_playerInvited.invitesAccepted) {
+        case 'all':
+          self.inviteGameDialogText("Player wants to play any game.");
+          self.invitesAvailable.push({id: 'random', label: 'Random'});
+          self.invitesAvailable.push({id: 'dark', label: 'Dark'});
+          self.invitesAvailable.push({id: 'light', label: 'Light'});
+        break;
+        case 'light':
+          self.inviteGameDialogText("Player wants to play light only.");
+          self.invitesAvailable.push({id: 'dark', label: 'Dark'});
+        break;
+        case 'dark':
+          self.inviteGameDialogText("Player wants to play dark only.");
+          self.invitesAvailable.push({id: 'light', label: 'Light'});
+        break;
+        case 'none':
+          self.inviteGameDialogText("Player doesn't accept invites.");
+        break;
+      }
     };
 
-    self.emitResignGame = null;
+    self.requestGame = function(invite) {
+      lobby.emit('requestGame', _.extend(_playerInvited, {invite: invite}));
+    };
+
+    self.emitRequestGame = null;
     self.emitChangeMyPlayerName = null;
     
     var findGame = function(gameid) {
@@ -84,7 +117,7 @@ function AppViewModel(lobby_) {
     self.onSetInvitesAccepted = function(invitesAccepted) {
       self.invitesAccepted(invitesAccepted);
       return self.onSetInvitesAccepted;
-    }
+    };
 
     self.onSetChatLog = function(log) {
       var correspondingGame = findGame(log.gameid);
@@ -159,6 +192,7 @@ function AppViewModel(lobby_) {
       $.pnotify({
         title: 'Game Request',
         text: data.playerName + ' requested a game. ' +
+        'He wants to play: ' + data.invite + '. ' +
         '<a href="#" id="acc' + encodeURI(data.playerName) + '">Accept</a>.'
       });
       $("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
@@ -200,6 +234,7 @@ function AppViewModel(lobby_) {
         self.onAddPlayerName(data);
       } else {
         self.onSetMyPlayerName(data);
+        self.onSetInvitesAccepted(data.invitesAccepted);
       }
       return self.onAddNewPlayer;
     };
