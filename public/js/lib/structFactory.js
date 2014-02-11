@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 function makeStruct(names_) {
   var names = names_.split(' ');
   var count = names_.length;
@@ -11,6 +11,4 @@ function makeStruct(names_) {
   return constructor;
 }
 
-module.exports = {
-  makeStruct : makeStruct
-};
+module.exports = makeStruct;

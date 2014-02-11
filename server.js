@@ -47,7 +47,7 @@ logger.log('info', 'http server listening on %d', port);
 var lobby = require('./socketHandlers/lobby.js');
 var game = require('./socketHandlers/game.js');
 var chat = require('./socketHandlers/chat.js');
-var makeStruct = require('./lib/structFactory.js').makeStruct;
+var makeStruct = require('./public/js/lib/structFactory.js');
 
 var ActiveConnection = makeStruct('io socket session');
 sessionSocket.of('/lobby').on('connection', function(err, socket, session) {

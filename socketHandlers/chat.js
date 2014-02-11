@@ -1,5 +1,5 @@
 var db = require('../lib/db');
-var makeStruct = require('../lib/structFactory').makeStruct;
+var makeStruct = require('../public/js/lib/structFactory.js');
 var Chat = require('../models/Chat');
 var ChatStruct = makeStruct("gameid player message playerName");
 var logger = require('../lib/logger');

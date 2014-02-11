@@ -1,13 +1,13 @@
-var Q = require('q');
 var clients = [];
-var db = require('../lib/db');
-var lobbyutils = require('../lib/lobbyutils');
-var makeStruct = require('../lib/structFactory').makeStruct;
+var Q = require('q');
+var db = require('./../lib/db.js');
+var lobbyutils = require('./../lib/lobbyutils.js');
+var makeStruct = require('../public/js/lib/structFactory.js');
 var Client = makeStruct("socket sid");
-var Game = require('../models/Game');
-var arr = require('../public/js/arr.js');
-var _ = require('../public/js/lib/underscore.js');
-var gameutils = require('../models/utils/gameutils');
+var InviteRecord = makeStruct("opponentSid mySide");
+var Game = require('./../models/Game.js');
+var _ = require('./../public/js/lib/underscore.js');
+var gameutils = require('./../models/utils/gameutils.js');
 
 // first one is default
 var invitesAllowed = ['all', 'light', 'dark', 'none'];
@@ -77,10 +77,10 @@ function changeMyPlayerName(playerName) {
     socket.emit('addNewPlayer', _cNewPlayer(session, true));
 }
 
-function requestGame(data) {
+function requestGame(uInvite) {
     var session = this.session;
     try {
-      var opponent = clients[data.playerName];
+      var opponent = clients[uInvite.playerName];
       if(!opponent) {
         return;
       }
@@ -90,21 +90,24 @@ function requestGame(data) {
           return;
         }
         if(session.acceptedInvites === 'dark'
-          && data.invite !== 'light') {
+          && uInvite.invite !== 'light') {
             return;
         }
         if(session.acceptedInvites === 'light'
-          && data.invite !== 'dark') {
+          && uInvite.invite !== 'dark') {
             return;
         }
-        opponent.socket.emit('requestGame', _.extend(data, {playerName: session.playerName}));
+        opponent.socket.emit('requestGame', _.extend(uInvite, {playerName: session.playerName}));
       });
       if (typeof session.invites === "undefined") {
         session.invites = [];
       }
       // I am inviting the opponent to the game
-      session.invites.pushIfNotExist({sid: opponent.sid, side: data.side});
-      session.save();
+      var inviteRecord = new InviteRecord(opponent.sid, uInvite.mySide);
+      if(!_.findWhere(session.invites, inviteRecord)) {
+        session.invites.push(inviteRecord);
+        session.save();
+      }
     } catch(e) {
       logger.log('warn', "can't fetch the game");
       logger.log('warn', e);
@@ -125,31 +128,32 @@ function changeInvitesAccepted(invitesAccepted) {
   }
 }
 
-function acceptGame(data) {
-  if(!data || typeof data.playerName === "undefined") {
+function acceptGame(uInvite) {
+   if(!_.every(["playerName", "opponentSide"], Object.prototype.hasOwnProperty,
+         uInvite)) {
     return;
   }
   var socket = this.socket;
   var self = this;
 
-    var opponent = clients[data.playerName];
-    db.mongoStore.get(opponent.sid, function (err, opsession) {
-      if(err) {
-        logger.log('warn', "failed to fetch the opponent from db");
-        logger.log('warn', err);
-        return;
-      }
+  var opponent = clients[uInvite.playerName];
+  db.mongoStore.get(opponent.sid, function (err, opsession) {
+    if(err) {
+      logger.log('warn', "failed to fetch the opponent from db");
+      logger.log('warn', err);
+      return;
+    }
 
-      var indexOfInvitation = opsession.invites.indexOf(socket.sid);
-      var wasInvited = (indexOfInvitation !== -1);
-      if (wasInvited) {
-        (_addNewGame.bind(self))(opponent, opsession);
-        opsession.invites.splice(indexOfInvitation);
-        opsession.save();
-      } else {
-        socket.emit('error', "The player has not invited you.");
-      }
-   });
+    var indexOfInvitation = opsession.invites.indexOf(socket.sid);
+    var wasInvited = (indexOfInvitation !== -1);
+    if (wasInvited) {
+      (_addNewGame.bind(self))(opponent, opsession);
+      opsession.invites.splice(indexOfInvitation);
+      opsession.save();
+    } else {
+      socket.emit('error', "The player has not invited you.");
+    }
+ });
   }
 
 function _addNewGame(opponent, opsession) {

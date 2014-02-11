@@ -6,6 +6,7 @@ var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');
 var lobby = io.connect(location.origin + '/lobby');
+var NewPlayer = require('./lib/structFactory.js')("playerName invitesAccepted isSelf");
 require('knockout-jquery');
 
 function AppViewModel(lobby_) {
@@ -95,7 +96,7 @@ function AppViewModel(lobby_) {
     };
 
     self.requestGame = function(invite) {
-      lobby.emit('requestGame', _.extend(_playerInvited, {invite: invite}));
+      lobby.emit('requestGame', _.extend(_playerInvited, {mySide: invite}));
     };
 
     self.emitRequestGame = null;
@@ -192,11 +193,11 @@ function AppViewModel(lobby_) {
       $.pnotify({
         title: 'Game Request',
         text: data.playerName + ' requested a game. ' +
-        'He wants to play: ' + data.invite + '. ' +
+        'He wants to play: ' + data.mySide + '. ' +
         '<a href="#" id="acc' + encodeURI(data.playerName) + '">Accept</a>.'
       });
       $("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
-        lobby.emit('acceptGame', {playerName: data.playerName});
+        lobby.emit('acceptGame', {playerName: data.playerName, opponentSide: data.invite});
       return false;});
       return self.onRemoveGame;
     };
@@ -230,11 +231,12 @@ function AppViewModel(lobby_) {
     };
 
     self.onAddNewPlayer = function(data) {
-      if(data.isSelf === false) {
-        self.onAddPlayerName(data);
+      var newPlayer = new NewPlayer(data.playerName, data.invitesAccepted, data.isSelf);
+      if(newPlayer.isSelf === false) {
+        self.onAddPlayerName(newPlayer);
       } else {
-        self.onSetMyPlayerName(data);
-        self.onSetInvitesAccepted(data.invitesAccepted);
+        self.onSetMyPlayerName(newPlayer);
+        self.onSetInvitesAccepted(newPlayer.invitesAccepted);
       }
       return self.onAddNewPlayer;
     };
