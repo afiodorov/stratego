@@ -25,8 +25,8 @@ describe('GameStruct', function(){
       assert.equal("Mordor",          gameStructs.tiles[[7,1]].name);
     });
 
-    var correctTilesCount = _.range(1, gameStructs.tiles.NUM_OF_ROWS + 1).reduceRight(
-          function(res, i) {return res + gameStructs.tiles.columnLimit(i); },
+    var correctTilesCount = _.range(1, gameStructs.tiles.numRows + 1).reduceRight(
+          function(res, i) {return res + gameStructs.tiles.numCols(i); },
           0);
     var tilesCount = gameStructs.tiles.reduceRight(function(res) {return res + 1;}, 0);
     it('is array', function() {
@@ -43,12 +43,12 @@ describe('GameStruct', function(){
   });
 
   describe('tile', function() {
-    it('#columnLimit', function() {
-      assert.equal(3, gameStructs.tiles.columnLimit(3));
-      assert.equal(4, gameStructs.tiles.columnLimit(4));
-      assert.equal(3, gameStructs.tiles.columnLimit(5));
-      assert.equal(2, gameStructs.tiles.columnLimit(6));
-      assert.equal(1, gameStructs.tiles.columnLimit(7));
+    it('#numCols', function() {
+      assert.equal(3, gameStructs.tiles.numCols(3));
+      assert.equal(4, gameStructs.tiles.numCols(4));
+      assert.equal(3, gameStructs.tiles.numCols(5));
+      assert.equal(2, gameStructs.tiles.numCols(6));
+      assert.equal(1, gameStructs.tiles.numCols(7));
     });
 
     it('#isWithin', function() {
