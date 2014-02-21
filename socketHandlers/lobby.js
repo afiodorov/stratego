@@ -8,6 +8,7 @@ var InviteRecord = makeStruct("opponentSid mySide");
 var Game = require('./../models/Game.js');
 var _ = require('./../public/js/lib/underscore.js');
 var gameutils = require('./../models/utils/gameutils.js');
+var events = require('./../public/js/events.js');
 
 // first one is default
 var invitesAllowed = ['all', 'light', 'dark', 'none'];
@@ -79,25 +80,31 @@ function changeMyPlayerName(playerName) {
 
 function requestGame(uInvite) {
     var session = this.session;
+    var invite = new events.cInvite(uInvite);
+    if(!invite.isValid()) {
+      return;
+    }
     try {
-      var opponent = clients[uInvite.playerName];
+      var opponent = clients[invite.opponentName];
       if(!opponent) {
         return;
       }
       var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
-      getSession(opponent.sid).then(function(session) {
-        if(session.acceptedInvites === 'none') {
+      getSession(opponent.sid).then(function(opSession) {
+        if(opSession.acceptedInvites === 'none') {
           return;
         }
-        if(session.acceptedInvites === 'dark'
-          && uInvite.invite !== 'light') {
+        if(opSession.acceptedInvites === 'dark'
+          && invite.mySide !== 'light') {
             return;
         }
-        if(session.acceptedInvites === 'light'
-          && uInvite.invite !== 'dark') {
+        if(opSession.acceptedInvites === 'light'
+          && invite.mySide !== 'dark') {
             return;
         }
-        opponent.socket.emit('requestGame', _.extend(uInvite, {playerName: session.playerName}));
+        opponent.socket.emit('requestGame', 
+          {opponentName: session.playerName,
+            opponentSide: invite.mySide});
       });
       if (typeof session.invites === "undefined") {
         session.invites = [];
@@ -129,14 +136,14 @@ function changeInvitesAccepted(invitesAccepted) {
 }
 
 function acceptGame(uInvite) {
-   if(!_.every(["playerName", "opponentSide"], Object.prototype.hasOwnProperty,
-         uInvite)) {
+  var sInvite = new events.sInvite(uInvite);
+   if(!sInvite.isValid()) {
     return;
   }
   var socket = this.socket;
   var self = this;
 
-  var opponent = clients[uInvite.playerName];
+  var opponent = clients[uInvite.opponentName];
   db.mongoStore.get(opponent.sid, function (err, opsession) {
     if(err) {
       logger.log('warn', "failed to fetch the opponent from db");
@@ -144,11 +151,22 @@ function acceptGame(uInvite) {
       return;
     }
 
-    var indexOfInvitation = opsession.invites.indexOf(socket.sid);
-    var wasInvited = (indexOfInvitation !== -1);
+    var i;
+    var inviteRecordIndex = -1;
+    var inviteRecord;
+    for(i = 0; i < opsession.invites.length; i++) {
+      inviteRecord = opsession.invites[i];
+      if(inviteRecord.opponentSid === socket.sid 
+        && inviteRecord.mySide === sInvite.opponentSide) {
+          inviteRecordIndex = i;
+          break;
+        }
+    }
+
+    var wasInvited = (inviteRecordIndex !== -1);
     if (wasInvited) {
-      (_addNewGame.bind(self))(opponent, opsession);
-      opsession.invites.splice(indexOfInvitation);
+      _addNewGame.call(self, opponent, opsession);
+      opsession.invites.splice(inviteRecordIndex, 1);
       opsession.save();
     } else {
       socket.emit('error', "The player has not invited you.");

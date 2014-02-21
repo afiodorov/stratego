@@ -6,22 +6,22 @@ var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');
 var lobby = io.connect(location.origin + '/lobby');
-var NewPlayer = require('./lib/structFactory.js')("playerName invitesAccepted isSelf");
 require('knockout-jquery');
+var events = require('./events.js');
 
 function AppViewModel(lobby_) {
     var self = this;
     var lobby = lobby_;
     var _playerInvited = null;
-    Object.defineProperty(self, "playerInvited", 
+    Object.defineProperty(self, 'playerInvited', 
       {get : function(){ return _playerInvited; }});
 
     var _gameToBeClosed = null;
-    Object.defineProperty(self, "gameToBeClosed", 
+    Object.defineProperty(self, 'gameToBeClosed', 
       {get : function(){ return _gameToBeClosed; }});
 
     var _currentGame = null;
-    Object.defineProperty(self, "currentGame", 
+    Object.defineProperty(self, 'currentGame', 
       {get : function(){ return _currentGame; }});
 
     self.activeTab = ko.observable();
@@ -30,12 +30,12 @@ function AppViewModel(lobby_) {
     self.games = ko.observableArray();
     self.players = ko.observableArray();
     self.chatInput = ko.observable();
-    self.myPlayerName = ko.observable("");
+    self.myPlayerName = ko.observable('');
     self.isCloseGameDialogOpen = ko.observable(false);
     self.isInviteGameDialogOpen = ko.observable(false);
     self.openInviteGameDialog = ko.observable(false);
-    self.inviteGameDialogText = ko.observable("");
-    self.opponentNameOfGameToBeClosed = ko.observable("");
+    self.inviteGameDialogText = ko.observable('');
+    self.opponentNameOfGameToBeClosed = ko.observable('');
     self.invitesAvailable = ko.observableArray([]);
 
     self.switchToGame = function(game) {
@@ -48,20 +48,14 @@ function AppViewModel(lobby_) {
       lobby.emit('setInvitesAccepted', self.invitesAccepted());
     };
 
-    self.setShouldShowPage = function(show) {self.shouldShowPage(show);};
-
     self.sendChatInput = function() {
       if(_currentGame) {
         lobby.emit('addChatMessage', {gameid: _currentGame.id, message: self.chatInput()});
-        self.chatInput("");
+        self.chatInput('');
       } else {
         // TODO display error
         console.log('no chat selected');
       }
-    };
-
-    self.isPlayerOnline = function(playerName) {
-      return self.players.indexOf({player: playerName, isSelf: false}) !== -1;
     };
 
     self.openCloseGameDialog = function() {
@@ -95,8 +89,8 @@ function AppViewModel(lobby_) {
       }
     };
 
-    self.requestGame = function(invite) {
-      lobby.emit('requestGame', _.extend(_playerInvited, {mySide: invite}));
+    self.requestGame = function(mySide) {
+      lobby.emit('requestGame', {opponentName: _playerInvited.playerName, mySide: mySide});
     };
 
     self.emitRequestGame = null;
@@ -157,12 +151,14 @@ function AppViewModel(lobby_) {
       return self.onAddChatMessage;
     };
 
-    self.onAddPlayerName = function(player) {
+    self.onAddPlayerName = function(data) {
+      var player = new events.Player(data);
       self.players.push(player);
       return self.onAddPlayerName;
     };
 
-    self.onRemovePlayerName = function(player) {
+    self.onRemovePlayerName = function(data) {
+      var player = new events.Player(data);
       self.players.remove(
         function(playerIt) {
           return playerIt.playerName === player.playerName;
@@ -171,7 +167,8 @@ function AppViewModel(lobby_) {
       return self.onRemovePlayerName;
     };
 
-    self.onSetMyPlayerName = function(player) {
+    self.onSetMyPlayerName = function(data) {
+      var player = new events.Player(data);
       self.myPlayerName(player.playerName);
       return self.onSetMyPlayerName;
     };
@@ -190,14 +187,15 @@ function AppViewModel(lobby_) {
     };
       
     self.onRequestGame = function(data) {
+      var sInvite = new events.sInvite(data);
       $.pnotify({
         title: 'Game Request',
-        text: data.playerName + ' requested a game. ' +
-        'He wants to play: ' + data.mySide + '. ' +
-        '<a href="#" id="acc' + encodeURI(data.playerName) + '">Accept</a>.'
+        text: sInvite.opponentName + ' requested a game. ' +
+        'He wants to play: ' + sInvite.opponentSide + '. ' +
+        '<a href="#" id="acc' + encodeURI(sInvite.opponentName) + '">Accept</a>.'
       });
-      $("a[id=acc" + encodeURI(data.playerName) + "]").click(function(){
-        lobby.emit('acceptGame', {playerName: data.playerName, opponentSide: data.invite});
+      $("a[id=acc" + encodeURI(sInvite.opponentName) + "]").click(function(){
+        lobby.emit('acceptGame', data);
       return false;});
       return self.onRemoveGame;
     };
@@ -231,7 +229,7 @@ function AppViewModel(lobby_) {
     };
 
     self.onAddNewPlayer = function(data) {
-      var newPlayer = new NewPlayer(data.playerName, data.invitesAccepted, data.isSelf);
+      var newPlayer = new events.Player(data);
       if(newPlayer.isSelf === false) {
         self.onAddPlayerName(newPlayer);
       } else {
@@ -242,8 +240,9 @@ function AppViewModel(lobby_) {
     };
 
     self.onSetShouldShowPage = function(data) {
-      self.setShouldShowPage(data.bool);
-      $("#blockingMsg").text(data.err);
+      var shouldShowPage = new events.ShouldShowPage(data);
+      self.shouldShowPage(shouldShowPage.bool);
+      $("#blockingMsg").text(shouldShowPage.err);
       $("#blockingMsg").dialog({
          closeOnEscape: false,
          open: function(event, ui) 
@@ -290,13 +289,10 @@ $(function() {
   ko.bindingHandlers.playerOnline = {
       update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
         var players = ko.utils.unwrapObservable(valueAccessor());
-        var found = false;
-        players.forEach(function(player) {
-          if(player.playerName === bindingContext.$data.opponentName) {
-            found = true;
-          }
+        var isPlayerOnline = _.any(players, function(player) {
+           return player.playerName === bindingContext.$data.opponentName;
         });
-        element.style.visibility = found ? "visible" : "hidden";
+        element.style.visibility = isPlayerOnline ? "visible" : "hidden";
       }
   };
 
