@@ -8,27 +8,26 @@ var startingPositions =  {
   light: _.times(4, _.constant([1,1]))
     .concat(
        gameStructs.tiles.filter(
-         function(tile) {return tile.index[0] === 2 || 3;})
-       .map(
-         function(tile) {return tile.index;})
-       ),
+         function(tile) {
+           return tile.index[0] === 2 || tile.index[0] === 3;
+         }).map(
+         function(tile) {return tile.index;})),
   dark: _.times(4, _.constant([gameStructs.tiles.numRows,1]))
     .concat(
        gameStructs.tiles.filter(
          function(tile) {return tile.index[0] === gameStructs.tiles.numRows - 1
-           || gameStructs.tiles.numRows - 2;})
+           || tile.index[0] === gameStructs.tiles.numRows - 2;})
        .map(
          function(tile) {return tile.index;})
        )
 };
 
 var _generateStartPosistion = function(side) {
+  var pieces = gameStructs.pieces[side];
   return _.zip(
-      Object.prototype.getOwnPropertyNames(gameStructs.pieces[side]
-        .map(function(prop){return {name: prop};})),
+      _.keys(pieces),
       _.shuffle(startingPositions[side])
-        .map(function(pos){return {position: pos};})
-      );
+      ).map(_.object.bind(null, ['name', 'position']));
 };
 
 var generatePiecePositions = function() {
@@ -139,7 +138,8 @@ module.exports = {
   isMoveValid : isMoveValid,
   getOppositeSide : getOppositeSide,
   generateRandomSide : generateRandomSide,
-  generatePiecePositions : generatePiecePositions
+  generatePiecePositions : generatePiecePositions,
+  startingPositions : startingPositions
 };
 
 /* autocompletion now works */
