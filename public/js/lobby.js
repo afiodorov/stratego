@@ -187,14 +187,14 @@ function AppViewModel(lobby_) {
     };
       
     self.onRequestGame = function(data) {
-      var sInvite = new events.sInvite(data);
+      var inviteToPlayer = new events.InviteToPlayer(data);
       $.pnotify({
         title: 'Game Request',
-        text: sInvite.opponentName + ' requested a game. ' +
-        'He wants to play: ' + sInvite.opponentSide + '. ' +
-        '<a href="#" id="acc' + encodeURI(sInvite.opponentName) + '">Accept</a>.'
+        text: inviteToPlayer.opponentName + ' requested a game. ' +
+        'He wants to play: ' + inviteToPlayer.opponentSide + '. ' +
+        '<a href="#" id="acc' + encodeURI(inviteToPlayer.opponentName) + '">Accept</a>.'
       });
-      $("a[id=acc" + encodeURI(sInvite.opponentName) + "]").click(function(){
+      $("a[id=acc" + encodeURI(inviteToPlayer.opponentName) + "]").click(function(){
         lobby.emit('acceptGame', data);
       return false;});
       return self.onRemoveGame;

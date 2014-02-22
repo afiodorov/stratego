@@ -49,7 +49,7 @@ module.exports = function(grunt) {
         script: 'server.js',
         options: {
           nodeArgs: ['--debug'],
-          ignore: ['node_modules/**', 'public/**'],
+          ignore: ['node_modules/**'],
           env: {
           },
           // omit this property if you aren't serving HTML files and 

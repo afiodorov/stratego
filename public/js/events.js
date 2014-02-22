@@ -1,5 +1,6 @@
 'use strict';
 var _ = require('./lib/underscore.js');
+var acceptedInviteSides = ['light', 'dark', 'random'];
 
 function notNull(prop) {
   return typeof(this[prop]) !== 'undefined';
@@ -7,22 +8,34 @@ function notNull(prop) {
 
 var allPropertiesAreNotNull = function() {
   return _.every(Object.getOwnPropertyNames(this), notNull, this);
-}
+};
 
 function Event() {}
-Event.prototype.isValid = allPropertiesAreNotNull.bind(this);
+Event.prototype = {
+  get isValid() {
+    return allPropertiesAreNotNull.call(this);
+  }
+};
 
-var cInvite = function(json) {
+var InviteFromPlayer = function(json) {
   var o = new Event();
   o.opponentName = json.opponentName;
   o.mySide = json.mySide;
+
+  if(acceptedInviteSides.indexOf(json.mySide) === -1) {
+    o.isValid = false;
+  }
   return o;
 };
 
-var sInvite = function(json) {
+var InviteToPlayer = function(json) {
   var o = new Event();
   o.opponentName = json.opponentName;
   o.opponentSide = json.opponentSide;
+
+  if(acceptedInviteSides.indexOf(json.opponentSide) === -1) {
+    o.isValid = false;
+  }
   return o;
 };
 
@@ -39,11 +52,11 @@ var ShouldShowPage = function(json) {
   o.bool = json.bool;
   o.err = json.err;
   return o;
-}
+};
 
 module.exports = {
-  cInvite : cInvite,
-  sInvite : sInvite,
+  InviteFromPlayer : InviteFromPlayer,
+  InviteToPlayer : InviteToPlayer,
   Player : Player,
   ShouldShowPage : ShouldShowPage,
-}
+};

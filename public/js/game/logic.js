@@ -1,6 +1,42 @@
 /*global Enumerable*/
 'use strict';
 var gameStructs = require("./structs.js");
+var _ = require('../lib/underscore.js');
+var allowedSides = ['light', 'dark'];
+
+var startingPositions =  {
+  light: _.times(4, _.constant([1,1]))
+    .concat(
+       gameStructs.tiles.filter(
+         function(tile) {return tile.index[0] === 2 || 3;})
+       .map(
+         function(tile) {return tile.index;})
+       ),
+  dark: _.times(4, _.constant([gameStructs.tiles.numRows,1]))
+    .concat(
+       gameStructs.tiles.filter(
+         function(tile) {return tile.index[0] === gameStructs.tiles.numRows - 1
+           || gameStructs.tiles.numRows - 2;})
+       .map(
+         function(tile) {return tile.index;})
+       )
+};
+
+var _generateStartPosistion = function(side) {
+  return _.zip(
+      Object.prototype.getOwnPropertyNames(gameStructs.pieces[side]
+        .map(function(prop){return {name: prop};})),
+      _.shuffle(startingPositions[side])
+        .map(function(pos){return {position: pos};})
+      );
+};
+
+var generatePiecePositions = function() {
+  return {
+    light: _generateStartPosistion('light'),
+    dark: _generateStartPosistion('dark')
+  };
+};
 
 var hasRequiredFields = function(o, requiredFields) {
   return requiredFields.reduce(function(res, prop) {
@@ -9,26 +45,30 @@ var hasRequiredFields = function(o, requiredFields) {
 };
 
 var isGameStateValid = function(stateHolder) {
-  var requiredFields = ["pieces", "cards"];
-  return hasRequiredFields(stateHolder, ["stage", "mySide", "turn"])
+  var requiredFields = ['pieces', 'cards'];
+  return hasRequiredFields(stateHolder, ['stage', 'mySide', 'turn'])
     && hasRequiredFields(stateHolder.light, requiredFields) 
     && hasRequiredFields(stateHolder.dark, requiredFields);
 };
 
 var isSideValid = function(side) {
-  return ["light", "dark"].indexOf(side) !== -1;
+  return allowedSides.indexOf(side) !== -1;
 };
 
 var getOppositeSide = function(side) {
-  if(side === "light") {
-    return "dark";
+  if(side === 'light') {
+    return 'dark';
   } 
 
-  if(side === "dark") {
-    return "light";
+  if(side === 'dark') {
+    return 'light';
   }
 
   throw new TypeError("Can't get opposite side");
+};
+
+var generateRandomSide = function() {
+  return _.sample(allowedSides);
 };
 
 var isMoveObjectValid = function(move) {
@@ -97,7 +137,9 @@ var isMoveValid = function(stateHolder, move) {
 
 module.exports = {
   isMoveValid : isMoveValid,
-  getOppositeSide : getOppositeSide
+  getOppositeSide : getOppositeSide,
+  generateRandomSide : generateRandomSide,
+  generatePiecePositions : generatePiecePositions
 };
 
 /* autocompletion now works */
