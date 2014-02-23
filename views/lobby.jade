@@ -66,7 +66,7 @@ html
             span(data-bind="text: opponentNameOfGameToBeClosed")
             span ?
           div(data-bind="dialog: {isOpen: isInviteGameDialogOpen, resizable: false, modal: true, buttons: {Cancel: function() { $( this ).dialog(\"close\") } } }")
-            span(data-bind='text: inviteGameDialogText');
+            span(data-bind='text: inviteGameDialogText')
             div Select your side:
             div(data-bind='buttonset: { refreshOn: invitesAvailable }')
               // ko foreach: invitesAvailable
