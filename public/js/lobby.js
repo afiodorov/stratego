@@ -137,6 +137,7 @@ function AppViewModel(lobby_) {
         }
 
         lobby.emit('requestChatLog', game._id);
+        console.log(game);
     };
 
     self.onAddChatMessage = function(chat) {
