@@ -91,13 +91,16 @@ function create(player1, player2, player1Side) {
   });
 }
 
+var gameFind = Q.nfbind(Game.find.bind(Game));
+var gameFindOne = Q.nfbind(Game.findOne.bind(Game));
+
 function getInstances(playerSid) {
-  var gameFind = Q.nfbind(Game.find.bind(Game));
   return gameFind({players: {$elemMatch: {'sid': playerSid}}}); 
 }
 
-function resignPlayer(player, game, callback) {
- Game.findOne({'_id': game.id, players: player}).remove().exec(callback);
+function findOne(gameId, playerSid) {
+ return gameFindOne({'_id': gameId, players: {$elemMatch: {'sid':
+   playerSid}}});
 }
 
 module.exports = {
@@ -106,6 +109,6 @@ module.exports = {
   },
   create: create,
   getInstances: getInstances,
-  resignPlayer: resignPlayer,
+  findOne: findOne,
   Model: Game
 };

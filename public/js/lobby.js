@@ -47,9 +47,13 @@ function AppViewModel(lobby_) {
       lobby.emit('setInvitesAccepted', self.invitesAccepted());
     };
 
+    self.emitResignGame = function(game) {
+      lobby.emit('resignGame', game._id);
+    };
+
     self.sendChatInput = function() {
       if(_currentGame) {
-        lobby.emit('addChatMessage', {gameid: _currentGame._id, message: self.chatInput()});
+        lobby.emit('addChatMessage', {gameId: _currentGame._id, message: self.chatInput()});
         self.chatInput('');
       } else {
         // TODO display error
@@ -95,12 +99,12 @@ function AppViewModel(lobby_) {
     self.emitRequestGame = null;
     self.emitChangeMyPlayerName = null;
     
-    var findGame = function(gameid) {
+    var findGame = function(gameId) {
       var correspondingGame;
       var allGames = self.games();
       var i;
       for(i=0; i<allGames.length; i++) {
-        if(allGames[i]._id === gameid) {
+        if(allGames[i]._id === gameId) {
           correspondingGame = allGames[i];
           break;
         }
@@ -114,11 +118,12 @@ function AppViewModel(lobby_) {
     };
 
     self.onSetChatLog = function(log) {
-      var correspondingGame = findGame(log.gameid);
+      var correspondingGame = findGame(log.gameId);
       if(typeof correspondingGame !== "undefined") {
         correspondingGame.messages(log.log);
       } else {
-        console.log("received chat message for a non-existing game");
+        console.log("received a chat log for a non-existing game");
+        console.log(log);
       }
       return self.onSetChatLog;
     };
@@ -134,7 +139,7 @@ function AppViewModel(lobby_) {
     };
 
     self.onAddChatMessage = function(chat) {
-      var game = findGame(chat.gameid);
+      var game = findGame(chat.gameId);
       if(typeof game === "undefined") {
         console.log("received a chat message to an non-existing game");
         return self.onAddChatMessage;
@@ -170,13 +175,13 @@ function AppViewModel(lobby_) {
       return self.onSetMyPlayerName;
     };
 
-    self.onRemoveGame = function(game) {
+    self.onRemoveGame = function(gameId) {
       self.games.remove(
         function(gameIt) {
-          return gameIt._id === game._id;
+          return gameIt._id === gameId;
         }
       );
-      if(game === _currentGame) {
+      if(gameId === _currentGame._id) {
         _currentGame = null;
         localStorage.removeItem('currentGameId');
       }
@@ -271,7 +276,7 @@ function AppViewModel(lobby_) {
 
       for(prop in self) {
         if(self.hasOwnProperty(prop)) {
-          if(prop.match(/^emit/)) {
+          if(prop.match(/^emit/) && self[prop] === null) {
             eventName = prop[4].toLowerCase() + prop.slice(5);
             self[prop] = makeSocketEmitter.bind(self, eventName);
           }

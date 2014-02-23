@@ -40,18 +40,18 @@ function disconnect() {
     {playerName: this.session.playerName, isSelf: false});
 }
 
-function resignGame(game) {
-  if(!game || typeof game.id === "undefined") {
-    return;
-  }
-  this.io.of('/lobby').in(game.id).emit('removeGame', game);
-  this.socket.broadcast.to(game.id).emit('opponentResigned', this.session.playerName);
-  Game.resignPlayer(this.session.id, game, function(err) {
-    if(err) {
-      logger.log(err);
+function resignGame(gameId) {
+  var io = this.io;
+  var socket = this.socket;
+  var session = this.session;
+  Game.findOne(gameId, this.session.id).then(function(game) {
+    if(game) {
+      game.remove();
+      io.of('/lobby').in(gameId).emit('removeGame', gameId);
+      socket.broadcast.to(gameId).emit('opponentResigned', session.playerName);
     }
   });
-  require('../models/Chat.js').removeMessages(game.id);
+  require('../models/Chat.js').removeMessages(gameId);
 }
 
 function changeMyPlayerName(playerName) {
