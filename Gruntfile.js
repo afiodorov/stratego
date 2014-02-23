@@ -96,8 +96,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('default', ['concurrent']);  
-  grunt.registerTask('heroku',
-    ['browserify']);
+  grunt.registerTask('heroku', ['browserify']);
 
   grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-concurrent');
