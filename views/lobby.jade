@@ -18,7 +18,7 @@ html
               a(href='#main') Main
             // ko foreach: games
             li
-              a(data-bind='attr: {title: opponentName, href: \'#\' + id}, click: $parent.switchToGame') 
+              a(data-bind='attr: {title: opponentName, href: \'#\' + _id}, click: $parent.switchToGame') 
                 span.mytabs-text(data-bind='text: \'playing \' + opponentName')
                 span.ui-icon.ui-icon-bullet.mytabs-text(data-bind='playerOnline: $parent.players')
               span.ui-icon.ui-icon-close.mytabs-text.cursor-hand(data-bind="click: $parent.openCloseGameDialog, disable: $parent.isCloseGameDialogOpen.bind(this)", href='#')
@@ -48,7 +48,7 @@ html
                   span None
                   input(type='radio' value='none' data-bind='checked: invitesAccepted, click: changeInvitesAccepted')
           // ko foreach: games
-          div(data-bind='attr: {id: id}')
+          div(data-bind='attr: {id: _id}')
             canvas.game-canvas(width='750', height='500') Canvas not supported
             .chat
               .messages(data-bind='foreach: messages')

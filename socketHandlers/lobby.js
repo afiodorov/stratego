@@ -168,14 +168,14 @@ function acceptGame(uInvite) {
         && inviteRecord.mySide === inviteToPlayer.opponentSide) {
           inviteRecordIndex = i;
           break;
-        }
+      }
     }
 
     var wasInvited = (inviteRecordIndex !== -1);
     if (wasInvited) {
       _addNewGame.call(self, opponent, opsession, inviteToPlayer);
       opsession.invites.splice(inviteRecordIndex, 1);
-      opsession.save();
+      db.mongoStore.set(opponent.sid, opsession);
     } else {
       socket.emit('error', "The player has not invited you.");
     }
@@ -192,18 +192,19 @@ function _addNewGame(opponent, opsession, sInviteToPlayer) {
       socket.emit('gameStarted', {playerName: opsession.playerName});
       opponent.socket.emit('gameStarted',
         {playerName: session.playerName});
+      var gameJson = game.toObject();
 
-      gameutils.getState(game, socket.sid).then(function(state) {
-          socket.emit('addGame', state);
+      gameutils.getState(gameJson, socket.sid).then(function(state) {
+        socket.emit('addGame', state);
       }).fail(function(err) {
-        logger.log('warn', "couldn't update about new game");
+        logger.log('warn', 'couldn\'t update about new game');
         logger.log('warn', err);
       }).done();
 
-      gameutils.getState(game, opponent.sid).then(function(state) {
-          opponent.socket.emit('updateState', state);
+      gameutils.getState(gameJson, opponent.sid).then(function(state) {
+        opponent.socket.emit('addGame', state);
       }).fail(function(err) {
-        logger.log('warn', "failed to updated opponent's new game");
+        logger.log('warn', 'failed to updated opponent\'s new game');
         logger.log('warn', err);
       }).done();
 
@@ -227,15 +228,13 @@ function _isNewClient() {
 function _joinRooms() {
   var socket = this.socket;
   var session = this.session;
-  Game.getInstances(session.id, function(err, games) {
-    if(err) {
-      logger.log('error', "problem fetching games for the session");
-      return;
-    }
-
+  Game.getInstances(session.id).then(function(games) {
     games.forEach(function(game){
       socket.join(game.id);
     });
+  }).fail(function(err) {
+    logger.log('error', "problem fetching games for the session");
+    logger.log('error', err);
   });
 }
 
@@ -272,7 +271,17 @@ function _checkForDuplicateSession(onlineClients) {
 
 function _sendListOfGames() {
   var socket = this.socket;
-  // send all games
+  Game.getInstances(this.socket.sid)
+    .then(function(games) {
+      games.forEach(function(game) {
+        gameutils.getState(game.toObject(), socket.sid).then(function(state) {
+          socket.emit('addGame', state);
+        }).fail(function(err) {
+          logger.log('info', 'couldn\'t send new game');
+          logger.log('info', err);
+        }).done();
+      });
+  });
 }
 
 function _sendListOfPlayers(onlineClients) {

@@ -39,9 +39,8 @@ function AppViewModel(lobby_) {
     self.invitesAvailable = ko.observableArray([]);
 
     self.switchToGame = function(game) {
-      console.log(game);
       _currentGame = game;
-      localStorage.setItem('currentGameId', game.id);
+      localStorage.setItem('currentGameId', game._id);
     };
 
     self.changeInvitesAccepted = function() {
@@ -50,7 +49,7 @@ function AppViewModel(lobby_) {
 
     self.sendChatInput = function() {
       if(_currentGame) {
-        lobby.emit('addChatMessage', {gameid: _currentGame.id, message: self.chatInput()});
+        lobby.emit('addChatMessage', {gameid: _currentGame._id, message: self.chatInput()});
         self.chatInput('');
       } else {
         // TODO display error
@@ -101,7 +100,7 @@ function AppViewModel(lobby_) {
       var allGames = self.games();
       var i;
       for(i=0; i<allGames.length; i++) {
-        if(allGames[i].id === gameid) {
+        if(allGames[i]._id === gameid) {
           correspondingGame = allGames[i];
           break;
         }
@@ -127,11 +126,10 @@ function AppViewModel(lobby_) {
     self.onAddGame = function(game) {
         game.messages = ko.observableArray([]);
         self.games.push(game);
-        if(localStorage.getItem('currentGameId') === game.id) {
+        if(localStorage.getItem('currentGameId') === game._id) {
           _currentGame = game;
           self.activeTab(-1);
         }
-        console.log(game);
         lobby.emit('requestChatLog', game);
     };
 
@@ -175,7 +173,7 @@ function AppViewModel(lobby_) {
     self.onRemoveGame = function(game) {
       self.games.remove(
         function(gameIt) {
-          return gameIt.id === game.id;
+          return gameIt._id === game._id;
         }
       );
       if(game === _currentGame) {

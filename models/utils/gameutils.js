@@ -6,21 +6,21 @@ var makeStruct = require('../../public/js/lib/structFactory.js');
 var GameLogic = require('../../public/js/game/logic.js');
 
 function _getOpponentSid(game, playerSid) {
-  var opponents = game.players;
-  return opponents.filter(function(playerPair) {
+  var players = game.players;
+  return players.filter(function(playerPair) {
     return playerPair.sid !== playerSid;
   })[0].sid;
 }
 
 function _getPlayerSide(game, playerSid) {
-  var opponents = game.players;
-  return opponents.filter(function(playerPair) {
+  var players = game.players;
+  return players.filter(function(playerPair) {
     return playerPair.sid === playerSid;
   })[0].side;
 }
 
 function addOpponentName(game, playerSid) {
-  var opponentSid = _getOpponentSid(playerSid, game);
+  var opponentSid = _getOpponentSid(game, playerSid);
   var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
   return getSession(opponentSid).then(function(opSession) {
     game.opponentName = opSession.playerName;
@@ -44,7 +44,8 @@ function addMySide(game, playerSid) {
   game.mySide = _getPlayerSide(game, playerSid);
 }
 
-function getState(game, playerSid) {
+function getState(gameCopy, playerSid) {
+  var game = _.clone(gameCopy);
   return addOpponentName(game, playerSid).then(
     function(game) {
       addMySide(game, playerSid);
@@ -56,6 +57,11 @@ function getState(game, playerSid) {
     });
 }
 
+function getAllStates(playerSid) {
+  
+}
+
 module.exports = {
-  getState: getState
+  getState: getState,
+  getAllStates: getAllStates
 };
