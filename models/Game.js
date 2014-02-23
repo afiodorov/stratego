@@ -29,6 +29,12 @@ function getInstancePromise() {
   });
 }
 
+function makePromise(instance) {
+  return Q.fcall(function() {
+    return instance;
+  });
+}
+
 function addPlayers(instance, player1, player2, player1Side) {
   var player2Side;
   switch(player1Side) {
@@ -49,11 +55,11 @@ function addPlayers(instance, player1, player2, player1Side) {
 }
 
 function initialiseCards(instance) {
-
 }
 
 function initialisePieces(instance) {
-  _.extend(instance.state, GameLogic.generatePiecePositions());
+  instance.state.light.pieces = GameLogic.generateStartPosition('light');
+  instance.state.dark.pieces = GameLogic.generateStartPosition('dark');
 }
 
 function initialiseState(instance) {
@@ -67,6 +73,7 @@ function saveInstance(instance) {
       throw new Error(err);
     }
   });
+  return makePromise(instance);
 }
 
 function create(player1, player2, player1Side) {
@@ -77,7 +84,7 @@ function create(player1, player2, player1Side) {
     initialiseState(instance);
     initialiseCards(instance);
     initialisePieces(instance);
-    console.log(instance);
+    return makePromise(instance);
   }).then(saveInstance).fail(function(err) {
     logger.log('warn', 'cannot create a game');
     logger.log('warn', err);

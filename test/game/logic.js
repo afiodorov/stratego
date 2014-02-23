@@ -10,8 +10,8 @@ describe('GameLogic', function() {
   });
 
   describe('correct start positions', function() {
-    var positions = logic.startingPositions;
-    it('#startingPositions', function() {
+    var positions = logic._startingPositions;
+    it('#_startingPositions', function() {
       assert.deepEqual(positions.light,
        [[1, 1],
         [1, 1],

@@ -154,7 +154,7 @@ function acceptGame(uInvite) {
   var opponent = clients[inviteToPlayer.opponentName];
   db.mongoStore.get(opponent.sid, function (err, opsession) {
     if(err) {
-      logger.log('warn', "failed to fetch the opponent from db");
+      logger.log('warn', 'failed to fetch the opponent from db');
       logger.log('warn', err);
       return;
     }
@@ -193,23 +193,19 @@ function _addNewGame(opponent, opsession, sInviteToPlayer) {
       opponent.socket.emit('gameStarted',
         {playerName: session.playerName});
 
-      gameutils.getShortSummary(game, socket.sid, function(err, game){
-        if(!err) {
-          socket.emit('addShortGame', game);
-        } else {
-          logger.log('warn', "couldn't update about new game");
-          logger.log('warn', err);
-        }
-      });
+      gameutils.getState(game, socket.sid).then(function(state) {
+          socket.emit('addGame', state);
+      }).fail(function(err) {
+        logger.log('warn', "couldn't update about new game");
+        logger.log('warn', err);
+      }).done();
 
-      gameutils.getShortSummary(game, opponent.sid, function(err, game){
-        if(!err) {
-          opponent.socket.emit('addShortGame', game);
-        } else {
-          logger.log('warn', "failed to updated opponent's new game");
-          logger.log('warn', err);
-        }
-      });
+      gameutils.getState(game, opponent.sid).then(function(state) {
+          opponent.socket.emit('updateState', state);
+      }).fail(function(err) {
+        logger.log('warn', "failed to updated opponent's new game");
+        logger.log('warn', err);
+      }).done();
 
     }).fail(function(err) {
       logger.log('warn', "failed to add game");
@@ -276,14 +272,7 @@ function _checkForDuplicateSession(onlineClients) {
 
 function _sendListOfGames() {
   var socket = this.socket;
-  gameutils.getShortSummaries(socket.sid, function(err, game){
-    if(!err) {
-      socket.emit('addShortGame', game);
-    } else {
-      logger.log('warn', "can't build game summary");
-      logger.log('warn', err);
-    }
-  });
+  // send all games
 }
 
 function _sendListOfPlayers(onlineClients) {

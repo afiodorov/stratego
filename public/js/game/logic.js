@@ -4,7 +4,31 @@ var gameStructs = require("./structs.js");
 var _ = require('../lib/underscore.js');
 var allowedSides = ['light', 'dark'];
 
-var startingPositions =  {
+/* Returns an object of the starting positions
+ * For a standard board will return:
+ * { light:
+ *     [[1, 1],
+ *      [1, 1],
+ *      [1, 1],
+ *      [1, 1],
+ *      [2, 1],
+ *      [2, 2],
+ *      [3, 1],
+ *      [3, 2],
+ *      [3, 3]],
+ *   dark:
+ *     [[7, 1],
+ *      [7, 1],
+ *      [7, 1],
+ *      [7, 1],
+ *      [5, 1],
+ *      [5, 2],
+ *      [5, 3],
+ *      [6, 1],
+ *      [6, 2]]
+ * }
+ */
+var _startingPositions =  {
   light: _.times(4, _.constant([1,1]))
     .concat(
        gameStructs.tiles.filter(
@@ -22,19 +46,14 @@ var startingPositions =  {
        )
 };
 
-var _generateStartPosistion = function(side) {
+/* Random position for a dark/light side 
+ * used in initialising a game state */
+var generateStartPosition = function(side) {
   var pieces = gameStructs.pieces[side];
   return _.zip(
       _.keys(pieces),
-      _.shuffle(startingPositions[side])
+      _.shuffle(_startingPositions[side])
       ).map(_.object.bind(null, ['name', 'position']));
-};
-
-var generatePiecePositions = function() {
-  return {
-    light: _generateStartPosistion('light'),
-    dark: _generateStartPosistion('dark')
-  };
 };
 
 var hasRequiredFields = function(o, requiredFields) {
@@ -54,6 +73,7 @@ var isSideValid = function(side) {
   return allowedSides.indexOf(side) !== -1;
 };
 
+/* returns dark if input is light and light if input is dark */
 var getOppositeSide = function(side) {
   if(side === 'light') {
     return 'dark';
@@ -66,6 +86,7 @@ var getOppositeSide = function(side) {
   throw new TypeError("Can't get opposite side");
 };
 
+/* Returns 'light' or 'dark' at random */
 var generateRandomSide = function() {
   return _.sample(allowedSides);
 };
@@ -138,8 +159,8 @@ module.exports = {
   isMoveValid : isMoveValid,
   getOppositeSide : getOppositeSide,
   generateRandomSide : generateRandomSide,
-  generatePiecePositions : generatePiecePositions,
-  startingPositions : startingPositions
+  generateStartPosition : generateStartPosition,
+  _startingPositions : _startingPositions
 };
 
 /* autocompletion now works */

@@ -124,15 +124,14 @@ function AppViewModel(lobby_) {
       return self.onSetChatLog;
     };
 
-    self.onAddShortGame = function(game) {
+    self.onAddGame = function(game) {
         game.messages = ko.observableArray([]);
         self.games.push(game);
         if(localStorage.getItem('currentGameId') === game.id) {
           _currentGame = game;
           self.activeTab(-1);
         }
-
-        lobby.emit('gGetState', game);
+        console.log(game);
         lobby.emit('requestChatLog', game);
     };
 
