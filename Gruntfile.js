@@ -1,5 +1,8 @@
 module.exports = function(grunt) {
   grunt.initConfig({
+    heroku: {
+      tasks: ['browserify']
+    },
     concurrent: {
       dev: {
         tasks: ['nodemon', 'node-inspector', 'browserify', 'watch'],
