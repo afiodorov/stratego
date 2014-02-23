@@ -135,7 +135,8 @@ function AppViewModel(lobby_) {
           _currentGame = game;
           self.activeTab(-1);
         }
-        lobby.emit('requestChatLog', game);
+
+        lobby.emit('requestChatLog', game._id);
     };
 
     self.onAddChatMessage = function(chat) {
