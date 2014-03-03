@@ -35,13 +35,13 @@ function nullifyPosition(o) {
 }
 
 function removeOpponentPieces(game) {
-  var opponentSide = GameLogic.getOppositeSide(game.mySide);
+  var opponentSide = GameLogic.getOppositeSide(game.state.mySide);
   game.state[opponentSide].pieces =
     game.state[opponentSide].pieces.map(nullifyPosition);
 }
 
 function addMySide(game, playerSid) {
-  game.mySide = _getPlayerSide(game, playerSid);
+  game.state.mySide = _getPlayerSide(game, playerSid);
 }
 
 function getState(gameCopy, playerSid) {
@@ -57,11 +57,6 @@ function getState(gameCopy, playerSid) {
     });
 }
 
-function getAllStates(playerSid) {
-  
-}
-
 module.exports = {
-  getState: getState,
-  getAllStates: getAllStates
+  getState: getState
 };
