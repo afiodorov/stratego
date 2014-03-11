@@ -5,7 +5,7 @@ var jade = require('jade')
   , express = require('express')
   , app = express()
   , port = process.env.PORT || 5000
-, cookieParser = express.cookieParser(secret)
+  , cookieParser = express.cookieParser(secret)
   , db = require('./lib/db.js');
 var logger = require('./lib/logger.js');
 

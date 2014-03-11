@@ -3,6 +3,7 @@
 var gameStructs = require("./structs.js");
 var _ = require('../lib/underscore.js');
 var allowedSides = ['light', 'dark'];
+var events = require("./../events.js");
 
 /* Returns an object of the starting positions
  * For a standard board will return:
@@ -28,6 +29,7 @@ var allowedSides = ['light', 'dark'];
  *      [6, 2]]
  * }
  */
+
 var _startingPositions =  {
   light: _.times(4, _.constant([1,1]))
     .concat(
@@ -124,35 +126,30 @@ var getPieceLocation = function(stateHolder, side, piece) {
   return pieceLocArr[0];
 };
 
-var isMoveValid = function(stateHolder, move) {
-  /* 
-   * move {piece, side, toTile}
-  */
-
-  var newState = null;
-
-  if(!isGameStateValid(stateHolder)) {
-    return {err: "Invalid gaming state passed"};
-  }
-
-  if(!isMoveObjectValid(move)) {
-    return {err: "Invalid move passed"};
-  }
-
-  if(stateHolder.stage === "start" || "game") {
-    if(move.side !== stateHolder.turn) {
-      return {err: "Not your turn"};
+var isMyTurn = function(mySide, stateHolder) {
+  if(stateHolder.stage === 'start' || 'game' || 'battle') {
+    if(mySide !== stateHolder.turn) {
+      return false;
     }
   }
+
+  return true;
+};
+
+var isMoveValid = function(stateHolder, move) {
+  var moveEvent = new events.Move(move);
+
 
   var pieceLocation = getPieceLocation(stateHolder, move.side, move.piece);
   if(pieceLocation === -1) {
     return {err: "You don't have that piece"};
   }
 
-  return {
-    newState : newState
-  };
+  if(!isMyTurn(moveEvent.side, stateHolder)) {
+    return false;
+  }
+
+  return true;
 };
 
 module.exports = {

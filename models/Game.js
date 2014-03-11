@@ -95,7 +95,7 @@ var gameFind = Q.nfbind(Game.find.bind(Game));
 var gameFindOne = Q.nfbind(Game.findOne.bind(Game));
 
 function getInstances(playerSid) {
-  return gameFind({players: {$elemMatch: {'sid': playerSid}}}); 
+  return gameFind({players: {$elemMatch: {'sid': playerSid}}});
 }
 
 function findOne(gameId, playerSid) {

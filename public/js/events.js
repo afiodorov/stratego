@@ -17,6 +17,15 @@ Event.prototype = {
   }
 };
 
+var Move = function(json) {
+  o = new Event();
+  o.piece = json.piece;
+  o.side = json.side;
+  o.toTile = json.toTile;
+
+  return o;
+}
+
 var InviteFromPlayer = function(json) {
   var o = new Event();
   o.opponentName = json.opponentName;
@@ -59,4 +68,5 @@ module.exports = {
   InviteToPlayer : InviteToPlayer,
   Player : Player,
   ShouldShowPage : ShouldShowPage,
+  Move : Move
 };
