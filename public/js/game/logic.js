@@ -138,19 +138,17 @@ var getStandardDarkMoves = function(pieceLocation) {
   return gameStructs.tiles[pieceLocation].getBackward();
 };
 
+var getStandardMoves = function(side, pieceLocation) {
+  return (side === 'light') ? getStandardLightMoves(pieceLocation) :
+    getStandardDarkMoves(pieceLocation);
+};
+
 var getValidMoveTiles = function(stateHolder, piece) {
   var pieceLocation = stateHolder.getPieceLocation(piece);
-  var moves;
-
-  if(getPieceSide(piece) === 'light') {
-    moves = getStandardLightMoves();
-  } else if (getPieceSide(piece) === 'dark') {
-    moves = getStandardDarkMoves();
-  }
-
-  moves = moves.filter(function(tile) {
-    return stateHolder.isTileFull(tile);}
-  );
+  var moves = getStandardMoves(getPieceSide(piece),
+      pieceLocation).filter(function(tile) {
+    return stateHolder.isTileFull(tile);
+  });
 
   switch(piece) {
     case 'aragorn':
