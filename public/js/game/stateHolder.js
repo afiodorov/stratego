@@ -12,6 +12,7 @@ stateHolder.prototype.getSide = function() {
   return this._stateJson.mySide;
 };
 
+/* Gets a number of pieces of my side in a tile */
 stateHolder.prototype.piecesCount = function(tile) {
   return this._stateJson[this.getSide()].pieces.filter(function(piece) {
     return _.isEqual(piece.position, tile);
@@ -27,7 +28,7 @@ stateHolder.prototype.update = function(stateJson) {
   });
 };
 
-/* Checks if board tile out of space */
+/* Checks if board tile out of space, takes into account only tiles of my side */
 stateHolder.prototype.isTileFull = function(tile) {
   return this.piecesCount(tile) >= GameStructs.tiles[tile].capacity;
 };
@@ -52,5 +53,15 @@ stateHolder.prototype.addObserver = function(observer) {
     this._observers.push(observer);
   }
 };
+
+stateHolder.prototype.getPieceLocation = function(piece) {
+  var mySide = this.getSide();
+  var piecePair = _.findWhere(this._stateJson[mySide].pieces, {name: piece});
+  if(!piecePair) {
+    return null;
+  }
+
+  return piecePair.position;
+}
 
 module.exports = stateHolder;

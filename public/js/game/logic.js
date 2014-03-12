@@ -30,6 +30,18 @@ var events = require("./../events.js");
  * }
  */
 
+var getPieceSide = function(piece) {
+  if(_.keys(gameStructs.pieces.dark).indexOf(piece) !== -1) {
+    return 'dark';
+  }
+
+  if(_.keys(gameStructs.pieces.light).indexOf(piece) !== -1) {
+    return 'light';
+  }
+
+  return null;
+};
+
 var _startingPositions =  {
   light: _.times(4, _.constant([1,1]))
     .concat(
@@ -93,37 +105,8 @@ var generateRandomSide = function() {
   return _.sample(allowedSides);
 };
 
-var isMoveObjectValid = function(move) {
-  if(!hasRequiredFields(move, ["piece", "side", "toTile"])) {
-    return false;
-  }
-
-  if(!isSideValid(move.side)) {
-    return false;
-  }
-
-  if(!gameStructs.pieces[move.side][move.piece]) {
-    return false;
-  }
-
-  if(!gameStructs.isWithinGrid(move.toTile)) {
-    return false;
-  }
-};
-
-var isAttack = function(stateHolder, move) {
-  return stateHolder.isTileWithEnemy(move.toTile);
-};
-
-var getPieceLocation = function(stateHolder, side, piece) {
-  var pieceLocArr =
-    Enumerable.From(stateHolder[side].piecesLeft).Where(
-    function(x) {return x.name === piece;}).Select(
-    function(x) {return x.position;}).Take(1).toArray();
-    if(pieceLocArr.length === 0) {
-      return -1;
-    }
-  return pieceLocArr[0];
+var isAttack = function(stateHolder, moveEvent) {
+  return stateHolder.isTileWithEnemy(moveEvent.toTile);
 };
 
 var isMyTurn = function(mySide, stateHolder) {
@@ -136,16 +119,68 @@ var isMyTurn = function(mySide, stateHolder) {
   return true;
 };
 
-var isMoveValid = function(stateHolder, move) {
-  var moveEvent = new events.Move(move);
+var getStandardLightMoves = function(pieceLocation) {
+  var moves = gameStructs.tiles[pieceLocation].getForward();
+  // no switch on reference types => convert [1,1] to '1 1'
+  switch(pieceLocation.join(' ')) {
+    case '3 2':
+    case '5 1':
+      moves.push([5,2]);
+    break;
+    case '5 2':
+      moves.push([5,3]);
+    break;
+  }
+  return moves;
+};
+
+var getStandardDarkMoves = function(pieceLocation) {
+  return gameStructs.tiles[pieceLocation].getBackward();
+};
+
+var getValidMoveTiles = function(stateHolder, piece) {
+  var pieceLocation = stateHolder.getPieceLocation(piece);
+  var moves;
+
+  if(getPieceSide(piece) === 'light') {
+    moves = getStandardLightMoves();
+  } else if (getPieceSide(piece) === 'dark') {
+    moves = getStandardDarkMoves();
+  }
+
+  moves = moves.filter(function(tile) {
+    return stateHolder.isTileFull(tile);}
+  );
+
+  switch(piece) {
+    case 'aragorn':
+      var sideTiles = gameStructs.tiles[pieceLocation].getSideway();
+      var backTiles = gameStructs.tiles[pieceLocation].getBackward();
+      var attackTiles = _.union(sideTiles, backTiles).filter(function(tile) {
+        return stateHolder.isTileWithEnemy(tile);
+      });
+      return _.union(attackTiles, moves);
+  }
+  return moves;
+};
 
 
-  var pieceLocation = getPieceLocation(stateHolder, move.side, move.piece);
-  if(pieceLocation === -1) {
-    return {err: "You don't have that piece"};
+var isMoveValid = function(stateHolder, moveEvent) {
+  if(!moveEvent.isValid) {
+    return false;
+  }
+
+  var pieceLocation = stateHolder.getPieceLocation(moveEvent.piece);
+  if(!pieceLocation) {
+    return false;
   }
 
   if(!isMyTurn(moveEvent.side, stateHolder)) {
+    return false;
+  }
+
+  var validMoves = getValidMoveTiles(stateHolder, moveEvent);
+  if(validMoves.indexOf(moveEvent.toTile) === -1) {
     return false;
   }
 
@@ -157,6 +192,8 @@ module.exports = {
   getOppositeSide : getOppositeSide,
   generateRandomSide : generateRandomSide,
   generateStartPosition : generateStartPosition,
+  isSideValid : isSideValid,
+  getPieceSide : getPieceSide,
   _startingPositions : _startingPositions
 };
 
@@ -164,6 +201,8 @@ module.exports = {
 if(false) {
   var StateHolder = require('./stateHolder.js');
   var stateHolder = new StateHolder();
-  isAttack(stateHolder, {piece: 'gandalf', side: 'light', toTile: [1,1]});
-  isMoveValid(stateHolder, {piece: 'gandalf', side: 'light', toTile: [1,1]});
+  var moveEvent = new events.Move();
+  isAttack(stateHolder, moveEvent);
+  isMoveValid(stateHolder, moveEvent);
+  getValidMoveTiles(stateHolder, moveEvent.piece);
 }

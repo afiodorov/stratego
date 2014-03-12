@@ -46,7 +46,8 @@ var tiles = (function() {
     this.index = index;
   };
 
-  /* get all forward tiles */
+  /* get all forward tiles
+   * returns an empty array */
   Tile.prototype.getForward = function() {
     var res = new Array(0);
     res.push([this.index[0] + 1, this.index[1]]);
@@ -70,9 +71,13 @@ var tiles = (function() {
     return res.filter(isWithinGrid).sort();
   };
 
-  /* get all side tiles */
-  Tile.prototype.getSide = function() {
+  /* get all side tiles,
+   * the row in the middle doesn't have side tiles */
+  Tile.prototype.getSideway = function() {
     var res = new Array(0);
+    if(this.index[0] === Math.ceil(NUM_OF_ROWS / 2)) {
+      return res;
+    }
     res.push([this.index[0], this.index[1] - 1]);
     res.push([this.index[0], this.index[1] + 1]);
     return res.filter(isWithinGrid);

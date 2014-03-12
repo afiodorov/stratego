@@ -1,6 +1,8 @@
 'use strict';
 var _ = require('./lib/underscore.js');
 var acceptedInviteSides = ['light', 'dark', 'random'];
+var gameLogic = require('./game/logic.js');
+var gameStructs = require('./game/structs.js');
 
 function notNull(prop) {
   return typeof(this[prop]) !== 'undefined';
@@ -22,6 +24,18 @@ var Move = function(json) {
   o.piece = json.piece;
   o.side = json.side;
   o.toTile = json.toTile;
+
+  if(!gameLogic.isSideValid(o.side)) {
+    o.isValid = false;
+  }
+
+  if(!gameStructs.pieces[o.side][o.piece]) {
+    o.isValid = false;
+  }
+
+  if(!gameStructs.isWithinGrid(o.toTile)) {
+    o.isValid = false;
+  }
 
   return o;
 }
@@ -53,6 +67,7 @@ var Player = function(json) {
   o.playerName = json.playerName;
   o.invitesAccepted = json.invitesAccepted;
   o.isSelf = json.isSelf;
+
   return o;
 };
 
