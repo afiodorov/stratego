@@ -99,11 +99,11 @@ describe('GameStruct', function() {
       assert.deepEqual([[6, 1]], gameStructs.tiles[[5, 1]].getForward());
       assert.deepEqual([], gameStructs.tiles[[7, 1]].getForward());
     });
-    it('#getSide', function() {
-      assert.deepEqual([[4, 1], [4, 3]], gameStructs.tiles[[4, 2]].getSide());
-      assert.deepEqual([], gameStructs.tiles[[1, 1]].getSide());
-      assert.deepEqual([[5, 1], [5, 3]], gameStructs.tiles[[5, 2]].getSide());
-      assert.deepEqual([[6, 1]], gameStructs.tiles[[6, 2]].getSide());
+    it('#getSideway', function() {
+      assert.deepEqual([], gameStructs.tiles[[4, 2]].getSideway());
+      assert.deepEqual([], gameStructs.tiles[[1, 1]].getSideway());
+      assert.deepEqual([[5, 1], [5, 3]], gameStructs.tiles[[5, 2]].getSideway());
+      assert.deepEqual([[6, 1]], gameStructs.tiles[[6, 2]].getSideway());
     });
   });
 });

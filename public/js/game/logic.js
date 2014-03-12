@@ -161,6 +161,7 @@ var getValidMoveTiles = function(stateHolder, piece) {
       });
       return _.union(attackTiles, moves);
   }
+
   return moves;
 };
 
