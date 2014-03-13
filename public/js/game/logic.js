@@ -196,6 +196,7 @@ module.exports = {
   generateStartPosition : generateStartPosition,
   isSideValid : isSideValid,
   getPieceSide : getPieceSide,
+  getValidMoveTiles : getValidMoveTiles,
   _startingPositions : _startingPositions
 };
 

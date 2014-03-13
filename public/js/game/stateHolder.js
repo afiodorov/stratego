@@ -20,12 +20,14 @@ stateHolder.prototype._piecesCount = function(side, tile) {
 };
 
 /* Gets a number of pieces of my side in a tile */
-stateHolder.prototype.piecesCount = this._piecesCount.bind(this, this.getSide());
+stateHolder.prototype.piecesCount = function(tile) {
+  return this._piecesCount(this.getSide(), tile);
+}
 
 /* Gets a number of pieces of the opponent in a tile */
 stateHolder.prototype.oppPiecesCount = function(tile) {
   var oppSide = GameLogic.getOppSide(this.getSide());
-  return _piecesCount(opponentSide, tile);
+  return this._piecesCount(opponentSide, tile);
 }
 
 stateHolder.prototype.getOppTiles = function() {

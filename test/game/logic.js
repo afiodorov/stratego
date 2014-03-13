@@ -3,6 +3,7 @@
 var assert = require('assert');
 var _ = require('../../public/js/lib/underscore.js');
 var logic = require('../../public/js/game/logic.js');
+var fs = require('fs');
 
 describe('GameLogic', function() {
   describe('#startingPositions', function() {
@@ -55,6 +56,17 @@ describe('GameLogic', function() {
       assert.equal(logic.getPieceSide('black rider'  ), 'dark');
       assert.equal(logic.getPieceSide('witch king'   ), 'dark');
       assert.equal(logic.getPieceSide('cave troll'   ), 'dark');
+    });
+    it('#getValidMoveTiles', function() {
+      fs.readdir('./test/game/states', function(err, files) {
+        if(err) {
+          console.log(err);
+          return;
+        }
+        files.forEach(function(file) {
+          console.log(file);
+        });
+      });
     });
   });
 });
