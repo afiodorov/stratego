@@ -88,7 +88,7 @@ var isSideValid = function(side) {
 };
 
 /* returns dark if input is light and light if input is dark */
-var getOppositeSide = function(side) {
+var getOppSide = function(side) {
   if(side === 'light') {
     return 'dark';
   } 
@@ -147,15 +147,18 @@ var getValidMoveTiles = function(stateHolder, piece) {
   var pieceLocation = stateHolder.getPieceLocation(piece);
   var moves = getStandardMoves(getPieceSide(piece),
       pieceLocation).filter(function(tile) {
-    return stateHolder.isTileFull(tile);
+    return !stateHolder.isTileFull(tile);
   });
 
   switch(piece) {
     case 'aragorn':
       var sideTiles = gameStructs.tiles[pieceLocation].getSideway();
       var backTiles = gameStructs.tiles[pieceLocation].getBackward();
-      var attackTiles = _.union(sideTiles, backTiles).filter(function(tile) {
-        return stateHolder.isTileWithEnemy(tile);
+      var attackTiles = _.union(sideTiles, backTiles).filter(stateHolder.isTileWithEnemy);
+      return _.union(attackTiles, moves);
+    case 'flying nazgul':
+      var attackTiles = stateHolder.getOppTiles().filter(function(tile) {
+        return stateHolder.oppPiecesCount(tile) === 1;
       });
       return _.union(attackTiles, moves);
   }
@@ -188,7 +191,7 @@ var isMoveValid = function(stateHolder, moveEvent) {
 
 module.exports = {
   isMoveValid : isMoveValid,
-  getOppositeSide : getOppositeSide,
+  getOppSide : getOppSide,
   generateRandomSide : generateRandomSide,
   generateStartPosition : generateStartPosition,
   isSideValid : isSideValid,
