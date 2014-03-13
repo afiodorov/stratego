@@ -7,6 +7,7 @@ module.exports = function(grunt) {
       dev: {
         tasks: ['nodemon', 'node-inspector', 'browserify', 'watch'],
         options: {
+          limit: 4,
           logConcurrentOutput: true
         }
       }
