@@ -34,4 +34,27 @@ describe('GameLogic', function() {
         [6, 2]]);
     });
   });
+
+  describe('correctPieceSide', function() {
+    it('#getPieceSide', function() {
+      assert.equal(logic.getPieceSide('gandalf'), 'light');
+      assert.equal(logic.getPieceSide('aragorn'), 'light');
+      assert.equal(logic.getPieceSide('boromir'), 'light');
+      assert.equal(logic.getPieceSide('frodo'  ), 'light');
+      assert.equal(logic.getPieceSide('gimly'  ), 'light');
+      assert.equal(logic.getPieceSide('legolas'), 'light');
+      assert.equal(logic.getPieceSide('merry'  ), 'light');
+      assert.equal(logic.getPieceSide('pippin' ), 'light');
+      assert.equal(logic.getPieceSide('sam'    ), 'light');
+      assert.equal(logic.getPieceSide('orcs'         ), 'dark');
+      assert.equal(logic.getPieceSide('shelob'       ), 'dark');
+      assert.equal(logic.getPieceSide('saruman'      ), 'dark');
+      assert.equal(logic.getPieceSide('flying nazgul'), 'dark'); 
+      assert.equal(logic.getPieceSide('barlog'       ), 'dark');
+      assert.equal(logic.getPieceSide('warg'         ), 'dark');
+      assert.equal(logic.getPieceSide('black rider'  ), 'dark');
+      assert.equal(logic.getPieceSide('witch king'   ), 'dark');
+      assert.equal(logic.getPieceSide('cave troll'   ), 'dark');
+    });
+  });
 });
