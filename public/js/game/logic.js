@@ -161,11 +161,28 @@ var getValidMoveTiles = function(stateHolder, piece) {
         return stateHolder.oppPiecesCount(tile) === 1;
       });
       return _.union(attackTiles, moves);
+    case 'witch king':
+      var attackTiles = gameStructs.tiles[pieceLocation].getSideway().filter(stateHolder.isTileWithEnemy);
+      return _.union(attackTiles, moves);
+    case 'black rider':
+      var attackTiles = new Array(0);
+      preorder(attackTiles, gameStructs.tiles[pieceLocation],
+        function(tile){return !stateHolder.isTileWithEnemy;});
+      return _.union(attackTiles, moves);
   }
 
   return moves;
 };
 
+var preorder = function(acc, tile, predicate) {
+  if(!tile) return;
+  if(predicate(tile)) {
+    acc = _.union(acc, [tile.index]);
+    tile.getForwards().forEach(function(tile) {
+      preorder(acc, tile, predicate);
+    });
+  }
+}
 
 var isMoveValid = function(stateHolder, moveEvent) {
   if(!moveEvent.isValid) {
