@@ -18,7 +18,7 @@ html
               a(href='#main') Main
             // ko foreach: games
             li
-              a(data-bind='attr: {title: opponentName, href: \'#\' + id}, click: $parent.switchToGame') 
+              a(data-bind='attr: {title: opponentName, href: \'#\' + _id}, click: $parent.switchToGame') 
                 span.mytabs-text(data-bind='text: \'playing \' + opponentName')
                 span.ui-icon.ui-icon-bullet.mytabs-text(data-bind='playerOnline: $parent.players')
               span.ui-icon.ui-icon-close.mytabs-text.cursor-hand(data-bind="click: $parent.openCloseGameDialog, disable: $parent.isCloseGameDialogOpen.bind(this)", href='#')
@@ -30,7 +30,7 @@ html
             ul.dropdown
               // ko foreach: players
               li
-                a(href='#', data-bind='text: playerName, click: $parent.requestGame')
+                a(href='#', data-bind='text: playerName, click: $parent.openInviteGameDialog')
               // /ko
             #bottom
               span
@@ -48,7 +48,7 @@ html
                   span None
                   input(type='radio' value='none' data-bind='checked: invitesAccepted, click: changeInvitesAccepted')
           // ko foreach: games
-          div(data-bind='attr: {id: id}')
+          div(data-bind='attr: {id: _id}')
             canvas.game-canvas(width='750', height='500') Canvas not supported
             .chat
               .messages(data-bind='foreach: messages')
@@ -65,3 +65,11 @@ html
             span Are you sure you want to finish a game with 
             span(data-bind="text: opponentNameOfGameToBeClosed")
             span ?
+          div(data-bind="dialog: {isOpen: isInviteGameDialogOpen, resizable: false, modal: true, buttons: {Cancel: function() { $( this ).dialog(\"close\") } } }")
+            span(data-bind='text: inviteGameDialogText')
+            div Select your side:
+            div(data-bind='buttonset: { refreshOn: invitesAvailable }')
+              // ko foreach: invitesAvailable
+              input(type='checkbox' data-bind="attr: {id: id}")
+              label(data-bind='attr: {\'for\': id}, text: label, click: function() { $parent.requestGame(this.id); $($element).parent().parent().dialog(\"close\"); }')
+              // /ko

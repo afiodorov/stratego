@@ -1,6 +1,6 @@
 var db = require('../lib/db.js');
 var ChatSchema = new db.Schema({
-    gameid: {type: String},
+    gameId: {type: String},
     player: {type: String},
     message: {type: String},
     date: {type: Date},
@@ -12,7 +12,7 @@ var Chat = db.mongoose.model('Chat', ChatSchema);
 function pushMessage(chatStruct, callback) {
   var instance = new Chat();
   instance.date = new Date();
-  instance.gameid = chatStruct.gameid;
+  instance.gameId = chatStruct.gameId;
   instance.player = chatStruct.player;
   instance.message = chatStruct.message;
   instance.playerName = chatStruct.playerName;
@@ -26,13 +26,13 @@ function pushMessage(chatStruct, callback) {
   });
 }
 
-function getMessages(gameid, limit, callback) {
-  Chat.find({gameid: gameid})
+function getMessages(gameId, limit, callback) {
+  Chat.find({gameId: gameId})
     .sort('_id', 'descending').limit(limit).exec(callback);
 }
 
-function removeMessages(gameid, callback) {
-  Chat.find({gameid: gameid}).remove().exec(callback);
+function removeMessages(gameId, callback) {
+  Chat.find({gameId: gameId}).remove().exec(callback);
 }
 
 module.exports = {

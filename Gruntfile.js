@@ -1,9 +1,13 @@
 module.exports = function(grunt) {
   grunt.initConfig({
+    heroku: {
+      tasks: ['browserify']
+    },
     concurrent: {
       dev: {
         tasks: ['nodemon', 'node-inspector', 'browserify', 'watch'],
         options: {
+          limit: 4,
           logConcurrentOutput: true
         }
       }
@@ -49,7 +53,7 @@ module.exports = function(grunt) {
         script: 'server.js',
         options: {
           nodeArgs: ['--debug'],
-          ignore: ['node_modules/**', 'public/**'],
+          ignore: ['node_modules/**'],
           env: {
           },
           // omit this property if you aren't serving HTML files and 
@@ -96,6 +100,9 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('default', ['concurrent']);  
+  grunt.registerTask('heroku', ['browserify']);
+  grunt.registerTask('heroku:production', ['browserify']);
+  grunt.registerTask('heroku:development', ['browserify']);
 
   grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-concurrent');

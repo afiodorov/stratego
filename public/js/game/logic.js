@@ -1,6 +1,74 @@
 /*global Enumerable*/
 'use strict';
 var gameStructs = require("./structs.js");
+var _ = require('../lib/underscore.js');
+var allowedSides = ['light', 'dark'];
+var events = require("./../events.js");
+
+/* Returns an object of the starting positions
+ * For a standard board will return:
+ * { light:
+ *     [[1, 1],
+ *      [1, 1],
+ *      [1, 1],
+ *      [1, 1],
+ *      [2, 1],
+ *      [2, 2],
+ *      [3, 1],
+ *      [3, 2],
+ *      [3, 3]],
+ *   dark:
+ *     [[7, 1],
+ *      [7, 1],
+ *      [7, 1],
+ *      [7, 1],
+ *      [5, 1],
+ *      [5, 2],
+ *      [5, 3],
+ *      [6, 1],
+ *      [6, 2]]
+ * }
+ */
+
+var getPieceSide = function(piece) {
+  if(_.keys(gameStructs.pieces.dark).indexOf(piece) !== -1) {
+    return 'dark';
+  }
+
+  if(_.keys(gameStructs.pieces.light).indexOf(piece) !== -1) {
+    return 'light';
+  }
+
+  return null;
+};
+
+var _startingPositions =  {
+  light: _.times(4, _.constant([1,1]))
+    .concat(
+       gameStructs.tiles.filter(
+         function(tile) {
+           return tile.index[0] === 2 || tile.index[0] === 3;
+         }).map(
+         function(tile) {return tile.index;})),
+  dark: _.times(4, _.constant([gameStructs.tiles.numRows,1]))
+    .concat(
+       gameStructs.tiles.filter(
+         function(tile) {return tile.index[0] === gameStructs.tiles.numRows - 1
+           || tile.index[0] === gameStructs.tiles.numRows - 2;})
+       .map(
+         function(tile) {return tile.index;})
+       )
+};
+
+/* Random position for a dark/light side 
+ * used in initialising a game state */
+var generateStartPosition = function(side) {
+  var pieces = gameStructs.pieces[side];
+  return _.zip(
+      _.keys(pieces),
+      _.shuffle(_startingPositions[side])
+      ).map(_.object.bind(null, ['name', 'position']));
+};
 
 var hasRequiredFields = function(o, requiredFields) {
   return requiredFields.reduce(function(res, prop) {
@@ -9,101 +77,131 @@ var hasRequiredFields = function(o, requiredFields) {
 };
 
 var isGameStateValid = function(stateHolder) {
-  var requiredFields = ["pieces", "cards"];
-  return hasRequiredFields(stateHolder, ["stage", "mySide", "turn"])
+  var requiredFields = ['pieces', 'cards'];
+  return hasRequiredFields(stateHolder, ['stage', 'mySide', 'turn'])
     && hasRequiredFields(stateHolder.light, requiredFields) 
     && hasRequiredFields(stateHolder.dark, requiredFields);
 };
 
 var isSideValid = function(side) {
-  return ["light", "dark"].indexOf(side) !== -1;
+  return allowedSides.indexOf(side) !== -1;
 };
 
+/* returns dark if input is light and light if input is dark */
 var getOppositeSide = function(side) {
-  if(side === "light") {
-    return "dark";
+  if(side === 'light') {
+    return 'dark';
   } 
 
-  if(side === "dark") {
-    return "light";
+  if(side === 'dark') {
+    return 'light';
   }
 
   throw new TypeError("Can't get opposite side");
 };
 
-var isMoveObjectValid = function(move) {
-  if(!hasRequiredFields(move, ["piece", "side", "toTile"])) {
-    return false;
-  }
-
-  if(!isSideValid(move.side)) {
-    return false;
-  }
-
-  if(!gameStructs.pieces[move.side][move.piece]) {
-    return false;
-  }
-
-  if(!gameStructs.isWithinGrid(move.toTile)) {
-    return false;
-  }
+/* Returns 'light' or 'dark' at random */
+var generateRandomSide = function() {
+  return _.sample(allowedSides);
 };
 
-var isAttack = function(stateHolder, move) {
-  return stateHolder.isTileWithEnemy(move.toTile);
+var isAttack = function(stateHolder, moveEvent) {
+  return stateHolder.isTileWithEnemy(moveEvent.toTile);
 };
 
-var getPieceLocation = function(stateHolder, side, piece) {
-  var pieceLocArr =
-    Enumerable.From(stateHolder[side].piecesLeft).Where(
-    function(x) {return x.name === piece;}).Select(
-    function(x) {return x.position;}).Take(1).toArray();
-    if(pieceLocArr.length === 0) {
-      return -1;
-    }
-  return pieceLocArr[0];
-};
-
-var isMoveValid = function(stateHolder, move) {
-  /* 
-   * move {piece, side, toTile}
-  */
-
-  var newState = null;
-
-  if(!isGameStateValid(stateHolder)) {
-    return {err: "Invalid gaming state passed"};
-  }
-
-  if(!isMoveObjectValid(move)) {
-    return {err: "Invalid move passed"};
-  }
-
-  if(stateHolder.stage === "start" || "game") {
-    if(move.side !== stateHolder.turn) {
-      return {err: "Not your turn"};
+var isMyTurn = function(mySide, stateHolder) {
+  if(stateHolder.stage === 'start' || 'game' || 'battle') {
+    if(mySide !== stateHolder.turn) {
+      return false;
     }
   }
 
-  var pieceLocation = getPieceLocation(stateHolder, move.side, move.piece);
-  if(pieceLocation === -1) {
-    return {err: "You don't have that piece"};
+  return true;
+};
+
+var getStandardLightMoves = function(pieceLocation) {
+  var moves = gameStructs.tiles[pieceLocation].getForward();
+  // no switch on reference types => convert [1,1] to '1 1'
+  switch(pieceLocation.join(' ')) {
+    case '3 2':
+    case '5 1':
+      moves.push([5,2]);
+    break;
+    case '5 2':
+      moves.push([5,3]);
+    break;
+  }
+  return moves;
+};
+
+var getStandardDarkMoves = function(pieceLocation) {
+  return gameStructs.tiles[pieceLocation].getBackward();
+};
+
+var getStandardMoves = function(side, pieceLocation) {
+  return (side === 'light') ? getStandardLightMoves(pieceLocation) :
+    getStandardDarkMoves(pieceLocation);
+};
+
+var getValidMoveTiles = function(stateHolder, piece) {
+  var pieceLocation = stateHolder.getPieceLocation(piece);
+  var moves = getStandardMoves(getPieceSide(piece),
+      pieceLocation).filter(function(tile) {
+    return stateHolder.isTileFull(tile);
+  });
+
+  switch(piece) {
+    case 'aragorn':
+      var sideTiles = gameStructs.tiles[pieceLocation].getSideway();
+      var backTiles = gameStructs.tiles[pieceLocation].getBackward();
+      var attackTiles = _.union(sideTiles, backTiles).filter(function(tile) {
+        return stateHolder.isTileWithEnemy(tile);
+      });
+      return _.union(attackTiles, moves);
   }
 
-  return {
-    newState : newState
-  };
+  return moves;
+};
+
+
+var isMoveValid = function(stateHolder, moveEvent) {
+  if(!moveEvent.isValid) {
+    return false;
+  }
+
+  var pieceLocation = stateHolder.getPieceLocation(moveEvent.piece);
+  if(!pieceLocation) {
+    return false;
+  }
+
+  if(!isMyTurn(moveEvent.side, stateHolder)) {
+    return false;
+  }
+
+  var validMoves = getValidMoveTiles(stateHolder, moveEvent);
+  if(validMoves.indexOf(moveEvent.toTile) === -1) {
+    return false;
+  }
+
+  return true;
 };
 
 module.exports = {
   isMoveValid : isMoveValid,
-  getOppositeSide : getOppositeSide
+  getOppositeSide : getOppositeSide,
+  generateRandomSide : generateRandomSide,
+  generateStartPosition : generateStartPosition,
+  isSideValid : isSideValid,
+  getPieceSide : getPieceSide,
+  _startingPositions : _startingPositions
 };
 
 /* autocompletion now works */
 if(false) {
   var StateHolder = require('./stateHolder.js');
   var stateHolder = new StateHolder();
-  isAttack(stateHolder, {piece: 'gandalf', side: 'light', toTile: [1,1]});
-  isMoveValid(stateHolder, {piece: 'gandalf', side: 'light', toTile: [1,1]});
+  var moveEvent = new events.Move();
+  isAttack(stateHolder, moveEvent);
+  isMoveValid(stateHolder, moveEvent);
+  getValidMoveTiles(stateHolder, moveEvent.piece);
 }

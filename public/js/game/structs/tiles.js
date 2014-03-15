@@ -46,7 +46,8 @@ var tiles = (function() {
     this.index = index;
   };
 
-  /* get all forward tiles */
+  /* get all forward tiles
+   * returns an empty array */
   Tile.prototype.getForward = function() {
     var res = new Array(0);
     res.push([this.index[0] + 1, this.index[1]]);
@@ -70,9 +71,13 @@ var tiles = (function() {
     return res.filter(isWithinGrid).sort();
   };
 
-  /* get all side tiles */
-  Tile.prototype.getSide = function() {
+  /* get all side tiles,
+   * the row in the middle doesn't have side tiles */
+  Tile.prototype.getSideway = function() {
     var res = new Array(0);
+    if(this.index[0] === Math.ceil(NUM_OF_ROWS / 2)) {
+      return res;
+    }
     res.push([this.index[0], this.index[1] - 1]);
     res.push([this.index[0], this.index[1] + 1]);
     return res.filter(isWithinGrid);
@@ -82,7 +87,7 @@ var tiles = (function() {
   tiles[2][1] = new Tile('Arthedam'        , 2, [2, 1]);
   tiles[2][2] = new Tile('Cardolan'        , 2, [2, 2]);
   tiles[3][1] = new Tile('Rhudaur'         , 2, [3, 1]);
-  tile[3][2] = new Tile('Eregion'         , 2, [3, 2]);
+  tiles[3][2] = new Tile('Eregion'         , 2, [3, 2]);
   tiles[3][3] = new Tile('Enedwaith'       , 2, [3, 3]);
   tiles[4][1] = new Tile('The High Pass'   , 1, [4, 1]);
   tiles[4][2] = new Tile('Misty Mountains' , 1, [4, 2]);
@@ -108,12 +113,12 @@ var tiles = (function() {
     });
 
     mytiles.numRows = NUM_OF_ROWS;
-    Object.defineProperty(mytiles, 'NUM_OF_ROWS', {
+    Object.defineProperty(mytiles, 'numRows', {
       enumerable: false
     });
 
     mytiles.numCols = columnLimit;
-    Object.defineProperty(mytiles, 'columnLimit', {
+    Object.defineProperty(mytiles, 'numCols', {
       enumerable: false
     });
 
