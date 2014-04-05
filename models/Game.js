@@ -40,11 +40,11 @@ function addPlayers(instance, player1, player2, player1Side) {
   switch(player1Side) {
     case 'light':
     case 'dark':
-      player2Side = GameLogic.getOppositeSide(player1Side);
+      player2Side = GameLogic.getOppSide(player1Side);
     break;
     case 'random':
       player2Side = GameLogic.generateRandomSide();
-      player1Side = GameLogic.getOppositeSide(player2Side);
+      player1Side = GameLogic.getOppSide(player2Side);
     break;
     default:
       throw new Error('unrecognised side');
