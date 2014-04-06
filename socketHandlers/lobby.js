@@ -182,10 +182,10 @@ function acceptGame(uInvite) {
  });
 }
 
-function _addNewGame(opponent, opsession, sInviteToPlayer) {
+function _addNewGame(opponent, opsession, inviteToPlayer) {
   var socket = this.socket;
   var session = this.session;
-  Game.create(opponent.sid, socket.sid, sInviteToPlayer.opponentSide).
+  Game.create(opponent.sid, socket.sid, inviteToPlayer.opponentSide).
     then(function(game) {
       opponent.socket.join(game.id);
       socket.join(game.id);
@@ -207,7 +207,6 @@ function _addNewGame(opponent, opsession, sInviteToPlayer) {
         logger.log('warn', 'failed to updated opponent\'s new game');
         logger.log('warn', err);
       }).done();
-
     }).fail(function(err) {
       logger.log('warn', "failed to add game");
       logger.log('warn', err);

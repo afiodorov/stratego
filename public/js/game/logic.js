@@ -88,7 +88,7 @@ var isSideValid = function(side) {
 };
 
 /* returns dark if input is light and light if input is dark */
-var getOppositeSide = function(side) {
+var getOppSide = function(side) {
   if(side === 'light') {
     return 'dark';
   } 
@@ -120,7 +120,7 @@ var isMyTurn = function(mySide, stateHolder) {
 };
 
 var getStandardLightMoves = function(pieceLocation) {
-  var moves = gameStructs.tiles[pieceLocation].getForward();
+  var moves = gameStructs.tiles[pieceLocation].getForwardTiles();
   // no switch on reference types => convert [1,1] to '1 1'
   switch(pieceLocation.join(' ')) {
     case '3 2':
@@ -135,7 +135,7 @@ var getStandardLightMoves = function(pieceLocation) {
 };
 
 var getStandardDarkMoves = function(pieceLocation) {
-  return gameStructs.tiles[pieceLocation].getBackward();
+  return gameStructs.tiles[pieceLocation].getBackwardTiles();
 };
 
 var getStandardMoves = function(side, pieceLocation) {
@@ -147,22 +147,42 @@ var getValidMoveTiles = function(stateHolder, piece) {
   var pieceLocation = stateHolder.getPieceLocation(piece);
   var moves = getStandardMoves(getPieceSide(piece),
       pieceLocation).filter(function(tile) {
-    return stateHolder.isTileFull(tile);
+    return !stateHolder.isTileFull(tile);
   });
 
   switch(piece) {
     case 'aragorn':
-      var sideTiles = gameStructs.tiles[pieceLocation].getSideway();
-      var backTiles = gameStructs.tiles[pieceLocation].getBackward();
-      var attackTiles = _.union(sideTiles, backTiles).filter(function(tile) {
-        return stateHolder.isTileWithEnemy(tile);
+      var sideTiles = gameStructs.tiles[pieceLocation].getReachableSideTiles();
+      var backTiles = gameStructs.tiles[pieceLocation].getBackwardTiles();
+      var attackTiles = _.union(sideTiles, backTiles).filter(stateHolder.isTileWithEnemy);
+      return _.union(attackTiles, moves);
+    case 'flying nazgul':
+      var attackTiles = stateHolder.getOppTiles().filter(function(tile) {
+        return stateHolder.oppPiecesCount(tile) === 1;
       });
+      return _.union(attackTiles, moves);
+    case 'witch king':
+      var attackTiles = gameStructs.tiles[pieceLocation].getReachableSideTiles().filter(stateHolder.isTileWithEnemy);
+      return _.union(attackTiles, moves);
+    case 'black rider':
+      var attackTiles = new Array(0);
+      preorder(attackTiles, gameStructs.tiles[pieceLocation],
+        function(tile){return !stateHolder.isTileWithEnemy;});
       return _.union(attackTiles, moves);
   }
 
   return moves;
 };
 
+var preorder = function(acc, tile, predicate) {
+  if(!tile) return;
+  if(predicate(tile)) {
+    acc = _.union(acc, [tile.index]);
+    tile.getForwardTiless().forEach(function(tile) {
+      preorder(acc, tile, predicate);
+    });
+  }
+}
 
 var isMoveValid = function(stateHolder, moveEvent) {
   if(!moveEvent.isValid) {
@@ -188,11 +208,12 @@ var isMoveValid = function(stateHolder, moveEvent) {
 
 module.exports = {
   isMoveValid : isMoveValid,
-  getOppositeSide : getOppositeSide,
+  getOppSide : getOppSide,
   generateRandomSide : generateRandomSide,
   generateStartPosition : generateStartPosition,
   isSideValid : isSideValid,
   getPieceSide : getPieceSide,
+  getValidMoveTiles : getValidMoveTiles,
   _startingPositions : _startingPositions
 };
 

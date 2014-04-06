@@ -12,12 +12,30 @@ stateHolder.prototype.getSide = function() {
   return this._stateJson.mySide;
 };
 
-/* Gets a number of pieces of my side in a tile */
-stateHolder.prototype.piecesCount = function(tile) {
-  return this._stateJson[this.getSide()].pieces.filter(function(piece) {
+/* Gets number of pieces of a side in a tile */
+stateHolder.prototype._piecesCount = function(side, tile) {
+  return this._stateJson[side].pieces.filter(function(piece) {
     return _.isEqual(piece.position, tile);
   }).length;
 };
+
+/* Gets a number of pieces of my side in a tile */
+stateHolder.prototype.piecesCount = function(tile) {
+  return this._piecesCount(this.getSide(), tile);
+}
+
+/* Gets a number of pieces of the opponent in a tile */
+stateHolder.prototype.oppPiecesCount = function(tile) {
+  var oppSide = GameLogic.getOppSide(this.getSide());
+  return this._piecesCount(opponentSide, tile);
+}
+
+stateHolder.prototype.getOppTiles = function() {
+  var oppSide = GameLogic.getOppSide(this.getSide());
+  return _.map(this._stateJson[oppSide].pieces, function(piecePair) {
+    return piecePair.position;
+  });
+}
 
 stateHolder.prototype.update = function(stateJson) {
   this._stateJson = stateJson;
@@ -33,10 +51,14 @@ stateHolder.prototype.isTileFull = function(tile) {
   return this.piecesCount(tile) >= GameStructs.tiles[tile].capacity;
 };
 
+stateHolder.prototype.isOppTileFull = function(tile) {
+  return this.oppPiecesCount(tile) >= GameStructs.tiles[tile].capacity;
+};
+
 /* Checks if tile [int, int] has an enemy piece */
 stateHolder.prototype.isTileWithEnemy = function(tile) {
-  var oppositeSide = GameLogic.getOppositeSide(this.getSide());
-  return this._stateJson[oppositeSide].pieces.filter(
+  var oppSide = GameLogic.getOppSide(this.getSide());
+  return this._stateJson[oppSide].pieces.filter(
       function(piece) {
         return _.isEqual(piece.position, tile);
       }).length !== 0;

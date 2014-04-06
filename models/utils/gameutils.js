@@ -35,7 +35,7 @@ function nullifyPosition(o) {
 }
 
 function removeOpponentPieces(game) {
-  var opponentSide = GameLogic.getOppositeSide(game.state.mySide);
+  var opponentSide = GameLogic.getOppSide(game.state.mySide);
   game.state[opponentSide].pieces =
     game.state[opponentSide].pieces.map(nullifyPosition);
 }
