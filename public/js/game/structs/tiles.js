@@ -140,8 +140,9 @@ var tiles = (function() {
 
     /**
      * Returns a tile. First tile is indexed as [1, 1]
-     * @param {integer} row
-     * @param {integer} col
+     * @param {number} row
+     * @param {number} col
+     * @return Tile object
      */
     mytiles.get = function(row, col) {
       return mytiles[[row, col]];
