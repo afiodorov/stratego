@@ -139,7 +139,7 @@ var tiles = (function() {
     });
 
     /**
-     * Returns a tile. First tiles in indexed as [1, 1]
+     * Returns a tile. First tile is indexed as [1, 1]
      * @param {integer} row
      * @param {integer} col
      */
