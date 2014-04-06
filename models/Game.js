@@ -9,16 +9,16 @@ var _ = require('../public/js/lib/underscore.js');
 var logger = require('../lib/logger.js');
 
 var GameSchema = new db.Schema({
-    players: [PlayerSchema],
-    state: 
-      {
-        turn: String,
-        stage: String,
-        dark: {pieces: [PiecesSchema],
-              cards: [CardsSchema]},
-        light: {pieces: [PiecesSchema],
-              cards: [CardsSchema]}
-      }
+  players: [PlayerSchema],
+  state: 
+    {
+      turn: String,
+      stage: String,
+      dark: {pieces: [PiecesSchema],
+            cards: [CardsSchema]},
+      light: {pieces: [PiecesSchema],
+            cards: [CardsSchema]}
+    }
 });
 
 var Game = db.mongoose.model('Game', GameSchema);
@@ -99,7 +99,7 @@ function getInstances(playerSid) {
 }
 
 function findOne(gameId, playerSid) {
- return gameFindOne({'_id': gameId, players: {$elemMatch: {'sid':
+  return gameFindOne({'_id': gameId, players: {$elemMatch: {'sid':
    playerSid}}});
 }
 
@@ -112,3 +112,7 @@ module.exports = {
   findOne: findOne,
   Model: Game
 };
+
+if(process.env.STRATEGO_DEVELOPMENT) {
+  module.exports.Schema = GameSchema;
+}

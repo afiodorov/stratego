@@ -57,6 +57,7 @@ describe('GameLogic', function() {
       assert.equal(logic.getPieceSide('witch king'   ), 'dark');
       assert.equal(logic.getPieceSide('cave troll'   ), 'dark');
     });
+
     it('#getValidMoveTiles', function() {
       fs.readdir('./test/game/states', function(err, files) {
         if(err) {
