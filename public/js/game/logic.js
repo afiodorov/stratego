@@ -120,7 +120,7 @@ var isMyTurn = function(mySide, stateHolder) {
 };
 
 var getStandardLightMoves = function(pieceLocation) {
-  var moves = gameStructs.tiles[pieceLocation].getForward();
+  var moves = gameStructs.tiles[pieceLocation].getForwardTiles();
   // no switch on reference types => convert [1,1] to '1 1'
   switch(pieceLocation.join(' ')) {
     case '3 2':
@@ -135,7 +135,7 @@ var getStandardLightMoves = function(pieceLocation) {
 };
 
 var getStandardDarkMoves = function(pieceLocation) {
-  return gameStructs.tiles[pieceLocation].getBackward();
+  return gameStructs.tiles[pieceLocation].getBackwardTiles();
 };
 
 var getStandardMoves = function(side, pieceLocation) {
@@ -152,8 +152,8 @@ var getValidMoveTiles = function(stateHolder, piece) {
 
   switch(piece) {
     case 'aragorn':
-      var sideTiles = gameStructs.tiles[pieceLocation].getSideway();
-      var backTiles = gameStructs.tiles[pieceLocation].getBackward();
+      var sideTiles = gameStructs.tiles[pieceLocation].getReachableSideTiles();
+      var backTiles = gameStructs.tiles[pieceLocation].getBackwardTiles();
       var attackTiles = _.union(sideTiles, backTiles).filter(stateHolder.isTileWithEnemy);
       return _.union(attackTiles, moves);
     case 'flying nazgul':
@@ -162,7 +162,7 @@ var getValidMoveTiles = function(stateHolder, piece) {
       });
       return _.union(attackTiles, moves);
     case 'witch king':
-      var attackTiles = gameStructs.tiles[pieceLocation].getSideway().filter(stateHolder.isTileWithEnemy);
+      var attackTiles = gameStructs.tiles[pieceLocation].getReachableSideTiles().filter(stateHolder.isTileWithEnemy);
       return _.union(attackTiles, moves);
     case 'black rider':
       var attackTiles = new Array(0);
@@ -178,7 +178,7 @@ var preorder = function(acc, tile, predicate) {
   if(!tile) return;
   if(predicate(tile)) {
     acc = _.union(acc, [tile.index]);
-    tile.getForwards().forEach(function(tile) {
+    tile.getForwardTiless().forEach(function(tile) {
       preorder(acc, tile, predicate);
     });
   }
