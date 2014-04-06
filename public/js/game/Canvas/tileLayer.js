@@ -61,11 +61,11 @@ var tileLayer = function (boardWidth, boardHeight) {
     }
     
     //The game will be played top to bottom. "rows" are horizontal, and columns are verticle.
-    for (var row = 1; row <= tiles.NUM_OF_ROWS; row++) {
-        var numCols = tiles.columnLimit(row);
+    for (var row = 1; row <= tiles.numRows ; row++) {
+        var numCols = tiles.numCols(row);
         for (var col = 1; col <= numCols ; col++) {
             var rectWidth = boardWidth / numCols;
-            var rectHeight = boardHeight / tiles.NUM_OF_ROWS;
+            var rectHeight = boardHeight / tiles.numRows;
             var rectX = rectWidth * (col - 1);
             var rectY = rectHeight * (row - 1);
             tileGroups.push(
