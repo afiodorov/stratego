@@ -60,7 +60,7 @@ var _startingPositions =  {
        )
 };
 
-/* Random position for a dark/light side 
+/** Random position for a dark/light side 
  * used in initialising a game state */
 var generateStartPosition = function(side) {
   var pieces = gameStructs.pieces[side];

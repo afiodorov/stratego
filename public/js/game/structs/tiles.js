@@ -138,6 +138,22 @@ var tiles = (function() {
       enumerable: false
     });
 
+    /**
+     * Returns a tile. First tiles in indexed as [1, 1]
+     * @param {integer} row
+     * @param {integer} col
+     */
+    mytiles.get = function(row, col) {
+      return mytiles[[row, col]];
+    };
+    Object.defineProperty(mytiles, 'get', {
+      enumerable: false
+    });
+
+    Object.defineProperty(mytiles, 'isWithin', {
+      enumerable: false
+    });
+
     Object.freeze(mytiles);
     return mytiles;
   };
