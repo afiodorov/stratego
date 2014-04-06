@@ -1,124 +1,135 @@
 'use strict';
 var _ = require('../../lib/underscore.js');
 
+var Tile = function(name, capacity, index) {
+  this.name = name;
+  this.capacity = capacity;
+  this.index = index;
+};
+
+var tilesArr = [];
+_.range(7).forEach(function(i) {tilesArr[i] = [];});
+tilesArr[0][0] = new Tile('The Shire'       , 4, [1, 1]);
+tilesArr[1][0] = new Tile('Arthedam'        , 2, [2, 1]);
+tilesArr[1][1] = new Tile('Cardolan'        , 2, [2, 2]);
+tilesArr[2][0] = new Tile('Rhudaur'         , 2, [3, 1]);
+tilesArr[2][1] = new Tile('Eregion'         , 2, [3, 2]);
+tilesArr[2][2] = new Tile('Enedwaith'       , 2, [3, 3]);
+tilesArr[3][0] = new Tile('The High Pass'   , 1, [4, 1]);
+tilesArr[3][1] = new Tile('Misty Mountains' , 1, [4, 2]);
+tilesArr[3][2] = new Tile('Caradoras'       , 1, [4, 3]);
+tilesArr[3][3] = new Tile('Gap Of Rohan'    , 1, [4, 4]);
+tilesArr[4][0] = new Tile('Mirkwood'        , 2, [5, 1]);
+tilesArr[4][1] = new Tile('Fangorn'         , 2, [5, 2]);
+tilesArr[4][2] = new Tile('Rohan'           , 2, [5, 3]);
+tilesArr[5][0] = new Tile('Gondor'          , 2, [6, 1]);
+tilesArr[5][1] = new Tile('Dagorlad'        , 2, [6, 2]);
+tilesArr[6][0] = new Tile('Mordor'          , 4, [7, 1]);
+
+var numCols = function(rowNumber) {return tilesArr[rowNumber - 1].length;};
+
+/**
+ * @param {array|number} row_ either row (starts from 1) or index, e.g. [1,1]
+ * @param {number} col_ column number (starts from 1)
+ *
+ * @return {boolean} Returns whether grid index is valid. [1,1] is the first
+ * tile
+ */
+var isWithinGrid = function(row_, col_) {
+  var row = row_;
+  var col = col_;
+
+  if (Object.prototype.toString.call(row_) === '[object Array]') {
+    if (row_.length !== 2) {
+      throw new TypeError('Call with coordinates array of length 2');
+    }
+    row = row_[0];
+    col = row_[1];
+  }
+
+  if (isNaN(row) || row < 1 || row > tilesArr.length) {
+    return false;
+  }
+
+  if (isNaN(col) || col < 1 || col > numCols(row)) {
+    return false;
+  }
+
+  return true;
+};
+
+
+/**
+ * Get all the forward tiles, where direction of a board is fixed
+ * @return {array} array of all indices for tiles ahead of a tile, empty array
+ * for the last tile
+ */
+Tile.prototype.getForwardTiles = function() {
+  var res = new Array(0);
+  res.push([this.index[0] + 1, this.index[1]]);
+  if (this.index[0] > tilesArr.length / 2) {
+    res.push([this.index[0] + 1, this.index[1] - 1]);
+  } else {
+    res.push([this.index[0] + 1, this.index[1] + 1]);
+  }
+  return res.filter(isWithinGrid).sort();
+};
+
+/**
+ * Get all the backward tiles, where direction of a board is fixed
+ * @return {array} array of all indices of tiles behind the tile, empty array
+ * for the tile [1,1]
+ */
+Tile.prototype.getBackwardTiles = function() {
+  var res = new Array(0);
+  res.push([this.index[0] - 1, this.index[1]]);
+  if (this.index[0] > Math.ceil(tilesArr.length / 2)) {
+    res.push([this.index[0] - 1, this.index[1] + 1]);
+  } else {
+    res.push([this.index[0] - 1, this.index[1] - 1]);
+  }
+  return res.filter(isWithinGrid).sort();
+};
+
+/**
+ * @return {array} array of all side tiles, with an exception of a middle tile,
+ * where no tiles are returned
+ */
+Tile.prototype.getReachableSideTiles = function() {
+  var res = new Array(0);
+  if (this.index[0] === Math.ceil(tilesArr.length / 2)) {
+    return res;
+  }
+  res.push([this.index[0], this.index[1] - 1]);
+  res.push([this.index[0], this.index[1] + 1]);
+  return res.filter(isWithinGrid);
+};
+
 var tiles = (function() {
-  var NUM_OF_ROWS = 7;
-  var NUM_OF_COLS = 4;
-
-  /* gets the number of columns in a row */
-  var columnLimit = function(rowNumber) {
-    return (rowNumber > NUM_OF_ROWS / 2) ? NUM_OF_ROWS + 1 - rowNumber : rowNumber;
-  };
-
-  /**
-   * Returns whether a grid index is valid
-   * Call with int, int or [int, int]
-   */
-  var isWithinGrid = function(row_, col_) {
-    var row = row_;
-    var col = col_;
-
-    if (Object.prototype.toString.call(row_) === '[object Array]') {
-      if (row_.length !== 2) {
-        throw new TypeError('Call wish coordinates array of length 2');
-      }
-      row = row_[0];
-      col = row_[1];
-    }
-
-    if (isNaN(row) || row < 1 || row > NUM_OF_ROWS) {
-      return false;
-    }
-
-    if (isNaN(col) || col < 1 || col > columnLimit(row)) {
-      return false;
-    }
-
-    return true;
-  };
-
-  var tiles = [];
-  _.range(1, NUM_OF_ROWS + 1).forEach(function(i) { tiles[i] = []; });
-
-  var Tile = function(name, capacity, index) {
-    this.name = name;
-    this.capacity = capacity;
-    this.index = index;
-  };
-
-  /* get all forward tiles
-   * returns an empty array */
-  Tile.prototype.getForward = function() {
-    var res = new Array(0);
-    res.push([this.index[0] + 1, this.index[1]]);
-    if (this.index[0] > NUM_OF_ROWS / 2) {
-      res.push([this.index[0] + 1, this.index[1] - 1]);
-    } else {
-      res.push([this.index[0] + 1, this.index[1] + 1]);
-    }
-    return res.filter(isWithinGrid).sort();
-  };
-
-  /* get all backward tiles */
-  Tile.prototype.getBackward = function() {
-    var res = new Array(0);
-    res.push([this.index[0] - 1, this.index[1]]);
-    if (this.index[0] > Math.ceil(NUM_OF_ROWS / 2)) {
-      res.push([this.index[0] - 1, this.index[1] + 1]);
-    } else {
-      res.push([this.index[0] - 1, this.index[1] - 1]);
-    }
-    return res.filter(isWithinGrid).sort();
-  };
-
-  /* get all side tiles,
-   * the row in the middle doesn't have side tiles */
-  Tile.prototype.getSideway = function() {
-    var res = new Array(0);
-    if(this.index[0] === Math.ceil(NUM_OF_ROWS / 2)) {
-      return res;
-    }
-    res.push([this.index[0], this.index[1] - 1]);
-    res.push([this.index[0], this.index[1] + 1]);
-    return res.filter(isWithinGrid);
-  };
-
-  tiles[1][1] = new Tile('The Shire'       , 4, [1, 1]);
-  tiles[2][1] = new Tile('Arthedam'        , 2, [2, 1]);
-  tiles[2][2] = new Tile('Cardolan'        , 2, [2, 2]);
-  tiles[3][1] = new Tile('Rhudaur'         , 2, [3, 1]);
-  tiles[3][2] = new Tile('Eregion'         , 2, [3, 2]);
-  tiles[3][3] = new Tile('Enedwaith'       , 2, [3, 3]);
-  tiles[4][1] = new Tile('The High Pass'   , 1, [4, 1]);
-  tiles[4][2] = new Tile('Misty Mountains' , 1, [4, 2]);
-  tiles[4][3] = new Tile('Caradoras'       , 1, [4, 3]);
-  tiles[4][4] = new Tile('Gap Of Rohan'    , 1, [4, 4]);
-  tiles[5][1] = new Tile('Mirkwood'        , 2, [5, 1]);
-  tiles[5][2] = new Tile('Fangorn'         , 2, [5, 2]);
-  tiles[5][3] = new Tile('Rohan'           , 2, [5, 3]);
-  tiles[6][1] = new Tile('Gondor'          , 2, [6, 1]);
-  tiles[6][2] = new Tile('Dagorlad'        , 2, [6, 2]);
-  tiles[7][1] = new Tile('Mordor'          , 4, [7, 1]);
-
   var makeTiles = function(tiles) {
     var mytiles = new Array(0);
-    _.range(1, NUM_OF_ROWS + 1).forEach(function(i) {
-      _.range(1, columnLimit(i) + 1).forEach(function(j) {
-        mytiles.push(tiles[i][j]);
-        Object.defineProperty(mytiles, [[i, j]], {
+    tilesArr.forEach(function(row) {
+      row.forEach(function(tile) {
+        mytiles.push(tile);
+        Object.defineProperty(mytiles, tile.index, {
           enumerable: false,
-          value: tiles[i][j]
+          value: tile
         });
       });
     });
 
-    mytiles.numRows = NUM_OF_ROWS;
+    mytiles.numRows = tilesArr.length;
     Object.defineProperty(mytiles, 'numRows', {
       enumerable: false
     });
 
-    mytiles.numCols = columnLimit;
+    mytiles.numCols = numCols;
     Object.defineProperty(mytiles, 'numCols', {
+      enumerable: false
+    });
+
+    mytiles.arr = tiles;
+    Object.defineProperty(mytiles, 'tiles', {
       enumerable: false
     });
 
@@ -131,7 +142,7 @@ var tiles = (function() {
     return mytiles;
   };
 
-  return makeTiles(tiles);
+  return makeTiles(tilesArr);
 }());
 
 module.exports = tiles;

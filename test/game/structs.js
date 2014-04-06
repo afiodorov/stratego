@@ -78,32 +78,32 @@ describe('GameStruct', function() {
   });
 
   describe('tile', function() {
-    it('#getBackward', function() {
-      assert.deepEqual([], gameStructs.tiles[[1, 1]].getBackward());
-      assert.deepEqual([[3, 3]], gameStructs.tiles[[4, 4]].getBackward());
+    it('#getBackwardTiles', function() {
+      assert.deepEqual([], gameStructs.tiles[[1, 1]].getBackwardTiles());
+      assert.deepEqual([[3, 3]], gameStructs.tiles[[4, 4]].getBackwardTiles());
       assert.deepEqual([[4, 2], [4, 3]],
-        gameStructs.tiles[[5, 2]].getBackward());
+        gameStructs.tiles[[5, 2]].getBackwardTiles());
       assert.deepEqual([[6, 1], [6, 2]],
-        gameStructs.tiles[[7, 1]].getBackward());
+        gameStructs.tiles[[7, 1]].getBackwardTiles());
     });
-    it('#getForward', function() {
+    it('#getForwardTiles', function() {
       assert.deepEqual([[2, 1], [2, 2]],
-        gameStructs.tiles[[1, 1]].getForward());
+        gameStructs.tiles[[1, 1]].getForwardTiles());
       assert.deepEqual([[3, 1], [3, 2]],
-        gameStructs.tiles[[2, 1]].getForward());
+        gameStructs.tiles[[2, 1]].getForwardTiles());
       assert.deepEqual([[5, 2], [5, 3]],
-        gameStructs.tiles[[4, 3]].getForward());
-      assert.deepEqual([[5, 3]], gameStructs.tiles[[4, 4]].getForward());
+        gameStructs.tiles[[4, 3]].getForwardTiles());
+      assert.deepEqual([[5, 3]], gameStructs.tiles[[4, 4]].getForwardTiles());
       assert.deepEqual([[6, 1], [6, 2]],
-        gameStructs.tiles[[5, 2]].getForward());
-      assert.deepEqual([[6, 1]], gameStructs.tiles[[5, 1]].getForward());
-      assert.deepEqual([], gameStructs.tiles[[7, 1]].getForward());
+        gameStructs.tiles[[5, 2]].getForwardTiles());
+      assert.deepEqual([[6, 1]], gameStructs.tiles[[5, 1]].getForwardTiles());
+      assert.deepEqual([], gameStructs.tiles[[7, 1]].getForwardTiles());
     });
-    it('#getSideway', function() {
-      assert.deepEqual([], gameStructs.tiles[[4, 2]].getSideway());
-      assert.deepEqual([], gameStructs.tiles[[1, 1]].getSideway());
-      assert.deepEqual([[5, 1], [5, 3]], gameStructs.tiles[[5, 2]].getSideway());
-      assert.deepEqual([[6, 1]], gameStructs.tiles[[6, 2]].getSideway());
+    it('#getReachableSideTiles', function() {
+      assert.deepEqual([], gameStructs.tiles[[4, 2]].getReachableSideTiles());
+      assert.deepEqual([], gameStructs.tiles[[1, 1]].getReachableSideTiles());
+      assert.deepEqual([[5, 1], [5, 3]], gameStructs.tiles[[5, 2]].getReachableSideTiles());
+      assert.deepEqual([[6, 1]], gameStructs.tiles[[6, 2]].getReachableSideTiles());
     });
   });
 });
