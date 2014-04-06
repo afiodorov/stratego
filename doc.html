@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+</head>
+<body>
+<p>Design</p>
+<h1 id="socket.io-session-and-socket-recap">Socket.io, session and socket recap</h1>
+<p>Each connection with a server has a socket. Socket is lost if connection is lost (e.g. refresh), therefore each connection also mantains a session, which is not lost due to cookies on the client's side.</p>
+<p>Once a game between 2 players starts 2 sockets are joined by the game.id (auto generated) into a &quot;chat-room&quot;</p>
+<p>Servers and clients emit and handle custom events like this:</p>
+<h3 id="server">server</h3>
+<p>socket.of(game.id).broadcast('gameOver'); // just announced to everyone in the game that it's over</p>
+<h3 id="client">client</h3>
+<p>socket.emit('makeMove', {gameId: gameid, &quot;gandalf to mordor&quot;});</p>
+<h1 id="bird-eye-view">Bird eye view</h1>
+<p>Clients keep the current state of the game in GameState instance, which resembles heavily server's GameScheme json shema, which is stored in MongoDB.</p>
+<p>Noticeable differences between client's game state and server's game state: * Clients don't have opponents' pieces names, just the locations * Clients don't know opponents' ids.</p>
+<p>Clients however know game.id of each game, which is an auto-generated id from the MongoDB.</p>
+<p>Once the page is built the following happens for each game the client has: 1. The lobby requests the state of each game 2. GameController object is created</p>
+<p>GameController objects holds references to GUI, e.g. Board and Hand (of cards) and a referce to gameState.</p>
+<p>As game state changes on the server side, server sends new game scheme json (without the opponents pieces' names of course). Upon receiving that GameController updates the model (=gameState).</p>
+<p>I decided that the model and GUI have Observer / Subject pattern, i.e. GUI is an observer of the model.</p>
+<p>When game is loaded for the first time the GameController adds GUI as observers to the model, i.e once gameController updates gameState, gameState calls board.update(gameState), hand.update(gameState).</p>
+<p>hand.update, board.update methods actually refresh the canvas.</p>
+<h1 id="gui">Gui</h1>
+<p>Each hand and board object is a container for an array of the Knockout objects, which are visible on canvas, e.g. KnockoutPiece (KPiece) and KCard.</p>
+<p>To construct such objects from gameState, (static) GameStructs class is needed which contain an additional information about each piece/card.</p>
+<p>GameState is a lightweight object by design, so that communication with a server is responsive. Besides rules don't change throughout the game, so don't see the point of exchanging them all the time.</p>
+<h1 id="more-details">More Details</h1>
+<p>GameController is the only class which is capable of speaking to the server. GameController can also refresh GUI.</p>
+<p>However, GUI and GameController have a mixin pattern and are heavily coupled: hand.emitters = gameController.guiEvents.</p>
+<p>gameController.guiEvents contains the human interaction with gui, which require either of the following: * gameState must be known for the response * gameSocket must be known (to post the event off to the server)</p>
+<p>Examples:</p>
+<ul>
+<li><p>A player picked up a card - does not require gameState for GUI to highligh the designated area, it should not be in the guiEvents. Instead, it should just be in hand, e.g. hand.highlightWhereToDrop();</p></li>
+<li><p>A player played a card - requires checking whether he has that card, so gameState is required. The following happens: The gameController calls GameLogic.canPlayCard(gameState) method, if it's ok it emits it off to the server to deal with it, and we simply wait for server to respond with new stateJson. The controller could block further input at this point.</p></li>
+<li><p>A player picked up a piece - requires showing the player where he is allowed to drop it, hence the handler must be defined in gameController.guiEvents.</p></li>
+</ul>
+<h1 id="server-side">Server Side</h1>
+<p>Currently the pseudo code is missing, but the concept is simple:</p>
+<p>Server will receive a bunch of events, e.g. 'playCard', 'movePiece' and so on, will check whether it's ok reusing the GameLogic class and finally update the database, using the ./models/Game.js class, where a bunch of handy methods will be present (e.g. Game.playcard(&quot;dark&quot;, &quot;3&quot;))</p>
+<p>Upon success it fires off 'gameState' event and the gui of the games is eventually updated, though a mechani outlined above.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="ot">socket</span>.<span class="fu">on</span>(<span class="st">&#39;playCard&#39;</span>, , <span class="kw">function</span>(card <span class="co">/*{cardName: &#39;retreat&#39;, gameid: &#39;gameid&#39;}*/</span>) {
+  <span class="co">// check if socket is allowed to play game and get socket&#39;s side</span>
+  <span class="ot">Game</span>.<span class="fu">getClientGameState</span>(gameid, <span class="ot">socket</span>.<span class="fu">sid</span>, <span class="kw">function</span>(err, gameState) {
+    <span class="kw">if</span>(err) {
+      <span class="co">// log</span>
+      <span class="kw">return</span>;
+    }
+    <span class="kw">var</span> newClientGameState = <span class="ot">GameLogic</span>.<span class="fu">isValidCard</span>(gameState, card);
+    <span class="kw">if</span>(<span class="ot">newGameState</span>.<span class="fu">err</span>) {
+      <span class="kw">return</span>;
+    }
+    newClientGameState = <span class="ot">newGameState</span>.<span class="fu">newState</span>;
+
+    <span class="ot">Game</span>.<span class="fu">playCard</span>(gameid, <span class="kw">function</span>(err, newOpponentClientGameState) {
+      <span class="kw">if</span>(err) {
+        <span class="kw">return</span>;
+      }
+      <span class="co">// emit gameStates</span>
+    }
+  });
+}</code></pre>
+<h1 id="client-1">Client:</h1>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> gameStructs = {};
+<span class="ot">gameStructs</span>.<span class="fu">tiles</span> = [];
+<span class="ot">gameStructs</span>.<span class="fu">tiles</span>[<span class="dv">0</span>]  = { <span class="dt">capacity</span>: <span class="dv">4</span>, <span class="dt">name</span>: <span class="st">&quot;The Shire&quot;</span> };
+<span class="ot">gameStructs</span>.<span class="fu">tiles</span>[<span class="dv">1</span>]  = { <span class="dt">capacity</span>: <span class="dv">2</span>, <span class="dt">name</span>: <span class="st">&quot;Arthedam&quot;</span> };
+<span class="ot">gameStructs</span>.<span class="fu">tiles</span>[<span class="dv">2</span>]  = { <span class="dt">capacity</span>: <span class="dv">2</span>, <span class="dt">name</span>: <span class="st">&quot;Cardolan&quot;</span> };
+<span class="co">// ...</span>
+
+<span class="ot">gameStructs</span>.<span class="fu">pieces</span> = [];
+<span class="ot">gameStructs</span>.<span class="fu">pieces</span> = [
+  <span class="st">&quot;gandalf&quot;</span>:
+    {<span class="dt">strength</span>: <span class="st">&quot;5&quot;</span>,
+    <span class="dt">description</span>: <span class="st">&quot;dark player plays his card first&quot;</span>}
+  ,
+  <span class="co">// all pieces go here, even opponent player&#39;s</span>
+];
+<span class="ot">gameStructs</span>.<span class="fu">getPiece</span>(piecesName) {
+  <span class="kw">return</span> <span class="co">/* find piece object in pieces arr */</span>
+
+};
+
+<span class="kw">var</span> GameState = <span class="kw">function</span>() {
+  <span class="kw">var</span> self = <span class="kw">this</span>;
+  <span class="ot">self</span>.<span class="fu">mySide</span> = <span class="st">&quot;light&quot;</span>;
+  <span class="ot">self</span>.<span class="fu">stage</span> = <span class="st">&quot;game&quot;</span>; <span class="co">// start, game, battle</span>
+  <span class="ot">self</span>.<span class="fu">turn</span> = <span class="st">&quot;light&quot;</span>;
+  <span class="ot">self</span>.<span class="fu">light</span> =  {
+    <span class="dt">piecesLeft</span>: [{<span class="dt">name</span>: <span class="st">&quot;gandalf&quot;</span>, <span class="dt">position</span>: [<span class="dv">2</span>,<span class="dv">2</span>]}],
+    <span class="dt">cardsLeft</span>: [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;retreat&quot;</span>]
+  };
+  <span class="ot">self</span>.<span class="fu">dark</span> = {
+    <span class="dt">piecesLeft</span>: [{<span class="dt">position</span>: [<span class="dv">3</span>,<span class="dv">1</span>]}],
+    <span class="dt">cardsLeft</span>: [<span class="st">&quot;1&quot;</span>, <span class="st">&quot;magic&quot;</span>]
+  };
+  <span class="co">// each Observer must implement update() function</span>
+  <span class="ot">self</span>.<span class="fu">observers</span> = [];
+}
+
+<span class="co">/* the ONLY way server updates gui is through this */</span>
+<span class="ot">GameState</span>.<span class="ot">prototype</span>.<span class="fu">setState</span> = <span class="kw">function</span>(stateJson <span class="co">/* state Json received from server */</span>) {
+  <span class="co">// parse what changed and call each observer&#39;s update();</span>
+  <span class="co">// no state validation here - we can trust the server</span>
+}
+
+<span class="co">/* this is a massive class which has GameStructs as dependency,</span>
+<span class="co">it has all the rules in here and it is shared between server and client</span>
+<span class="co">*/</span>
+<span class="kw">var</span> GameLogic = (<span class="kw">function</span> {   
+  <span class="co">// some private methods if there&#39;s a difference between server and client data representation</span>
+  <span class="kw">return</span> {
+    <span class="dt">ioveValid</span>: <span class="kw">function</span>(gameState, move) {
+
+    }
+  }
+})();
+
+<span class="co">/* it ties GUI, model and interaction with the server together </span>
+<span class="co">   it is allowed to call hand and board public methods,</span>
+<span class="co">   and it calls GameLogic before emitting an event.</span>
+
+<span class="co">   It receives &#39;setState&#39; event from the server and updates the view.</span>
+<span class="co">*/</span>
+<span class="kw">var</span> GameController = <span class="kw">function</span>(gameId_, gameSocket_) {
+  <span class="kw">var</span> self = <span class="kw">this</span>;
+  <span class="kw">var</span> isInitialised = <span class="kw">false</span>;
+
+  <span class="ot">self</span>.<span class="fu">gameId</span> = gameId_;
+  <span class="ot">self</span>.<span class="fu">context</span> = <span class="fu">$</span>(<span class="st">&quot;#&quot;</span> + gameId + <span class="st">&quot; canvas.game-canvas&quot;</span>)[<span class="dv">0</span>].<span class="fu">getContext</span>(<span class="st">&#39;2d&#39;</span>);
+  <span class="ot">self</span>.<span class="fu">gameState</span> = <span class="kw">new</span> <span class="fu">GameState</span>();
+  <span class="ot">self</span>.<span class="fu">gameSocket</span> = gameSocket_;
+  <span class="ot">self</span>.<span class="fu">board</span> = <span class="kw">new</span> <span class="fu">Board</span>(context);
+  <span class="ot">self</span>.<span class="fu">hand</span> = <span class="kw">new</span> <span class="fu">Hand</span>(context);
+  <span class="ot">gameSocket</span>.<span class="fu">on</span>(<span class="st">&quot;gameState&quot;</span>, <span class="kw">function</span>(gameJson) {
+    <span class="kw">if</span>(!isInitialised) {
+      <span class="ot">board</span>.<span class="fu">initState</span>(gameJson);
+      <span class="ot">board</span>.<span class="fu">addEmitters</span>(<span class="ot">self</span>.<span class="fu">guiEvents</span>);
+      <span class="ot">gameState</span>.<span class="ot">observers</span>.<span class="fu">add</span>(board);
+
+      <span class="ot">hand</span>.<span class="fu">initState</span>(gameJson);
+      <span class="ot">hand</span>.<span class="fu">addEmitters</span>(<span class="ot">self</span>.<span class="fu">guiEvents</span>);
+      <span class="ot">gameState</span>.<span class="ot">observers</span>.<span class="fu">add</span>(hand);
+    }
+    <span class="ot">self</span>.<span class="ot">gameState</span>.<span class="fu">setState</span>(stateJson);
+  }
+}
+
+<span class="ot">GameController</span>.<span class="ot">prototype</span>.<span class="fu">guiEvents</span> = {
+  self = <span class="kw">this</span>;
+  <span class="dt">getAvailableTiles </span>: <span class="kw">function</span>(event) {
+  <span class="kw">return</span> <span class="ot">GameLogic</span>.<span class="fu">getTiles</span>(<span class="ot">self</span>.<span class="fu">gameState</span>, event);
+  },
+  <span class="dt">movePiece </span>: <span class="kw">function</span>(event) {
+    <span class="kw">if</span>(<span class="ot">GameLogic</span>.<span class="fu">ioveValid</span>(<span class="ot">self</span>.<span class="fu">gameState</span>, event) {
+      <span class="ot">self</span>.<span class="ot">gameSocket</span>.<span class="fu">emit</span>(<span class="st">&quot;movePiece&quot;</span>, event);
+    } <span class="kw">else</span> {
+      <span class="ot">self</span>.<span class="fu">showError</span>({<span class="dt">type</span>: <span class="st">&quot;invalidMove&quot;</span>, <span class="dt">text</span>: <span class="st">&quot;Against the rules&quot;</span>});
+    }
+  };
+  <span class="dt">playCard </span>: <span class="kw">function</span>(event) {
+    <span class="kw">if</span>(<span class="ot">GameLogic</span>.<span class="fu">isPlayCardValid</span>(<span class="ot">self</span>.<span class="fu">gameState</span>, event) {
+      <span class="ot">self</span>.<span class="ot">gameSocket</span>.<span class="fu">emit</span>(<span class="st">&quot;playCard&quot;</span>, event);
+    } <span class="kw">else</span> {
+      <span class="ot">self</span>.<span class="fu">showError</span>({<span class="dt">type</span>: <span class="st">&quot;invalidMove&quot;</span>, <span class="dt">text</span>: <span class="st">&quot;Against the rules&quot;</span>});
+    }
+  }
+}
+
+<span class="ot">GameController</span>.<span class="ot">prototype</span>.<span class="fu">showError</span>(errorObj) {
+  <span class="co">// show notifaction</span>
+}
+
+<span class="co">/* this is KinectJS piece</span>
+<span class="co">it maintains a referece (parent) to it&#39;s container (board), so</span>
+<span class="co">that it can call board&#39;s public interface directly (if</span>
+<span class="co">gameState/gameSocket is not required),</span>
+<span class="co">or indirectly, through parent.emitters</span>
+<span class="co">*/</span>
+<span class="kw">var</span> KPiece = <span class="kw">function</span>(parent_, pieceName_, location) {
+ <span class="co">// set up more things to display, use gameStructs.pieces for information</span>
+  <span class="kw">var</span> self = <span class="kw">this</span>;
+  <span class="kw">var</span> parent = parent_;
+  <span class="ot">self</span>.<span class="fu">pieceName</span>= pieceName_;
+  <span class="ot">self</span>.<span class="fu">x</span> = <span class="fu">getXFromLocation</span>(location);
+  <span class="ot">self</span>.<span class="fu">y</span> = <span class="fu">getYFromLocation</span>(location);
+};
+<span class="ot">KPiece</span>.<span class="fu">prototype</span> = <span class="fu">getXFromLocation</span>();
+<span class="ot">KPiece</span>.<span class="fu">prototype</span> = <span class="fu">getYFromLocation</span>();
+
+<span class="ot">KPiece</span>.<span class="fu">move</span> = <span class="kw">function</span>(newLocation) {
+  <span class="kw">this</span>.<span class="fu">x</span> = <span class="fu">getXFromLocation</span>(newLocation);
+  <span class="kw">this</span>.<span class="fu">y</span> = <span class="fu">getYFromLocation</span>(newLocation);
+  <span class="co">// tell Kinect to redraw;</span>
+};
+<span class="co">/* player picked up a piece */</span>
+<span class="ot">KPiece</span>.<span class="fu">onMove</span> = <span class="kw">function</span>(newLocation) {
+    <span class="co">/* </span>
+<span class="co">    any interaction requiring the current state - through the gameController!</span>
+<span class="co">    */</span>
+  <span class="kw">var</span> tilesToHighlight = 
+    <span class="kw">this</span>.<span class="ot">parent</span>.<span class="ot">emitters</span>.<span class="fu">getAvailableTiles</span>(<span class="ot">self</span>.<span class="fu">pieceName</span>);
+  <span class="kw">this</span>.<span class="ot">parent</span>.<span class="fu">highlightTiles</span>(tilesToHighlight);
+};
+
+<span class="kw">var</span> Board = <span class="kw">function</span>(context_) {
+  <span class="kw">var</span> self = <span class="kw">this</span>;
+  <span class="ot">self</span>.<span class="fu">emitters</span> = <span class="kw">null</span>;
+
+  <span class="kw">var</span> context = context_;
+  <span class="co">// let&#39;s hide the fact that we use KineticJS from the rest of the world</span>
+  <span class="ot">self</span>.<span class="fu">_kPieces</span> = {
+    <span class="co">// sample</span>
+    <span class="co">//&quot;gandalf&quot;: kGandalf,</span>
+    <span class="co">//&quot;frodo&quot; : kFrodo</span>
+  };
+};
+
+<span class="ot">Board</span>.<span class="ot">prototype</span>.<span class="fu">initState</span> = <span class="kw">function</span>(gameState <span class="co">/*lightweight JSON object*/</span>) {
+  <span class="kw">for</span>(piece <span class="kw">in</span> <span class="ot">gameState</span>.<span class="fu">pieces</span>) {
+     <span class="kw">this</span>.<span class="ot">_kPieces</span>.<span class="fu">push</span>({<span class="ot">piece</span>.<span class="fu">name</span>: <span class="kw">new</span> <span class="fu">KPiece</span>(self, <span class="ot">piece</span>.<span class="fu">name</span>, <span class="ot">piece</span>.<span class="fu">location</span>)});
+  }
+};
+
+<span class="ot">Board</span>.<span class="ot">prototype</span>.<span class="fu">addEmitters</span> = <span class="kw">function</span>(o) {
+  <span class="kw">this</span>.<span class="fu">emitters</span> = o;
+}
+
+<span class="ot">Board</span>.<span class="ot">prototype</span>.<span class="fu">update</span> = <span class="kw">function</span>(gameState) {
+   <span class="co">// update each kPiece </span>
+   <span class="co">// no gameState validation here</span>
+};
+
+<span class="ot">Board</span>.<span class="ot">prototype</span>.<span class="fu">highlightTiles</span>(tiles) {
+   <span class="co">// show user where he can move his next tile</span>
+};
+
+<span class="kw">var</span> KCard = <span class="kw">function</span>(parent_, name) {
+  <span class="kw">var</span> self = <span class="kw">this</span>;
+  <span class="ot">self</span>.<span class="fu">parent</span> = parent_;
+};
+
+<span class="ot">KCard</span>.<span class="ot">prototype</span>.<span class="fu">onMove</span> = <span class="kw">function</span>() {
+  <span class="kw">this</span>.<span class="ot">parent</span>.<span class="fu">highlightWhereToDrop</span>();
+}
+
+<span class="kw">var</span> Hand = <span class="kw">function</span>(context_) {
+  <span class="kw">var</span> self = <span class="kw">this</span>;
+  <span class="kw">var</span> context = context_;
+  <span class="ot">self</span>.<span class="fu">emitters</span> = <span class="kw">null</span>;
+  <span class="ot">self</span>.<span class="fu">_kCards</span> = [];
+};
+
+<span class="ot">Hand</span>.<span class="ot">prototype</span>.<span class="fu">initState</span> = <span class="kw">function</span>(gameState) {
+  <span class="kw">for</span>(<span class="co">/*for card in parsed gameState */</span>) { 
+    <span class="kw">this</span>.<span class="ot">_kCards</span>.<span class="fu">push</span>({<span class="ot">card</span>.<span class="fu">name</span>: <span class="kw">new</span> <span class="fu">KCard</span>(self, <span class="ot">card</span>.<span class="fu">name</span>)});
+  }
+};
+
+<span class="ot">Hand</span>.<span class="ot">prototype</span>.<span class="fu">addEmitters</span> = <span class="kw">function</span>(o) {
+  <span class="kw">this</span>.<span class="fu">emitters</span> = o;
+}
+
+<span class="ot">Hand</span>.<span class="ot">prototype</span>.<span class="fu">highlightWhereToDrop</span> = <span class="kw">function</span>() {
+
+}
+
+<span class="ot">Hand</span>.<span class="ot">prototype</span>.<span class="fu">update</span> = <span class="kw">function</span>(gameState) {
+  <span class="co">// refresh this._kCards</span>
+};</code></pre>
+</body>
+</html>
