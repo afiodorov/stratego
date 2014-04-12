@@ -14,6 +14,7 @@ var makeBoard = function (side) {
     var tilesArr = [];
     _.range(7).forEach(function (i) { tilesArr[i] = []; });
 
+
     var addTile = function (name, cap, xpos, ypos) {
       tilesArr[ypos][xpos] = makeTile(name, cap, { x: xpos, y: ypos });
     }
@@ -33,34 +34,89 @@ var makeBoard = function (side) {
     addTile('Gondor', 2, 0, 5);
     addTile('Dagorlad', 2, 1, 5);
     addTile('Mordor', 4, 0, 6);
-    return tilesArr
-    ;
-    return 6;
+    return tilesArr;
   })();
 
-  var validMoveFuncs = {
-    forwardTiles: function (tile) {
-      var targetRow = side === tile.position.y + (SIDE_DARK ? -1 : 1);
-      if (tiles[targetRow].length > tiles[tile.position.y]) {
+  var sideString = side === SIDE_DARK ? "dark" : "light";
+
+
+  var validMoveFuncs = (function(){
+
+    var getVerticleAdjTiles = function (tile, goingNorth) {
+      var targetRow = tile.position.y + (goingNorth ? -1 : +1);
+      if (targetRow >= tiles.length || targetRow < 0) {
+        return [];//ensures tiles[targetRow] always exists below.
+      }
+      if (tiles[targetRow].length > tiles[tile.position.y].length) {
         return [tiles[targetRow][tile.position.x], tiles[targetRow][tile.position.x + 1]];
       }
       else {
-        return [tiles[targetRow][tile.position.x], tiles[targetRow][tile.position.x - 1]].filter(function (x){return x === undefined});
+        return [tiles[targetRow][tile.position.x], tiles[targetRow][tile.position.x - 1]].filter(isDefined);
       }
-    },
- 
-    backwardTiles: function (){
-      
-    },
- 
-    sideTiles: function () {
+    }
 
-    }     
- 
-  };
+    var isDefined = function(obj){
+      return obj !== undefined;
+    }
+
+    var isNotAtMaxCap = function (tile) {
+      return !tile.isAtMaxCap();
+    }
+
+    var getHorizontalAdjTiles = function (tile) {
+      return [tiles[tile.position.y][tile.position.x - 1], tiles[tile.position.y][tile.position.x + 1]].filter(isDefined);
+    }
+
+    //potential refers to it being prior to the check that the square actually has space.
+    var getPotentialForwards = function(tile){
+      var forwardTiles = getVerticleAdjTiles(tile, side === SIDE_DARK);
+      if (side === SIDE_LIGHT && tile === tiles[2][1]) {//You can take a shortcut from this square if you're on the light side. 
+        forwardTiles.push(tiles[4][1]);
+      }
+      return forwardTiles;
+    }
+
+    var getPotentialBackwards = function (tile) {
+        return getVerticleAdjTiles(tile, side === SIDE_LIGHT);
+    }
+
+    var getPotentialSideways = function(tile){
+        if (tile.position.y === 3) {//Mountains, maybe this should be stored in the tile itself?
+          return [];
+        }
+        if (tile.position.y === 4) {//River, see above.
+          if (side === SIDE_DARK) {
+            return [];
+          }
+          return [tiles[4][tile.position.x -1]].filter(isDefined);
+        }
+        return getHorizontalAdjTiles(tile);
+      }
+
+    var validSideways = function(tile){
+      return getPotentialSideways(tile).filter(isNotAtMaxCap);
+    }
+
+    var validForwards = function(tile){
+      return getPotentialForwards(tile).filter(isNotAtMaxCap);
+    }
+
+    var validBackwards = function(tile){
+      return getPotentialBackwards(tile).filter(isNotAtMaxCap);
+    }
+
+    return {
+      forwards: validForwards,
+
+      backwards: validBackwards,
+
+      sideways: validSideways
+    };
+  })();
  
   return {
     tiles: tiles,
+    sideString: sideString,
     validMoveFuncs: validMoveFuncs
   };
 }

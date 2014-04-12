@@ -24,7 +24,7 @@ var tileLayer = function (boardWidth, boardHeight) {
         group.add(new Kinetic.Text({
             width: rectWidth,
             height: rectHeight,
-            text: tiles[[row, col]].name,
+            text: tiles[[row, col]].name + " " + (row -1) + " " + (col -1),
             fontSize: 18,
             fontFamily: 'Calibri',
             fill: '#555',
@@ -79,7 +79,7 @@ var tileLayer = function (boardWidth, boardHeight) {
                 new Kinetic.Text({
                     width: rectHeight,
                     height: rectHeight,
-                    text: tiles[[row, col]].name,
+                    text: tiles[[row, col]].name + " " + (row - 1) + " " + (col - 1),
                     fontSize: 18,
                     fontFamily: 'Calibri',
                     fill: '#555',

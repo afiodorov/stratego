@@ -17,6 +17,10 @@ var tile = function (name, capacity, position) {
     pieces.pop(piece);
   }
 
+  var atMaxCap = function () {
+    return pieces.length === capacity;
+  }
+
   return {
     name: name,
     capacity: capacity,
@@ -29,7 +33,9 @@ var tile = function (name, capacity, position) {
 
     removePiece: removePiece,
 
-    position: position
+    position: position,
+
+    isAtMaxCap: atMaxCap
 
   };
 };
