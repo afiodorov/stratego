@@ -1,4 +1,4 @@
-var fs = require('fs');
+#!/usr/bin/node
 var logic = require('../public/js/game/logic.js');
 var tiles = require('../public/js/game/structs.js').tiles;
 var pieces = require('../public/js/game/structs.js').pieces;
@@ -32,16 +32,22 @@ var genRandomState = function() {
 
   gameState.mySide = mySide;
   gameState.stage = 'move';
+  gameState.turn = logic.generateRandomSide();
   gameState[mySide] = {};
   gameState[mySide].pieces = mySidePieces;
   gameState[oppSide] = {};
   gameState[oppSide].pieces = oppPieces;
-  gameState.turn = logic.generateRandomSide();
 
   return gameState;
 };
 
 var isValid = function(state) {
+  var lastIndex = tiles.numRows + ' ' + tiles.numCols(tiles.numRows);
+  if (_.find(state.light.pieces, function(piece) {
+    return piece.name === 'frodo' && 
+      piece.position.join(' ') === lastIndex;})) {
+    return false;
+  }
   return true;
 };
 
@@ -50,4 +56,4 @@ while(!isValid(state)) {
   state = genRandomState();
 }
 
-console.log(JSON.stringify(state, null, 0));
+console.log(JSON.stringify(state, null, 1));
