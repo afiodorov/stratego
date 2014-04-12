@@ -7,16 +7,61 @@ var gameStructs = require('../../public/js/game/structs.js');
 var boardExport = require('../../public/js/game/structs/board.js');
 
 describe('GameStruct', function () {
+  describe("Matts board", function () {
+    var lightBoard = boardExport.makeBoard(boardExport.SIDE_LIGHT);
+    var darkBoard = boardExport.makeBoard(boardExport.SIDE_DARK);
 
-  describe("The new improved board", function () {
-    it("should get the correct forward moves", function () {
-      var board = boardExport.makeBoard(boardExport.SIDE_DARK);
-      assert.equal(board, undefined);
-      var forwardTiles = board.validMoveFuncs.forwardTiles(board.tiles[1][1])
-      assert.equal(forwardTiles.length, 2);
-      //assert(board.tiles.length, 7, "length is " + board.tiles.length);
-      // var forwardMoves = board.validMoveFuncs.forwardTiles(board.tiles[1][1]);
-      // equals(forwardMoves.length, 2);
+    describe("Standard movement, without considing other pieces", function () {
+      function checkMove(board, direction, xpos, ypos, numValidMoves) {
+        var forwardTiles = board.validMoveFuncs[direction](board.tiles[ypos][xpos])
+        assert.equal(forwardTiles.length, numValidMoves, "xpos: " + xpos + " ypos: " + ypos + " side: " + board.sideString + " direction: " + direction
+                                                          + " expected: " + numValidMoves + " actual: " + forwardTiles.length);
+      }
+      it("should get the correct forwards moves", function () {
+        checkMove(darkBoard, "forwards", 1, 1, 1);
+        checkMove(darkBoard, "forwards", 0, 0, 0);
+        checkMove(darkBoard, "forwards", 0, 4, 2);
+        checkMove(darkBoard, "forwards", 1, 5, 2);
+        checkMove(darkBoard, "forwards", 0, 6, 2);
+
+        checkMove(lightBoard, "forwards", 0, 0, 2);
+        checkMove(lightBoard, "forwards", 0, 6, 0);
+        checkMove(lightBoard, "forwards", 1, 2, 3);
+        checkMove(lightBoard, "forwards", 1, 5, 1);
+        checkMove(lightBoard, "forwards", 2, 4, 1);
+      });
+
+      it("should get correct backward moves", function () {
+        checkMove(darkBoard, "backwards", 1, 1, 2);
+        checkMove(darkBoard, "backwards", 0, 0, 2);
+        checkMove(darkBoard, "backwards", 0, 4, 1);
+        checkMove(darkBoard, "backwards", 1, 5, 1);
+        checkMove(darkBoard, "backwards", 0, 6, 0);
+
+        checkMove(lightBoard, "backwards", 0, 0, 0);
+        checkMove(lightBoard, "backwards", 0, 6, 2);
+        checkMove(lightBoard, "backwards", 1, 2, 2);
+        checkMove(lightBoard, "backwards", 1, 5, 2);
+        checkMove(lightBoard, "backwards", 2, 4, 2);
+        checkMove(lightBoard, "backwards", 0, 3, 1);
+
+      });
+
+      it("should get correct sideways moves", function () {
+        //can darkies ever move sideways? Don't think so, but if we want to tweak the rules we should allow for it in the future.
+        checkMove(darkBoard, "sideways", 1, 1, 1);
+        checkMove(darkBoard, "sideways", 0, 0, 0);
+        checkMove(darkBoard, "sideways", 0, 4, 0);
+        checkMove(darkBoard, "sideways", 1, 5, 1);
+        checkMove(darkBoard, "sideways", 0, 6, 0);
+
+        checkMove(lightBoard, "sideways", 0, 0, 0);
+        checkMove(lightBoard, "sideways", 0, 6, 0);
+        checkMove(lightBoard, "sideways", 1, 2, 2);
+        checkMove(lightBoard, "sideways", 1, 5, 1);
+        checkMove(lightBoard, "sideways", 2, 4, 1);
+        checkMove(lightBoard, "sideways", 0, 3, 0);
+      });
     });
   });
 
@@ -42,20 +87,20 @@ describe('GameStruct', function () {
 
     var correctTilesCount = _.range(gameStructs.tiles.numRows)
       .reduceRight(
-          function(res, i) {return res + gameStructs.tiles.numCols(i); },
+          function (res, i) { return res + gameStructs.tiles.numCols(i); },
           0);
     var tilesCount = gameStructs.tiles.reduceRight(
-        function(res) {return res + 1;}, 0);
-    it('is array', function() {
+        function (res) { return res + 1; }, 0);
+    it('is array', function () {
       assert.equal('[object Array]',
         Object.prototype.toString.call(gameStructs.tiles));
     });
 
-    it('correct number of tiles through forEach', function() {
+    it('correct number of tiles through forEach', function () {
       assert.equal(correctTilesCount, tilesCount);
     });
 
-    it('correct number of tiles through for', function() {
+    it('correct number of tiles through for', function () {
       assert.equal(correctTilesCount, gameStructs.tiles.length);
     });
   });
@@ -71,7 +116,7 @@ describe('GameStruct', function () {
       assert.equal(1, gameStructs.tiles.numCols(6));
     });
 
-    it('#isWithin', function() {
+    it('#isWithin', function () {
       assert.equal(true, gameStructs.tiles.isWithin(1, 1));
       assert.equal(true, gameStructs.tiles.isWithin([0, 0]));
       assert.equal(true, gameStructs.tiles.isWithin([1, 0]));
