@@ -1,10 +1,24 @@
+/// <reference path="../../public/js/game/structs/board.js" />
 /*global describe, it*/
 'use strict';
 var assert = require('assert');
 var _ = require('../../public/js/lib/underscore.js');
 var gameStructs = require('../../public/js/game/structs.js');
+var boardExport = require('../../public/js/game/structs/board.js');
 
-describe('GameStruct', function() {
+describe('GameStruct', function () {
+
+  describe("The new improved board", function () {
+    it("should get the correct forward moves", function () {
+      var board = boardExport.makeBoard(boardExport.SIDE_DARK);
+      var forwardTiles = board.validMoveFuncs.forwardTiles(board.tiles[1][1])
+      assert.equal(forwardTiles.length, 2);
+      //assert(board.tiles.length, 7, "length is " + board.tiles.length);
+      // var forwardMoves = board.validMoveFuncs.forwardTiles(board.tiles[1][1]);
+      // equals(forwardMoves.length, 2);
+    });
+  });
+
   describe('tiles', function() {
     it('can access through a double index', function() {
       assert.equal('The Shire',       gameStructs.tiles[[0, 0]].name);
@@ -44,6 +58,8 @@ describe('GameStruct', function() {
       assert.equal(correctTilesCount, gameStructs.tiles.length);
     });
   });
+
+
 
   describe('tile', function() {
     it('#numCols', function() {
