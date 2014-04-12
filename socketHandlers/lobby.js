@@ -192,16 +192,16 @@ function _addNewGame(opponent, opsession, inviteToPlayer) {
       socket.emit('gameStarted', {playerName: opsession.playerName});
       opponent.socket.emit('gameStarted',
         {playerName: session.playerName});
-      var gameJson = game.toObject();
+      var serverGameState = game.toObject();
 
-      gameutils.getState(gameJson, socket.sid).then(function(state) {
+      gameutils.getClientStateJson(serverGameState, socket.sid).then(function(state) {
         socket.emit('addGame', state);
       }).fail(function(err) {
         logger.log('warn', 'couldn\'t update about new game');
         logger.log('warn', err);
       }).done();
 
-      gameutils.getState(gameJson, opponent.sid).then(function(state) {
+      gameutils.getClientStateJson(serverGameState, opponent.sid).then(function(state) {
         opponent.socket.emit('addGame', state);
       }).fail(function(err) {
         logger.log('warn', 'failed to updated opponent\'s new game');
@@ -273,7 +273,7 @@ function _sendListOfGames() {
   Game.getInstances(this.socket.sid)
     .then(function(games) {
       games.forEach(function(game) {
-        gameutils.getState(game.toObject(), socket.sid).then(function(state) {
+        gameutils.getClientStateJson(game.toObject(), socket.sid).then(function(state) {
           socket.emit('addGame', state);
         }).fail(function(err) {
           logger.log('info', 'couldn\'t send new game');

@@ -44,8 +44,13 @@ function addMySide(game, playerSid) {
   game.state.mySide = _getPlayerSide(game, playerSid);
 }
 
-function getState(gameCopy, playerSid) {
-  var game = _.clone(gameCopy);
+/**
+ * @param {string} stateJsonServer Json of server game state representation
+ * @param {string} playerSid session id of the player for the client state
+ * @return {string} game state json for the client
+ */
+function getClientStateJson(stateJsonServer, playerSid) {
+  var game = _.clone(stateJsonServer);
   return addOpponentName(game, playerSid).then(
     function(game) {
       addMySide(game, playerSid);
@@ -58,5 +63,5 @@ function getState(gameCopy, playerSid) {
 }
 
 module.exports = {
-  getState: getState
+  getClientStateJson: getClientStateJson
 };
