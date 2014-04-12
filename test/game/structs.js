@@ -83,6 +83,11 @@ describe('GameStruct', function() {
       assert.deepEqual([[1, 1]], gameStructs.tiles[[2, 2]].getBackwardTiles());
       assert.deepEqual([[3, 1], [3, 2]],
         gameStructs.tiles[[4, 1]].getBackwardTiles());
+      assert.deepEqual([[2, 1], [2, 2]],
+        gameStructs.tiles[[3, 2]].getBackwardTiles());
+      assert.deepEqual([[2, 2]], gameStructs.tiles[[3, 3]].getBackwardTiles());
+      assert.deepEqual([[4, 1], [4, 2]],
+        gameStructs.tiles[[5, 1]].getBackwardTiles());
       assert.deepEqual([[5, 0], [5, 1]],
         gameStructs.tiles[[6, 0]].getBackwardTiles());
     });
