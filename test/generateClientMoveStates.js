@@ -42,10 +42,10 @@ var genRandomState = function() {
 };
 
 var isValid = function(state) {
-  var lastIndex = tiles.numRows + ' ' + tiles.numCols(tiles.numRows);
+  var lastIndex = [tiles.numRows, tiles.numCols(tiles.numRows)];
   if (_.find(state.light.pieces, function(piece) {
     return piece.name === 'frodo' && 
-      piece.position.join(' ') === lastIndex;})) {
+      _.isEqual(piece.position, lastIndex);})) {
     return false;
   }
   return true;
