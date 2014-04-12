@@ -11,6 +11,7 @@ describe('GameStruct', function () {
   describe("The new improved board", function () {
     it("should get the correct forward moves", function () {
       var board = boardExport.makeBoard(boardExport.SIDE_DARK);
+      assert.equal(board, undefined);
       var forwardTiles = board.validMoveFuncs.forwardTiles(board.tiles[1][1])
       assert.equal(forwardTiles.length, 2);
       //assert(board.tiles.length, 7, "length is " + board.tiles.length);
