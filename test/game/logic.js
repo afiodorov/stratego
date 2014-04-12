@@ -59,13 +59,24 @@ describe('GameLogic', function() {
     });
 
     it('#getValidMoveTiles', function() {
-      fs.readdir('./test/game/states', function(err, files) {
+      var path = require('path');
+      var data_dir = './test/data';
+      fs.readdir(data_dir, function(err, files) {
         if(err) {
           console.log(err);
           return;
         }
-        files.forEach(function(file) {
-          console.log(file);
+        files.forEach(function(filename) {
+          var relative_path = path.join(data_dir, filename);
+          fs.lstat(relative_path, function(err, stat) {
+            if(err) {
+              console.log(err);
+              return;
+            }
+            if(stat.isFile() && path.extname(relative_path) === '.js')  {
+              console.log("finally we got the list of state files!!");
+            }
+          });
         });
       });
     });
