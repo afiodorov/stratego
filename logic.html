@@ -32,18 +32,18 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="co">* </span>@nothrow
 <span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{string}</span><span class="co"> clientStateJson Json of the client game state</span>
 <span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{string}</span><span class="co"> Name of a piece as in /public/js/structs/pieces.js</span>
-<span class="co">* </span><span class="kw">@returns</span><span class="co"> {array} Array of indices of all valid moves</span>
+<span class="co">* </span><span class="kw">@return</span><span class="co"> {array} Array of indices of all valid moves</span>
 <span class="co">*/</span>
-<span class="kw">function</span> <span class="fu">validMoves</span>(ClientStateJson, piece) {
+<span class="kw">function</span> <span class="fu">validMoves</span>(clientStateJson, piece) {
 
 }</code></pre>
 <p>All the auxilary functions the client gui board needs go here too, so that server does not require Board class at all</p>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
 <span class="co">* </span>@nothrow
 <span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{string}</span><span class="co"> clientStateJson Json of the client game state</span>
-<span class="co">* </span><span class="kw">@returns</span><span class="co"> {array} Array of strings of all cards</span>
+<span class="co">* </span><span class="kw">@return</span><span class="co"> {array} Array of strings of all cards</span>
 <span class="co">*/</span>
-<span class="kw">function</span> <span class="fu">validCards</span>(ClientStateJson) {
+<span class="kw">function</span> <span class="fu">validCards</span>(clientStateJson) {
 
 }</code></pre>
 </body>

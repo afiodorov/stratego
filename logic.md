@@ -5,9 +5,9 @@
 * @nothrow
 * @param {string} clientStateJson Json of the client game state
 * @param {string} Name of a piece as in /public/js/structs/pieces.js
-* @returns {array} Array of indices of all valid moves
+* @return {array} Array of indices of all valid moves
 */
-function validMoves(ClientStateJson, piece) {
+function validMoves(clientStateJson, piece) {
 
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,9 +19,9 @@ server does not require Board class at all
 /**
 * @nothrow
 * @param {string} clientStateJson Json of the client game state
-* @returns {array} Array of strings of all cards
+* @return {array} Array of strings of all cards
 */
-function validCards(ClientStateJson) {
+function validCards(clientStateJson) {
 
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
