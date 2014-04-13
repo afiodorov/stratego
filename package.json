@@ -5,6 +5,23 @@
     "type": "git",
     "url": "git://github.com/afiodorv/stratego.git"
   },
+  "browser": {
+    "jquery": "./public/vendor/jquery.min.js",
+    "pnotify": "./public/vendor/pnotify/jquery.pnotify.min.js",
+    "jquery-ui": "./public/vendor/jquery-ui.min.js",
+    "knockout": "./public/vendor/knockout-2.2.1.js",
+    "knockout-jquery": "./public/vendor/knockout-jqueryui.min.js"
+  },
+  "browserify-shim": {
+    "jquery": {"exports": "$"},
+    "pnotify": {"exports": "$.pnotify"},
+    "jquery-ui": {"exports": null, "depends": ["jquery"]},
+    "knockout": {"exports": "ko", "depends": ["jquery"]},
+    "knockout-jquery": {"exports": null}
+  },
+  "browserify": {
+    "transform": [ "browserify-shim" ]
+  },
   "dependencies": {
     "socket.io": "~0.9.16",
     "express": "3.x",
@@ -16,7 +33,8 @@
     "connect-mongo": "0.4.x",
     "q": "*",
     "open": "*",
-    "grunt-browserify": "1.3.0"
+    "browserify-shim": "~3.2.0",
+    "grunt-browserify": "2.0.1"
   },
   "engines": {
     "node": "0.10.x",
@@ -25,6 +43,7 @@
   "devDependencies": {
     "grunt": "0.4.2",
     "grunt-watchify": "~0.1.0",
+    "grunt-mocha-test": "*",
     "grunt-nodemon": "~0.2.0",
     "grunt-concurrent": "~0.4.3",
     "grunt-node-inspector": "~0.1.2",

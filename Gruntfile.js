@@ -17,35 +17,17 @@ module.exports = function(grunt) {
         src: ['./public/js/**/*.js'],
         dest: 'public/app/bundle.js',
         options: {
-          shim: {
-            jquery: {
-              path: 'public/vendor/jquery.min.js',
-              exports: '$'
-            },
-            'jquery-ui': {
-              path: 'public/vendor/jquery-ui.min.js',
-              exports: null,
-              depends: {
-                jquery: '$'
-              }
-            },
-            pnotify: {
-              path: 'public/vendor/pnotify/jquery.pnotify.min.js',
-              exports: '$.pnotify'
-            },
-            knockout: {
-              path: 'public/vendor/knockout-2.2.1.js',
-              exports: 'ko',
-              depends: {
-                  jquery: '$'
-              }
-            },
-            'knockout-jquery' : {
-               path: './public/vendor/knockout-jqueryui.min.js',
-               exports: null,
-            }
-          }
+          bundleOptions: {debug: true},
+          transform: ["browserify-shim"],
         }
+      }
+    },
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec'
+        },
+        src: ['test/game/*.js']
       }
     },
     nodemon: {
@@ -110,4 +92,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-node-inspector');
   grunt.loadNpmTasks('grunt-contrib-watch'); 
   grunt.loadNpmTasks('grunt-contrib-livereload');
+  grunt.loadNpmTasks('grunt-mocha-test');
 };

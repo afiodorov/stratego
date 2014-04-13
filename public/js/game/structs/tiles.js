@@ -9,24 +9,24 @@ var Tile = function(name, capacity, index) {
 
 var tilesArr = [];
 _.range(7).forEach(function(i) {tilesArr[i] = [];});
-tilesArr[0][0] = new Tile('The Shire'       , 4, [1, 1]);
-tilesArr[1][0] = new Tile('Arthedam'        , 2, [2, 1]);
-tilesArr[1][1] = new Tile('Cardolan'        , 2, [2, 2]);
-tilesArr[2][0] = new Tile('Rhudaur'         , 2, [3, 1]);
-tilesArr[2][1] = new Tile('Eregion'         , 2, [3, 2]);
-tilesArr[2][2] = new Tile('Enedwaith'       , 2, [3, 3]);
-tilesArr[3][0] = new Tile('The High Pass'   , 1, [4, 1]);
-tilesArr[3][1] = new Tile('Misty Mountains' , 1, [4, 2]);
-tilesArr[3][2] = new Tile('Caradoras'       , 1, [4, 3]);
-tilesArr[3][3] = new Tile('Gap Of Rohan'    , 1, [4, 4]);
-tilesArr[4][0] = new Tile('Mirkwood'        , 2, [5, 1]);
-tilesArr[4][1] = new Tile('Fangorn'         , 2, [5, 2]);
-tilesArr[4][2] = new Tile('Rohan'           , 2, [5, 3]);
-tilesArr[5][0] = new Tile('Gondor'          , 2, [6, 1]);
-tilesArr[5][1] = new Tile('Dagorlad'        , 2, [6, 2]);
-tilesArr[6][0] = new Tile('Mordor'          , 4, [7, 1]);
+tilesArr[0][0] = new Tile('The Shire'       , 4, [0, 0]);
+tilesArr[1][0] = new Tile('Arthedam'        , 2, [1, 0]);
+tilesArr[1][1] = new Tile('Cardolan'        , 2, [1, 1]);
+tilesArr[2][0] = new Tile('Rhudaur'         , 2, [2, 0]);
+tilesArr[2][1] = new Tile('Eregion'         , 2, [2, 1]);
+tilesArr[2][2] = new Tile('Enedwaith'       , 2, [2, 2]);
+tilesArr[3][0] = new Tile('The High Pass'   , 1, [3, 0]);
+tilesArr[3][1] = new Tile('Misty Mountains' , 1, [3, 1]);
+tilesArr[3][2] = new Tile('Caradoras'       , 1, [3, 2]);
+tilesArr[3][3] = new Tile('Gap Of Rohan'    , 1, [3, 3]);
+tilesArr[4][0] = new Tile('Mirkwood'        , 2, [4, 0]);
+tilesArr[4][1] = new Tile('Fangorn'         , 2, [4, 1]);
+tilesArr[4][2] = new Tile('Rohan'           , 2, [4, 2]);
+tilesArr[5][0] = new Tile('Gondor'          , 2, [5, 0]);
+tilesArr[5][1] = new Tile('Dagorlad'        , 2, [5, 1]);
+tilesArr[6][0] = new Tile('Mordor'          , 4, [6, 0]);
 
-var numCols = function(rowNumber) {return tilesArr[rowNumber - 1].length;};
+var numCols = function(rowNumber) {return tilesArr[rowNumber].length;};
 
 /**
  * @param {array|number} row_ either row (starts from 1) or index, e.g. [1,1]
@@ -47,11 +47,11 @@ var isWithinGrid = function(row_, col_) {
     col = row_[1];
   }
 
-  if (isNaN(row) || row < 1 || row > tilesArr.length) {
+  if (isNaN(row) || row < 0 || row > tilesArr.length - 1) {
     return false;
   }
 
-  if (isNaN(col) || col < 1 || col > numCols(row)) {
+  if (isNaN(col) || col < 0 || col > numCols(row) - 1) {
     return false;
   }
 
@@ -67,7 +67,7 @@ var isWithinGrid = function(row_, col_) {
 Tile.prototype.getForwardTiles = function() {
   var res = new Array(0);
   res.push([this.index[0] + 1, this.index[1]]);
-  if (this.index[0] > tilesArr.length / 2) {
+  if (this.index[0] >= Math.floor(tilesArr.length / 2)) {
     res.push([this.index[0] + 1, this.index[1] - 1]);
   } else {
     res.push([this.index[0] + 1, this.index[1] + 1]);
@@ -83,7 +83,7 @@ Tile.prototype.getForwardTiles = function() {
 Tile.prototype.getBackwardTiles = function() {
   var res = new Array(0);
   res.push([this.index[0] - 1, this.index[1]]);
-  if (this.index[0] > Math.ceil(tilesArr.length / 2)) {
+  if (this.index[0] > Math.floor(tilesArr.length / 2)) {
     res.push([this.index[0] - 1, this.index[1] + 1]);
   } else {
     res.push([this.index[0] - 1, this.index[1] - 1]);
@@ -97,7 +97,7 @@ Tile.prototype.getBackwardTiles = function() {
  */
 Tile.prototype.getReachableSideTiles = function() {
   var res = new Array(0);
-  if (this.index[0] === Math.ceil(tilesArr.length / 2)) {
+  if (this.index[0] === Math.floor(tilesArr.length / 2)) {
     return res;
   }
   res.push([this.index[0], this.index[1] - 1]);
@@ -134,6 +134,23 @@ var tiles = (function() {
     });
 
     mytiles.isWithin = isWithinGrid;
+    Object.defineProperty(mytiles, 'isWithin', {
+      enumerable: false
+    });
+
+    /**
+     * Returns a tile. First tile is indexed as [1, 1]
+     * @param {number} row
+     * @param {number} col
+     * @return Tile object
+     */
+    mytiles.get = function(row, col) {
+      return mytiles[[row, col]];
+    };
+    Object.defineProperty(mytiles, 'get', {
+      enumerable: false
+    });
+
     Object.defineProperty(mytiles, 'isWithin', {
       enumerable: false
     });

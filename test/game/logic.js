@@ -14,25 +14,25 @@ describe('GameLogic', function() {
     var positions = logic._startingPositions;
     it('#_startingPositions', function() {
       assert.deepEqual(positions.light,
-       [[1, 1],
+       [[0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [1, 0],
         [1, 1],
-        [1, 1],
-        [1, 1],
+        [2, 0],
         [2, 1],
-        [2, 2],
-        [3, 1],
-        [3, 2],
-        [3, 3]]);
+        [2, 2]]);
       assert.deepEqual(positions.dark,
-       [[7, 1],
-        [7, 1],
-        [7, 1],
-        [7, 1],
-        [5, 1],
-        [5, 2],
-        [5, 3],
-        [6, 1],
-        [6, 2]]);
+       [[6, 0],
+        [6, 0],
+        [6, 0],
+        [6, 0],
+        [4, 0],
+        [4, 1],
+        [4, 2],
+        [5, 0],
+        [5, 1]]);
     });
   });
 
@@ -59,13 +59,24 @@ describe('GameLogic', function() {
     });
 
     it('#getValidMoveTiles', function() {
-      fs.readdir('./test/game/states', function(err, files) {
+      var path = require('path');
+      var data_dir = './test/data';
+      fs.readdir(data_dir, function(err, files) {
         if(err) {
           console.log(err);
           return;
         }
-        files.forEach(function(file) {
-          console.log(file);
+        files.forEach(function(filename) {
+          var relative_path = path.join(data_dir, filename);
+          fs.lstat(relative_path, function(err, stat) {
+            if(err) {
+              console.log(err);
+              return;
+            }
+            if(stat.isFile() && path.extname(relative_path) === '.js')  {
+              console.log("finally we got the list of state files!!");
+            }
+          });
         });
       });
     });

@@ -112,7 +112,3 @@ module.exports = {
   findOne: findOne,
   Model: Game
 };
-
-if(process.env.STRATEGO_DEVELOPMENT) {
-  module.exports.Schema = GameSchema;
-}

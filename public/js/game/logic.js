@@ -43,24 +43,24 @@ var getPieceSide = function(piece) {
 };
 
 var _startingPositions =  {
-  light: _.times(4, _.constant([1,1]))
+  light: _.times(4, _.constant([0,0]))
     .concat(
        gameStructs.tiles.filter(
          function(tile) {
-           return tile.index[0] === 2 || tile.index[0] === 3;
+           return tile.index[0] === 1 || tile.index[0] === 2;
          }).map(
          function(tile) {return tile.index;})),
-  dark: _.times(4, _.constant([gameStructs.tiles.numRows,1]))
+  dark: _.times(4, _.constant([gameStructs.tiles.numRows-1,0]))
     .concat(
        gameStructs.tiles.filter(
-         function(tile) {return tile.index[0] === gameStructs.tiles.numRows - 1
-           || tile.index[0] === gameStructs.tiles.numRows - 2;})
+         function(tile) {return tile.index[0] === gameStructs.tiles.numRows - 2
+           || tile.index[0] === gameStructs.tiles.numRows - 3;})
        .map(
          function(tile) {return tile.index;})
        )
 };
 
-/* Random position for a dark/light side 
+/** Random position for a dark/light side 
  * used in initialising a game state */
 var generateStartPosition = function(side) {
   var pieces = gameStructs.pieces[side];
