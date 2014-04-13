@@ -19,15 +19,19 @@ Event.prototype = {
   }
 };
 
+var cardEvent = function(json) {
+  o = new Event();
+  o.card = json.card;
+
+  // if(!gameSturcts.cards) {
+  // o.isValid = false;
+  // }
+};
+
 var Move = function(json) {
   o = new Event();
   o.piece = json.piece;
-  o.side = json.side;
   o.toTile = json.toTile;
-
-  if(!gameLogic.isSideValid(o.side)) {
-    o.isValid = false;
-  }
 
   if(!gameStructs.pieces[o.side][o.piece]) {
     o.isValid = false;
@@ -38,7 +42,7 @@ var Move = function(json) {
   }
 
   return o;
-}
+};
 
 var InviteFromPlayer = function(json) {
   var o = new Event();

@@ -5,31 +5,6 @@ var _ = require('../lib/underscore.js');
 var allowedSides = ['light', 'dark'];
 var events = require("./../events.js");
 
-/* Returns an object of the starting positions
- * For a standard board will return:
- * { light:
- *     [[1, 1],
- *      [1, 1],
- *      [1, 1],
- *      [1, 1],
- *      [2, 1],
- *      [2, 2],
- *      [3, 1],
- *      [3, 2],
- *      [3, 3]],
- *   dark:
- *     [[7, 1],
- *      [7, 1],
- *      [7, 1],
- *      [7, 1],
- *      [5, 1],
- *      [5, 2],
- *      [5, 3],
- *      [6, 1],
- *      [6, 2]]
- * }
- */
-
 var getPieceSide = function(piece) {
   if(_.keys(gameStructs.pieces.dark).indexOf(piece) !== -1) {
     return 'dark';
