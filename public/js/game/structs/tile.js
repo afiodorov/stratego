@@ -1,9 +1,5 @@
-﻿
-/// <reference path="side.js" />
-
+﻿/// <reference path="side.js" />
 var side = require('./side.js');
-
-
 
 var tile = function (name, capacity, position) {  
 
