@@ -13,8 +13,8 @@ describe('GameStruct', function () {
     var lightBoard = boardExport.makeBoard({
       turn: side.light,
       //stage: stage.start | stage.move | stage.battle | stage.finish,
-      friendlyPieces: [{name: "gandalf", position: [2,1]}],
-      enemyPieces: [[5,1],[6,0]]
+      friendlyPieces: [{ name: "gandalf", position: [2, 1] }],
+      enemyPieces: [[5, 1], [6, 0]]
     });
     var darkBoard = boardExport.makeBoard({
       turn: side.dark,
