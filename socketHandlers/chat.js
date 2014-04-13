@@ -37,5 +37,5 @@ function main() {
 }
 
 module.exports = {
-  main: main
+  registerHandlers: main
 };
