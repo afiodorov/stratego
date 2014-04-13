@@ -14,7 +14,7 @@ var tile = function (name, capacity, position) {
     if (pieces.indexOf(piece) === -1) {
       throw "Piece not found!";
     }
-    pieces.pop(piece);
+    return pieces.pop(piece);
   }
 
   var atMaxCap = function () {
