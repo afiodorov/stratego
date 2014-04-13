@@ -27,16 +27,66 @@ code > span.er { color: #ff0000; font-weight: bold; }
   </style>
 </head>
 <body>
-<p>Design</p>
-<h1 id="socket.io-session-and-socket-recap">Socket.io, session and socket recap</h1>
+<div id="TOC">
+<ul>
+<li><a href="#publicjslogic.js">/public/js/logic.js</a></li>
+<li><a href="#socket.io-session-and-socket-recap">Socket.io, session and socket recap</a><ul>
+<li><a href="#server">server</a></li>
+<li><a href="#client">client</a></li>
+</ul></li>
+<li><a href="#bird-eye-view">Bird eye view</a></li>
+<li><a href="#gui">Gui</a></li>
+<li><a href="#more-details">More Details</a></li>
+<li><a href="#server-side">Server Side</a></li>
+<li><a href="#client-1">Client:</a></li>
+</ul>
+</div>
+<h1 id="publicjslogic.js"><a href="#publicjslogic.js">/public/js/logic.js</a></h1>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
+<span class="co">* </span>@nothrow
+<span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{string}</span><span class="co"> clientStateJson Json of the client game state</span>
+<span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{string}</span><span class="co"> Name of a piece as in /public/js/structs/pieces.js</span>
+<span class="co">* </span><span class="kw">@return</span><span class="co"> {array} Array of indices of all valid moves</span>
+<span class="co">*/</span>
+<span class="kw">function</span> <span class="fu">validMoves</span>(clientStateJson, piece) {
+
+}</code></pre>
+<p>All the auxilary functions the client gui board needs go here too, so that server does not require Board class at all</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
+<span class="co">* </span>@nothrow
+<span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{string}</span><span class="co"> clientStateJson Json of the client game state</span>
+<span class="co">* </span><span class="kw">@return</span><span class="co"> {array} Array of strings of all cards</span>
+<span class="co">*/</span>
+<span class="kw">function</span> <span class="fu">validCards</span>(clientStateJson) {
+
+}</code></pre>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
+<span class="co">* </span>@nothrow
+<span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{string}</span><span class="co"> clientStateJson json of the client game state</span>
+<span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{object}</span><span class="co"> moveEvent see public/js/events.js Move</span>
+<span class="co">* </span><span class="kw">@return</span><span class="co"> {bool} whether move is allowed</span>
+<span class="co">*/</span>
+<span class="kw">function</span> <span class="fu">isMoveValid</span>(clientStateJson, moveEvent) {
+
+}</code></pre>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
+<span class="co">* </span>@nothrow
+<span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{string}</span><span class="co"> clientStateJson json of the client game state</span>
+<span class="co">* </span><span class="kw">@param</span><span class="co"> </span><span class="kw">{object}</span><span class="co"> cardEvent see public/js/events.js Event</span>
+<span class="co">* </span><span class="kw">@return</span><span class="co"> {bool} whether player can play the card</span>
+<span class="co">*/</span>
+<span class="kw">function</span> <span class="fu">isPlayedCardValid</span>(clientStateJson, cardEvent) {
+
+}</code></pre>
+<h1 id="socket.io-session-and-socket-recap"><a href="#socket.io-session-and-socket-recap">Socket.io, session and socket recap</a></h1>
 <p>Each connection with a server has a socket. Socket is lost if connection is lost (e.g. refresh), therefore each connection also mantains a session, which is not lost due to cookies on the client's side.</p>
 <p>Once a game between 2 players starts 2 sockets are joined by the game.id (auto generated) into a &quot;chat-room&quot;</p>
 <p>Servers and clients emit and handle custom events like this:</p>
-<h3 id="server">server</h3>
+<h3 id="server"><a href="#server">server</a></h3>
 <p>socket.of(game.id).broadcast('gameOver'); // just announced to everyone in the game that it's over</p>
-<h3 id="client">client</h3>
+<h3 id="client"><a href="#client">client</a></h3>
 <p>socket.emit('makeMove', {gameId: gameid, &quot;gandalf to mordor&quot;});</p>
-<h1 id="bird-eye-view">Bird eye view</h1>
+<h1 id="bird-eye-view"><a href="#bird-eye-view">Bird eye view</a></h1>
 <p>Clients keep the current state of the game in GameState instance, which resembles heavily server's GameScheme json shema, which is stored in MongoDB.</p>
 <p>Noticeable differences between client's game state and server's game state: * Clients don't have opponents' pieces names, just the locations * Clients don't know opponents' ids.</p>
 <p>Clients however know game.id of each game, which is an auto-generated id from the MongoDB.</p>
@@ -46,11 +96,11 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>I decided that the model and GUI have Observer / Subject pattern, i.e. GUI is an observer of the model.</p>
 <p>When game is loaded for the first time the GameController adds GUI as observers to the model, i.e once gameController updates gameState, gameState calls board.update(gameState), hand.update(gameState).</p>
 <p>hand.update, board.update methods actually refresh the canvas.</p>
-<h1 id="gui">Gui</h1>
+<h1 id="gui"><a href="#gui">Gui</a></h1>
 <p>Each hand and board object is a container for an array of the Knockout objects, which are visible on canvas, e.g. KnockoutPiece (KPiece) and KCard.</p>
 <p>To construct such objects from gameState, (static) GameStructs class is needed which contain an additional information about each piece/card.</p>
 <p>GameState is a lightweight object by design, so that communication with a server is responsive. Besides rules don't change throughout the game, so don't see the point of exchanging them all the time.</p>
-<h1 id="more-details">More Details</h1>
+<h1 id="more-details"><a href="#more-details">More Details</a></h1>
 <p>GameController is the only class which is capable of speaking to the server. GameController can also refresh GUI.</p>
 <p>However, GUI and GameController have a mixin pattern and are heavily coupled: hand.emitters = gameController.guiEvents.</p>
 <p>gameController.guiEvents contains the human interaction with gui, which require either of the following: * gameState must be known for the response * gameSocket must be known (to post the event off to the server)</p>
@@ -60,7 +110,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><p>A player played a card - requires checking whether he has that card, so gameState is required. The following happens: The gameController calls GameLogic.canPlayCard(gameState) method, if it's ok it emits it off to the server to deal with it, and we simply wait for server to respond with new stateJson. The controller could block further input at this point.</p></li>
 <li><p>A player picked up a piece - requires showing the player where he is allowed to drop it, hence the handler must be defined in gameController.guiEvents.</p></li>
 </ul>
-<h1 id="server-side">Server Side</h1>
+<h1 id="server-side"><a href="#server-side">Server Side</a></h1>
 <p>Currently the pseudo code is missing, but the concept is simple:</p>
 <p>Server will receive a bunch of events, e.g. 'playCard', 'movePiece' and so on, will check whether it's ok reusing the GameLogic class and finally update the database, using the ./models/Game.js class, where a bunch of handy methods will be present (e.g. Game.playcard(&quot;dark&quot;, &quot;3&quot;))</p>
 <p>Upon success it fires off 'gameState' event and the gui of the games is eventually updated, though a mechani outlined above.</p>
@@ -85,7 +135,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
     }
   });
 }</code></pre>
-<h1 id="client-1">Client:</h1>
+<h1 id="client-1"><a href="#client-1">Client:</a></h1>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> gameStructs = {};
 <span class="ot">gameStructs</span>.<span class="fu">tiles</span> = [];
 <span class="ot">gameStructs</span>.<span class="fu">tiles</span>[<span class="dv">0</span>]  = { <span class="dt">capacity</span>: <span class="dv">4</span>, <span class="dt">name</span>: <span class="st">&quot;The Shire&quot;</span> };
