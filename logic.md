@@ -4,7 +4,7 @@
 /**
 * @nothrow
 * @param {string} clientStateJson Json of the client game state
-* @piece {string} Name of a piece as in /public/js/structs/pieces.js
+* @param {string} Name of a piece as in /public/js/structs/pieces.js
 * @returns {array} Array of indices of all valid moves
 */
 function validMoves(ClientStateJson, piece) {
