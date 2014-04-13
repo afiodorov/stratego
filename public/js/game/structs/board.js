@@ -5,7 +5,7 @@
 var SIDE_DARK = 4325897;
 var SIDE_LIGHT = 203423487;
 
-var makeBoard = function (side) {
+var makeBoard = function (gameState) {
   // We are defining the tiles' position by its' location in the array.
   // All postional relatives will be assuming that the Shire is South, and that Mordor is North.
   // The shire will be at the top of the board with a 0 row index, Mordor at the bottom, with the highest row index.
@@ -63,12 +63,12 @@ var makeBoard = function (side) {
     return pieces;
   })();
 
-  var lightPieces = allPieces.filter(function (p) { return p.side === SIDE_LIGHT });
+  var friendlyPieces = allPieces.filter(function (piece) { allPieces.map(function(p) {return p.name;}).indexOf(piece.name) !== -1 });
 
-  var darkPieces = allPieces.filter(function (p) { return p.side === SIDE_DARK });
-
-  var sideString = side === SIDE_DARK ? "dark" : "light";
+  var enemyPieceLocs = gameState.enemyPieces;
   
+  var playerSide = gameState.friendlyPieces[0].side;
+
   var validMoveFuncs = (function () {
 
     var getVerticleAdjTiles = function (tile, goingNorth) {
@@ -98,15 +98,15 @@ var makeBoard = function (side) {
 
     //potential refers to it being prior to the check that the square actually has space.
     var getPotentialForwards = function (tile) {
-      var forwardTiles = getVerticleAdjTiles(tile, side === SIDE_DARK);
-      if (side === SIDE_LIGHT && tile === tiles[2][1]) {//You can take a shortcut from this square if you're on the light side. 
+      var forwardTiles = getVerticleAdjTiles(tile, playerSide === side.DARK);
+      if (playerSide === side.LIGHT && tile === tiles[2][1]) {//You can take a shortcut from this square if you're on the light side. 
         forwardTiles.push(tiles[4][1]);
       }
       return forwardTiles;
     }
 
     var getPotentialBackwards = function (tile) {
-      return getVerticleAdjTiles(tile, side === SIDE_LIGHT);
+      return getVerticleAdjTiles(tile, playerSide === side.LIGHT);
     }
 
     var getPotentialSideways = function (tile) {
@@ -114,7 +114,7 @@ var makeBoard = function (side) {
         return [];
       }
       if (tile.position.y === 4) {//River, see above.
-        if (side === SIDE_DARK) {
+        if (playerSide === side.DARK) {
           return [];
         }
         return [tiles[4][tile.position.x - 1]].filter(isDefined);
@@ -147,7 +147,11 @@ var makeBoard = function (side) {
     tiles: tiles,
     sideString: sideString,
     validMoveFuncs: validMoveFuncs,
-    lightPieces: lightPieces
+    friendlyPieces: friendlyPieces,
+    enemyPieceLocs: enemyPieceLocs,
+    //Less than ideal, only used in tests atm, Not sure I want to use this properly
+    side: playerSide,
+    sideString: playerSide === side.DARK ? side.darkString : side.lightString
   };
 }
 

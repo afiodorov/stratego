@@ -8,8 +8,24 @@ var boardExport = require('../../public/js/game/structs/board.js');
 
 describe('GameStruct', function () {
   describe("Matts board", function () {
-    var lightBoard = boardExport.makeBoard(boardExport.SIDE_LIGHT);
-    var darkBoard = boardExport.makeBoard(boardExport.SIDE_DARK);
+    var lightBoard = boardExport.makeBoard({
+      turn: side.light,
+      //stage: stage.start | stage.move | stage.battle | stage.finish,
+      friendlyPieces: [{name: "gandalf", position: [2,1]}],
+      enemyPieces: [[5,1],[6,0]]
+    });
+    var darkBoard = boardExport.makeBoard({
+      turn: side.dark,
+      //stage: stage.start | stage.move | stage.battle | stage.finish,
+      friendlyPieces: [{ name: "saruman", position: [2, 1] }],
+      enemyPieces: [[5, 1], [6, 0]]
+    });
+
+    describe("Board should be created properly", function () {
+      it("board with gandalf should be light", function () {
+        assert.equal(side.LIGHT, lightBoard.side);
+      });
+    });
 
     describe("Standard movement, without considing other pieces", function () {
       function checkMove(board, direction, xpos, ypos, numValidMoves) {
@@ -105,72 +121,70 @@ describe('GameStruct', function () {
     });
   });
 
+  //describe('tile', function() {
+    //it('#numCols', function() {
+      //assert.equal(3, gameStructs.tiles.numCols(2));
+      //assert.equal(4, gameStructs.tiles.numCols(3));
+      //assert.equal(3, gameStructs.tiles.numCols(4));
+      //assert.equal(2, gameStructs.tiles.numCols(5));
+      //assert.equal(1, gameStructs.tiles.numCols(6));
+    //});
 
+    //it('#isWithin', function () {
+      //assert.equal(true, gameStructs.tiles.isWithin(1, 1));
+      //assert.equal(true, gameStructs.tiles.isWithin([0, 0]));
+      //assert.equal(true, gameStructs.tiles.isWithin([1, 0]));
+      //assert.equal(true, gameStructs.tiles.isWithin([1, 1]));
+      //assert.equal(true, gameStructs.tiles.isWithin([2, 0]));
+      //assert.equal(true, gameStructs.tiles.isWithin([2, 1]));
+      //assert.equal(true, gameStructs.tiles.isWithin([2, 2]));
+      //assert.equal(true, gameStructs.tiles.isWithin([3, 0]));
+      //assert.equal(true, gameStructs.tiles.isWithin([3, 1]));
+      //assert.equal(true, gameStructs.tiles.isWithin([3, 2]));
+      //assert.equal(true, gameStructs.tiles.isWithin([3, 3]));
+      //assert.equal(true, gameStructs.tiles.isWithin([4, 0]));
+      //assert.equal(true, gameStructs.tiles.isWithin([4, 1]));
+      //assert.equal(true, gameStructs.tiles.isWithin([4, 2]));
+      //assert.equal(true, gameStructs.tiles.isWithin([5, 0]));
+      //assert.equal(true, gameStructs.tiles.isWithin([5, 1]));
+      //assert.equal(true, gameStructs.tiles.isWithin([6, 0]));
+      //assert.equal(false, gameStructs.tiles.isWithin([-2, 0]));
+      //assert.equal(false, gameStructs.tiles.isWithin([4, 3]));
+    //});
+  //});
 
-  describe('tile', function() {
-    it('#numCols', function() {
-      assert.equal(3, gameStructs.tiles.numCols(2));
-      assert.equal(4, gameStructs.tiles.numCols(3));
-      assert.equal(3, gameStructs.tiles.numCols(4));
-      assert.equal(2, gameStructs.tiles.numCols(5));
-      assert.equal(1, gameStructs.tiles.numCols(6));
-    });
-
-    it('#isWithin', function () {
-      assert.equal(true, gameStructs.tiles.isWithin(1, 1));
-      assert.equal(true, gameStructs.tiles.isWithin([0, 0]));
-      assert.equal(true, gameStructs.tiles.isWithin([1, 0]));
-      assert.equal(true, gameStructs.tiles.isWithin([1, 1]));
-      assert.equal(true, gameStructs.tiles.isWithin([2, 0]));
-      assert.equal(true, gameStructs.tiles.isWithin([2, 1]));
-      assert.equal(true, gameStructs.tiles.isWithin([2, 2]));
-      assert.equal(true, gameStructs.tiles.isWithin([3, 0]));
-      assert.equal(true, gameStructs.tiles.isWithin([3, 1]));
-      assert.equal(true, gameStructs.tiles.isWithin([3, 2]));
-      assert.equal(true, gameStructs.tiles.isWithin([3, 3]));
-      assert.equal(true, gameStructs.tiles.isWithin([4, 0]));
-      assert.equal(true, gameStructs.tiles.isWithin([4, 1]));
-      assert.equal(true, gameStructs.tiles.isWithin([4, 2]));
-      assert.equal(true, gameStructs.tiles.isWithin([5, 0]));
-      assert.equal(true, gameStructs.tiles.isWithin([5, 1]));
-      assert.equal(true, gameStructs.tiles.isWithin([6, 0]));
-      assert.equal(false, gameStructs.tiles.isWithin([-2, 0]));
-      assert.equal(false, gameStructs.tiles.isWithin([4, 3]));
-    });
-  });
-
-  describe('tile', function() {
-    it('#getBackwardTiles', function() {
-      assert.deepEqual([], gameStructs.tiles[[0, 0]].getBackwardTiles());
-      assert.deepEqual([[1, 1]], gameStructs.tiles[[2, 2]].getBackwardTiles());
-      assert.deepEqual([[3, 1], [3, 2]],
-        gameStructs.tiles[[4, 1]].getBackwardTiles());
-      assert.deepEqual([[2, 1], [2, 2]],
-        gameStructs.tiles[[3, 2]].getBackwardTiles());
-      assert.deepEqual([[2, 2]], gameStructs.tiles[[3, 3]].getBackwardTiles());
-      assert.deepEqual([[4, 1], [4, 2]],
-        gameStructs.tiles[[5, 1]].getBackwardTiles());
-      assert.deepEqual([[5, 0], [5, 1]],
-        gameStructs.tiles[[6, 0]].getBackwardTiles());
-    });
-    it('#getForwardTiles', function() {
-      assert.deepEqual([[1, 0], [1, 1]],
-        gameStructs.tiles[[0, 0]].getForwardTiles());
-      assert.deepEqual([[2, 0], [2, 1]],
-        gameStructs.tiles[[1, 0]].getForwardTiles());
-      assert.deepEqual([[4, 1], [4, 2]],
-        gameStructs.tiles[[3, 2]].getForwardTiles());
-      assert.deepEqual([[4, 2]], gameStructs.tiles[[3, 3]].getForwardTiles());
-      assert.deepEqual([[5, 0], [5, 1]],
-        gameStructs.tiles[[4, 1]].getForwardTiles());
-      assert.deepEqual([[5, 0]], gameStructs.tiles[[4, 0]].getForwardTiles());
-      assert.deepEqual([], gameStructs.tiles[[6, 0]].getForwardTiles());
-    });
-    it('#getReachableSideTiles', function() {
-      assert.deepEqual([], gameStructs.tiles[[3, 1]].getReachableSideTiles());
-      assert.deepEqual([], gameStructs.tiles[[0, 0]].getReachableSideTiles());
-      assert.deepEqual([[4, 0], [4, 2]], gameStructs.tiles[[4, 1]].getReachableSideTiles());
-      assert.deepEqual([[5, 0]], gameStructs.tiles[[5, 1]].getReachableSideTiles());
-    });
-  });
+  //describe('tile', function() {
+    //it('#getBackwardTiles', function() {
+      //assert.deepEqual([], gameStructs.tiles[[0, 0]].getBackwardTiles());
+      //assert.deepEqual([[1, 1]], gameStructs.tiles[[2, 2]].getBackwardTiles());
+      //assert.deepEqual([[3, 1], [3, 2]],
+        //gameStructs.tiles[[4, 1]].getBackwardTiles());
+      //assert.deepEqual([[2, 1], [2, 2]],
+        //gameStructs.tiles[[3, 2]].getBackwardTiles());
+      //assert.deepEqual([[2, 2]], gameStructs.tiles[[3, 3]].getBackwardTiles());
+      //assert.deepEqual([[4, 1], [4, 2]],
+        //gameStructs.tiles[[5, 1]].getBackwardTiles());
+      //assert.deepEqual([[5, 0], [5, 1]],
+        //gameStructs.tiles[[6, 0]].getBackwardTiles());
+    //});
+    //it('#getForwardTiles', function() {
+      //assert.deepEqual([[1, 0], [1, 1]],
+        //gameStructs.tiles[[0, 0]].getForwardTiles());
+      //assert.deepEqual([[2, 0], [2, 1]],
+        //gameStructs.tiles[[1, 0]].getForwardTiles());
+      //assert.deepEqual([[4, 1], [4, 2]],
+        //gameStructs.tiles[[3, 2]].getForwardTiles());
+      //assert.deepEqual([[4, 2]], gameStructs.tiles[[3, 3]].getForwardTiles());
+      //assert.deepEqual([[5, 0], [5, 1]],
+        //gameStructs.tiles[[4, 1]].getForwardTiles());
+      //assert.deepEqual([[5, 0]], gameStructs.tiles[[4, 0]].getForwardTiles());
+      //assert.deepEqual([], gameStructs.tiles[[6, 0]].getForwardTiles());
+    //});
+    //it('#getReachableSideTiles', function() {
+      //assert.deepEqual([], gameStructs.tiles[[3, 1]].getReachableSideTiles());
+      //assert.deepEqual([], gameStructs.tiles[[0, 0]].getReachableSideTiles());
+      //assert.deepEqual([[4, 0], [4, 2]], gameStructs.tiles[[4, 1]].getReachableSideTiles());
+      //assert.deepEqual([[5, 0]], gameStructs.tiles[[5, 1]].getReachableSideTiles());
+    //});
+  //});
 });
