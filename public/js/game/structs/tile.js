@@ -7,6 +7,9 @@ var tile = function (name, capacity, position) {
     if (pieces.indexOf(piece) !== -1) {
       throw "Piece already here!";
     }
+    if (atMaxCap()) {
+      throw "No more space";
+    }
     pieces.push(piece);
   }
 

@@ -11,6 +11,8 @@ var tileLayer = function (boardWidth, boardHeight) {
   var board = boardMod.makeBoard(boardMod.SIDE_DARK);
 
   board.tiles[1][1].addPiece(board.lightPieces[0]);
+  board.tiles[1][1].addPiece(board.lightPieces[1]);
+  board.tiles[2][1].addPiece(board.lightPieces[2]);
 
   function getTileGroup(tile, rectWidth, rectHeight, rectX, rectY) {
     var group = new Kinetic.Group({
@@ -38,14 +40,16 @@ var tileLayer = function (boardWidth, boardHeight) {
     }));
 
     for (var i = 0; i < tile.getPieces().length; i++) {
-      group.add(getPieceGroup(tile.getPieces()[i]));
+      var pieceGroup = getPieceGroup(tile.getPieces()[i], i * rectWidth / tile.getPieces().length );
+      group.add(pieceGroup);
     }
     return group;
   }
 
-  function getPieceGroup(piece) {
+  function getPieceGroup(piece, xOffset) {
     var radius = Math.min(boardWidth / (MAXPIECESINROW * 2), boardHeight / (MAXPIECESINCOL * 2));
     var group = new Kinetic.Group({
+      x: xOffset,
       width: radius * 2,
       height: radius * 2,
     });
