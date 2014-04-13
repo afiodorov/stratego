@@ -25,3 +25,29 @@ function validCards(clientStateJson) {
 
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~ {.javascript}
+/**
+* @nothrow
+* @param {string} clientStateJson json of the client game state
+* @param {object} moveEvent see public/js/events.js Move
+* @return {bool} whether move is allowed
+*/
+function isMoveValid(clientStateJson, moveEvent) {
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~ {.javascript}
+/**
+* @nothrow
+* @param {string} clientStateJson json of the client game state
+* @param {object} cardEvent see public/js/events.js Event
+* @return {bool} whether player can play the card
+*/
+function isPlayedCardValid(clientStateJson, cardEvent) {
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
