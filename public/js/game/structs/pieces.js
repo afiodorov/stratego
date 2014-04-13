@@ -25,3 +25,4 @@ var allPieces = (function () {
   return pieces;
 })();
 
+module.exports = allPieces;
