@@ -30,15 +30,11 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="TOC">
 <ul>
 <li><a href="#publicjslogic.js">/public/js/logic.js</a></li>
-<li><a href="#socket.io-session-and-socket-recap">Socket.io, session and socket recap</a><ul>
-<li><a href="#server">server</a></li>
-<li><a href="#client">client</a></li>
-</ul></li>
 <li><a href="#bird-eye-view">Bird eye view</a></li>
 <li><a href="#gui">Gui</a></li>
 <li><a href="#more-details">More Details</a></li>
 <li><a href="#server-side">Server Side</a></li>
-<li><a href="#client-1">Client:</a></li>
+<li><a href="#client">Client:</a></li>
 </ul>
 </div>
 <h1 id="publicjslogic.js"><a href="#publicjslogic.js">/public/js/logic.js</a></h1>
@@ -78,14 +74,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <span class="kw">function</span> <span class="fu">isPlayedCardValid</span>(clientStateJson, cardEvent) {
 
 }</code></pre>
-<h1 id="socket.io-session-and-socket-recap"><a href="#socket.io-session-and-socket-recap">Socket.io, session and socket recap</a></h1>
-<p>Each connection with a server has a socket. Socket is lost if connection is lost (e.g. refresh), therefore each connection also mantains a session, which is not lost due to cookies on the client's side.</p>
-<p>Once a game between 2 players starts 2 sockets are joined by the game.id (auto generated) into a &quot;chat-room&quot;</p>
-<p>Servers and clients emit and handle custom events like this:</p>
-<h3 id="server"><a href="#server">server</a></h3>
-<p>socket.of(game.id).broadcast('gameOver'); // just announced to everyone in the game that it's over</p>
-<h3 id="client"><a href="#client">client</a></h3>
-<p>socket.emit('makeMove', {gameId: gameid, &quot;gandalf to mordor&quot;});</p>
 <h1 id="bird-eye-view"><a href="#bird-eye-view">Bird eye view</a></h1>
 <p>Clients keep the current state of the game in GameState instance, which resembles heavily server's GameScheme json shema, which is stored in MongoDB.</p>
 <p>Noticeable differences between client's game state and server's game state: * Clients don't have opponents' pieces names, just the locations * Clients don't know opponents' ids.</p>
@@ -135,7 +123,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
     }
   });
 }</code></pre>
-<h1 id="client-1"><a href="#client-1">Client:</a></h1>
+<h1 id="client"><a href="#client">Client:</a></h1>
 <pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> gameStructs = {};
 <span class="ot">gameStructs</span>.<span class="fu">tiles</span> = [];
 <span class="ot">gameStructs</span>.<span class="fu">tiles</span>[<span class="dv">0</span>]  = { <span class="dt">capacity</span>: <span class="dv">4</span>, <span class="dt">name</span>: <span class="st">&quot;The Shire&quot;</span> };

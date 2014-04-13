@@ -51,23 +51,6 @@ function isPlayedCardValid(clientStateJson, cardEvent) {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Socket.io, session and socket recap
-
-Each connection with a server has a socket. Socket is lost if connection is
-lost (e.g. refresh), therefore each connection also mantains a session, which
-is not lost due to cookies on the client's side.
-
-Once a game between 2 players starts 2 sockets are joined by the game.id (auto
-generated) into a "chat-room"
-
-Servers and clients emit and handle custom events like this:
-
-### server
-socket.of(game.id).broadcast('gameOver'); // just announced to everyone in the game that it's over
-
-### client
-socket.emit('makeMove', {gameId: gameid, "gandalf to mordor"});
-
 # Bird eye view
 
 Clients keep the current state of the game in GameState instance, which
