@@ -51,8 +51,7 @@ pieces.forEach(function(piece) {
   });
 });
 
-var allSides = [side.DARK, side.LIGHT];
-allSides.forEach(function(side) {
+[side.DARK, side.LIGHT].forEach(function(side) {
   Object.defineProperty(pieces, side, {
     enumerable: false,
     value: pieces.filter(function(piece) {return piece.side === side;})
