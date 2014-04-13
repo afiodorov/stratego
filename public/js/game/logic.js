@@ -20,11 +20,8 @@ var getPieceSide = function(piece) {
 var _startingPositions =  {
   light: _.times(4, _.constant([0,0]))
     .concat(
-       gameStructs.tiles.filter(
-         function(tile) {
-           return tile.index[0] === 1 || tile.index[0] === 2;
-         }).map(
-         function(tile) {return tile.index;})),
+        _.union(gameStructs.tiles[1], gameStructs.tiles[2]).map(
+        _.pick.bind(null, 'index'))),
   dark: _.times(4, _.constant([gameStructs.tiles.numRows-1,0]))
     .concat(
        gameStructs.tiles.filter(
