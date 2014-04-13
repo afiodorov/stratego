@@ -1,5 +1,5 @@
-﻿var DARK = 4325897;
-var LIGHT = 203423487;
+﻿var DARK = '4325897_';
+var LIGHT = '203423487_';
 
 
 var darkString = "dark";

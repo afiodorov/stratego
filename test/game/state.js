@@ -1,4 +1,4 @@
-///*global describe, it*/
+/*global describe, it*/
 //'use strict';
 //var assert = require('assert');
 //var _ = require('../../public/js/lib/underscore.js');
