@@ -23,9 +23,19 @@ describe('GameStruct', function () {
       enemyPieces: [[5, 1], [6, 0]]
     });
 
+
+
     describe("Board should be created properly", function () {
+      it("light board should have gandalf", function () {
+        assert.equal(lightBoard.allPieces.map(function (p) { return p.name }).length, 18);
+        assert.equal(lightBoard.allPieces.filter(function (piece) { lightBoard.allPieces.map(function (p) { return p.name }).indexOf("gandalf") !== -1 }), 0);
+
+
+        assert.equal(undefined, lightBoard.friendlyPieces);
+        assert.equal(lightBoard.friendlyPieces.map(function (P) { return p.name }).indexOf("gandalf") !== -1, lightBoard.friendlyPieces);
+      });
       it("board with gandalf should be light", function () {
-        assert.equal(side.LIGHT, lightBoard.side);
+        assert.equal(side.LIGHT, lightBoard.friendlyPieces);
       });
     });
 

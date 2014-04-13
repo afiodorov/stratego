@@ -145,6 +145,7 @@ var makeBoard = function (gameState) {
   return {
     tiles: tiles,
     validMoveFuncs: validMoveFuncs,
+    allPieces: allPieces,
     friendlyPieces: friendlyPieces,
     enemyPieceLocs: enemyPieceLocs,
     //Less than ideal, only used in tests atm, Not sure I want to use this properly
