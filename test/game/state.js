@@ -68,27 +68,26 @@
 //  );
 //  var lightState = new stateHolder({mySide: 'light'});
 
-  describe('#isTileWithEnemy', function() {
-    it('', function() {
-      assert.equal(true, darkState.isTileWithEnemy([2, 2]));
-      assert.equal(true, darkState.isTileWithEnemy([3, 1]));
-      assert.equal(false, darkState.isTileWithEnemy([1, 1]));
-    });
-  });
+  //describe('#isTileWithEnemy', function() {
+    //it('', function() {
+      //assert.equal(true, darkState.isTileWithEnemy([2, 2]));
+      //assert.equal(true, darkState.isTileWithEnemy([3, 1]));
+      //assert.equal(false, darkState.isTileWithEnemy([1, 1]));
+    //});
+  //});
 
-  describe('#piecesCount', function() {
-    it('counting number of pieces in a tile', function() {
-      assert.equal(2, darkState.piecesCount([6, 2]));
-    });
-  });
+  //describe('#piecesCount', function() {
+    //it('counting number of pieces in a tile', function() {
+      //assert.equal(2, darkState.piecesCount([6, 2]));
+    //});
+  //});
 
-  describe('#isTileFull', function() {
-    it('checks if tiles are full', function() {
-      assert.equal(true, darkState.isTileFull([6, 2]));
-      assert.equal(true, darkState.isTileFull([5, 1]));
-      assert.equal(true, darkState.isTileFull([4, 4]));
-      assert.equal(false, darkState.isTileFull([7, 1]));
-      assert.equal(false, darkState.isTileFull([6, 1]));
-    });
-  });
-});
+  //describe('#isTileFull', function() {
+    //it('checks if tiles are full', function() {
+      //assert.equal(true, darkState.isTileFull([6, 2]));
+      //assert.equal(true, darkState.isTileFull([5, 1]));
+      //assert.equal(true, darkState.isTileFull([4, 4]));
+      //assert.equal(false, darkState.isTileFull([7, 1]));
+      //assert.equal(false, darkState.isTileFull([6, 1]));
+    //});
+  //});
