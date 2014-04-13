@@ -1,3 +1,4 @@
+/// <reference path="../../public/js/game/structs/side.js" />
 /// <reference path="../../public/js/game/structs/board.js" />
 /*global describe, it*/
 'use strict';
@@ -5,11 +6,12 @@ var assert = require('assert');
 var _ = require('../../public/js/lib/underscore.js');
 var gameStructs = require('../../public/js/game/structs.js');
 var boardExport = require('../../public/js/game/structs/board.js');
+var side = require('../../public/js/game/structs/side.js');
 
 describe('GameStruct', function () {
   describe("Matts board", function () {
-    var lightBoard = boardExport.makeBoard(boardExport.SIDE_LIGHT);
-    var darkBoard = boardExport.makeBoard(boardExport.SIDE_DARK);
+    var lightBoard = boardExport.makeBoard(side.LIGHT);
+    var darkBoard = boardExport.makeBoard(side.DARK);
 
     describe("Standard movement, without considing other pieces", function () {
       function checkMove(board, direction, xpos, ypos, numValidMoves) {
