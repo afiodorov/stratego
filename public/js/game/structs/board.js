@@ -5,19 +5,35 @@
 
 var side = require('./side.js');
 
+var allPieces = require('./pieces.js');
+
 var makeBoard = function (gameState) {
   // We are defining the tiles' position by its' location in the array.
   // All postional relatives will be assuming that the Shire is South, and that Mordor is North.
   // The shire will be at the top of the board with a 0 row index, Mordor at the bottom, with the highest row index.
   var tiles = require('./tiles.js');
 
-  var allPieces = require('./pieces.js');
+  //var friendlyPieces = gameState.friendlyPieces.map(function (p) { return allPieces[p.name]; });
 
-  var friendlyPieces = allPieces.filter(function (piece) { allPieces.map(function(p) {return p.name;}).indexOf(piece.name) !== -1 });
+  function getTile(pos) {
+    return tiles[pos.row][pos.col];
+  }
 
-  var enemyPieceLocs = gameState.enemyPieces;
-  
-  var playerSide = gameState.friendlyPieces[0].side;
+  (function assignPiecesToTiles() {
+    for (var i = 0; i < gameState.friendlyPieces.length; i++) {
+      getTile(gameState.friendlyPieces[i].position).addPiece(allPieces[gameState.friendlyPieces[i].name]);
+    };
+    var makePiece = require('./piece.js');
+    for (var i = 0; i < gameState.enemyPieces.length; i++) {
+      //The only part of the enemy pieces that get used should be the name, and not the real name.
+      //If anything else is called from enemy pieces found in the tile, there should be many an error.
+      getTile(gameState.enemyPieces[i].position).addPiece(makePiece('???', undefined, undefined, undefined));
+    };
+
+  })();
+
+
+  //var playerSide = friendlyPieces[0].side;
 
   var validMoveFuncs = (function () {
 
@@ -96,12 +112,11 @@ var makeBoard = function (gameState) {
   return {
     tiles: tiles,
     validMoveFuncs: validMoveFuncs,
-    allPieces: allPieces,
-    friendlyPieces: friendlyPieces,
-    enemyPieceLocs: enemyPieceLocs,
-    //Less than ideal, only used in tests atm, Not sure I want to use this properly
-    side: playerSide,
-    sideString: playerSide === side.DARK ? side.darkString : side.lightString
+    //friendlyPieces: friendlyPieces,
+    //enemyPieceLocs: enemyPieceLocs,
+    ////Less than ideal, only used in tests atm, Not sure I want to use this properly
+    //side: playerSide,
+    //sideString: playerSide === side.DARK ? side.darkString : side.lightString
   };
 }
 

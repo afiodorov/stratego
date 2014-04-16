@@ -27,16 +27,10 @@ describe('GameStruct', function () {
 
     describe("Board should be created properly", function () {
       it("light board should have gandalf", function () {
-        var allPieceNames = lightBoard.allPieces.map(function (p) { return p.name });
-        assert.equal(allPieceNames.length, 18);        
-        assert.equal(allPieceNames.indexOf("gandalf") !== -1, true);
-
-
-        assert.equal(undefined, lightBoard.friendlyPieces);
-        assert.equal(lightBoard.friendlyPieces.map(function (P) { return p.name }).indexOf("gandalf") !== -1, lightBoard.friendlyPieces);
+        assert.equal("gandalf", lightBoard.friendlyPieces[0].name);
       });
       it("board with gandalf should be light", function () {
-        assert.equal(side.LIGHT, lightBoard.friendlyPieces);
+        assert.equal(side.LIGHT, lightBoard.side);
       });
     });
 
