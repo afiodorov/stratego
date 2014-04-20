@@ -14,11 +14,11 @@ describe('tiles', function() {
     assert.equal(tiles[3].length, 4);
   });
 
-  it('#getTile works with a pair of arguments', function() {
+  it('#get works with a pair of arguments', function() {
     assert.equal(tiles.get(0, 0).name, 'The Shire');
   });
 
-  it('#getTile works with a position', function() {
+  it('#get works with a position', function() {
     assert.equal(tiles.get({row: 1, col: 0}).name, 'Arthedam');
   });
 });
