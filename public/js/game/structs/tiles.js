@@ -28,25 +28,27 @@ addTile('Gondor', 2, 0, 5);
 addTile('Dagorlad', 2, 1, 5);
 addTile('Mordor', 4, 0, 6);
 
-var getTile = function(position) {
-  var row, col;
-  if (arguments.length === 1) {
-    row = position.row;
-    col = position.col;
-  } else if (arguments.length === 2) {
-    row = arguments[0];
-    col = arguments[1];
-  } else {
-    // error case - wrong number of arguments
-    return {};
-  }
+(function defineGetProperty () {
+  var getTile = function(position) {
+    var row, col;
+    if (arguments.length === 1) {
+      row = position.row;
+      col = position.col;
+    } else if (arguments.length === 2) {
+      row = arguments[0];
+      col = arguments[1];
+    } else {
+      // error case - wrong number of arguments
+      return {};
+    }
 
-  return tiles[row][col];
-};
+    return tiles[row][col];
+  };
 
-Object.defineProperty(tiles, 'get', {
-  enumerable: false,
-  value: getTile
-});
+  Object.defineProperty(tiles, 'get', {
+    enumerable: false,
+    value: getTile
+  });
+}());
 
 module.exports = Object.freeze(tiles);
