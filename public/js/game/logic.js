@@ -3,7 +3,6 @@ var tiles = require('./structs/tiles.js');
 var pieces = require('./structs/pieces.js');
 var side = require('./structs/side.js');
 var Position = require('./structs/position.js');
-
 var _ = require('../lib/lodash.js');
 var events = require("./../events.js");
 
@@ -21,9 +20,12 @@ _startingPositions[side.DARK] = (function() {
     _.property('position')));
 }());
 
-/** Random position for a dark/light side 
- * used in initialising a game state */
-var generateStartPosition = function(side) {
+/**
+ * Random position for a dark/light side 
+ * @param {string} side.DARK || side.LIGHT
+ * @returns {array} E.g. [{name: 'gandalf', position: new Position(0, 0)}, ...]
+ */
+var randomStartPositions = function(side) {
   var sidePieces = pieces[side];
   return _.zip(
       sidePieces.map(_.property('name')),
@@ -35,22 +37,6 @@ var hasRequiredFields = function(o, requiredFields) {
   return requiredFields.reduce(function(res, prop) {
     return res && o.hasOwnProperty(prop);
   }, true);
-};
-
-var isGameStateValid = function(stateHolder) {
-  var requiredFields = ['pieces', 'cards'];
-  return hasRequiredFields(stateHolder, ['stage', 'mySide', 'turn'])
-    && hasRequiredFields(stateHolder.light, requiredFields) 
-    && hasRequiredFields(stateHolder.dark, requiredFields);
-};
-
-var isSideValid = function(side) {
-  return allowedSides.indexOf(side) !== -1;
-};
-
-/* Returns 'light' or 'dark' at random */
-var generateRandomSide = function() {
-  return _.sample(allowedSides);
 };
 
 var isAttack = function(stateHolder, moveEvent) {
@@ -91,7 +77,7 @@ var getStandardMoves = function(side, pieceLocation) {
     getStandardDarkMoves(pieceLocation);
 };
 
-var getValidMoveTiles = function(stateHolder, piece) {
+var validMoves = function(stateHolder, piece) {
   var pieceLocation = stateHolder.getPieceLocation(piece);
   var moves = getStandardMoves(getPieceSide(piece),
       pieceLocation).filter(function(tile) {
@@ -156,9 +142,7 @@ var isMoveValid = function(stateHolder, moveEvent) {
 
 module.exports = {
   isMoveValid : isMoveValid,
-  generateRandomSide : generateRandomSide,
-  generateStartPosition : generateStartPosition,
-  isSideValid : isSideValid,
-  getValidMoveTiles : getValidMoveTiles,
+  randomStartPositions : randomStartPositions,
+  validMoves : validMoves,
   _startingPositions : _startingPositions
 };

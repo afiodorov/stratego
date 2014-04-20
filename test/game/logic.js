@@ -10,7 +10,7 @@ var fs = require('fs');
 
 describe('GameLogic', function() {
   describe('#starting dark position', function() {
-    var darkStartPositions = logic.generateStartPosition(side.DARK);
+    var darkStartPositions = logic.randomStartPositions(side.DARK);
     assert.deepEqual(darkStartPositions.map(_.property('name')),
       pieces[side.DARK].map(_.property('name')));
     assert.equal(4,
@@ -22,7 +22,7 @@ describe('GameLogic', function() {
   });
 
   describe('#starting light position', function() {
-    var lightStartPositions = logic.generateStartPosition(side.LIGHT);
+    var lightStartPositions = logic.randomStartPositions(side.LIGHT);
     assert.deepEqual(lightStartPositions.map(_.property('name')),
       pieces[side.LIGHT].map(_.property('name')));
     assert.equal(4,

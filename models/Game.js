@@ -1,12 +1,13 @@
 'use strict';
 var db = require('../lib/db.js');
-var GameLogic = require('../public/js/game/logic.js');
+var logic = require('../public/js/game/logic.js');
 var Q = require('q');
 var PlayerSchema = new db.Schema({sid: String, side: String});
 var PiecesSchema = new db.Schema({name: String, position: String});
 var CardsSchema = new db.Schema({name: String});
-var _ = require('../public/js/lib/underscore.js');
+var _ = require('../public/js/lib/lodash.js');
 var logger = require('../lib/logger.js');
+var side = require('../public/js/game/structs/side.js');
 
 var GameSchema = new db.Schema({
   players: [PlayerSchema],
@@ -38,13 +39,13 @@ function makePromise(instance) {
 function addPlayers(instance, player1, player2, player1Side) {
   var player2Side;
   switch(player1Side) {
-    case 'light':
-    case 'dark':
-      player2Side = GameLogic.getOppSide(player1Side);
+    case side.LIGHT:
+    case side.DARK:
+      player2Side = logic.getOppSide(player1Side);
     break;
     case 'random':
-      player2Side = GameLogic.generateRandomSide();
-      player1Side = GameLogic.getOppSide(player2Side);
+      player2Side = logic.generateRandomSide();
+      player1Side = logic.getOppSide(player2Side);
     break;
     default:
       throw new Error('unrecognised side');
@@ -58,12 +59,12 @@ function initialiseCards(instance) {
 }
 
 function initialisePieces(instance) {
-  instance.state.light.pieces = GameLogic.generateStartPosition('light');
-  instance.state.dark.pieces = GameLogic.generateStartPosition('dark');
+  instance.state.light.pieces = logic.generateStartPosition(side.LIGHT);
+  instance.state.dark.pieces = logic.generateStartPosition(side.DARK);
 }
 
 function initialiseState(instance) {
-  instance.state.turn = 'dark';
+  instance.state.turn = side.DARK;
   instance.state.stage = 'start';
 }
 
