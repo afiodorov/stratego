@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 var side = {};
-side.DARK = '4325897_';
-side.LIGHT = '203423487_';
+side.DARK = '__dark__';
+side.LIGHT = '__light__';
 
 Object.freeze(side);
 module.exports = side;

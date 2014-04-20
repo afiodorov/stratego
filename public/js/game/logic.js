@@ -1,24 +1,25 @@
 'use strict';
-var tiles = require("./structs.js").tiles;
-var pieces = require("./structs.js").pieces;
+var tiles = require('./structs/tiles.js');
+var pieces = require('./structs/pieces.js');
 var side = require('./structs/side.js');
 var Position = require('./structs/position.js');
 
-var _ = require('../lib/underscore.js');
+var _ = require('../lib/lodash.js');
 var events = require("./../events.js");
 
-var _startingPositions;
-
-_startingPositions[side.LIGHT] = _.times(4, new Position(0, 0)).concat(
+var _startingPositions = {};
+_startingPositions[side.LIGHT] = _.times(4,_.constant(new Position(0, 0)))
+        .concat(
         _.union(tiles[1], tiles[2]).map(
-        _.pick.bind(null, 'position')));
+        _.property('position')));
+var tst = _.union(tiles[1], tiles[2]);
 
 _startingPositions[side.DARK] = (function() {
   var numRows = tiles.length;
-  return _.times(4, new Position(numRows - 1, 0)).concat(
+  return _.times(4,
+    _.constant(new Position(numRows - 1, 0))).concat(
     _.union(tiles[numRows - 2], tiles[numRows - 3]).map(
-    _.pick.bind(null, 'position'))
-  );
+    _.property('position')));
 }());
 
 /** Random position for a dark/light side 
@@ -26,7 +27,7 @@ _startingPositions[side.DARK] = (function() {
 var generateStartPosition = function(side) {
   var sidePieces = pieces[side];
   return _.zip(
-      _.keys(sidePieces),
+      sidePieces.map(_.property('name')),
       _.shuffle(_startingPositions[side])
       ).map(_.object.bind(null, ['name', 'position']));
 };
@@ -46,19 +47,6 @@ var isGameStateValid = function(stateHolder) {
 
 var isSideValid = function(side) {
   return allowedSides.indexOf(side) !== -1;
-};
-
-/* returns dark if input is light and light if input is dark */
-var getOppSide = function(side) {
-  if(side === 'light') {
-    return 'dark';
-  } 
-
-  if(side === 'dark') {
-    return 'light';
-  }
-
-  throw new TypeError("Can't get opposite side");
 };
 
 /* Returns 'light' or 'dark' at random */
@@ -169,11 +157,9 @@ var isMoveValid = function(stateHolder, moveEvent) {
 
 module.exports = {
   isMoveValid : isMoveValid,
-  getOppSide : getOppSide,
   generateRandomSide : generateRandomSide,
   generateStartPosition : generateStartPosition,
   isSideValid : isSideValid,
-  getPieceSide : getPieceSide,
   getValidMoveTiles : getValidMoveTiles,
   _startingPositions : _startingPositions
 };

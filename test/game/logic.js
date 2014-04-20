@@ -1,63 +1,43 @@
 /*global describe, it*/
 'use strict';
 var assert = require('assert');
-var _ = require('../../public/js/lib/underscore.js');
+var _ = require('../../public/js/lib/lodash.js');
 var logic = require('../../public/js/game/logic.js');
+var side = require('../../public/js/game/structs/side.js');
+var pieces = require('../../public/js/game/structs/pieces.js');
+var Position = require('../../public/js/game/structs/position.js');
 var fs = require('fs');
 
 describe('GameLogic', function() {
-  describe('#startingPositions', function() {
-    // console.log(logic.generatePiecePositions());
+  describe('#starting dark position', function() {
+    var darkStartPositions = logic.generateStartPosition(side.DARK);
+    assert.deepEqual(darkStartPositions.map(_.property('name')),
+      pieces[side.DARK].map(_.property('name')));
+    assert.equal(4,
+      darkStartPositions.map(_.property('position'))
+      .filter(_.partial(_.isEqual, new Position(6, 0))).length);
+    assert.equal(1,
+      darkStartPositions.map(_.property('position'))
+      .filter(_.partial(_.isEqual, new Position(5, 0))).length);
   });
 
-  describe('correct start positions', function() {
-    var positions = logic._startingPositions;
-    it('#_startingPositions', function() {
-      assert.deepEqual(positions.light,
-       [[0, 0],
-        [0, 0],
-        [0, 0],
-        [0, 0],
-        [1, 0],
-        [1, 1],
-        [2, 0],
-        [2, 1],
-        [2, 2]]);
-      assert.deepEqual(positions.dark,
-       [[6, 0],
-        [6, 0],
-        [6, 0],
-        [6, 0],
-        [4, 0],
-        [4, 1],
-        [4, 2],
-        [5, 0],
-        [5, 1]]);
-    });
+  describe('#starting light position', function() {
+    var lightStartPositions = logic.generateStartPosition(side.LIGHT);
+    assert.deepEqual(lightStartPositions.map(_.property('name')),
+      pieces[side.LIGHT].map(_.property('name')));
+    assert.equal(4,
+      lightStartPositions.map(_.property('position'))
+      .filter(_.partial(_.isEqual, new Position(0, 0))).length);
+    assert.equal(1,
+      lightStartPositions.map(_.property('position'))
+      .filter(_.partial(_.isEqual, new Position(2, 1))).length);
+    assert.equal(1,
+      lightStartPositions.map(_.property('position'))
+      .filter(_.partial(_.isEqual, new Position(1, 1))).length);
   });
+
 
   describe('correctPieceSide', function() {
-    it('#getPieceSide', function() {
-      assert.equal(logic.getPieceSide('gandalf'), 'light');
-      assert.equal(logic.getPieceSide('aragorn'), 'light');
-      assert.equal(logic.getPieceSide('boromir'), 'light');
-      assert.equal(logic.getPieceSide('frodo'  ), 'light');
-      assert.equal(logic.getPieceSide('gimly'  ), 'light');
-      assert.equal(logic.getPieceSide('legolas'), 'light');
-      assert.equal(logic.getPieceSide('merry'  ), 'light');
-      assert.equal(logic.getPieceSide('pippin' ), 'light');
-      assert.equal(logic.getPieceSide('sam'    ), 'light');
-      assert.equal(logic.getPieceSide('orcs'         ), 'dark');
-      assert.equal(logic.getPieceSide('shelob'       ), 'dark');
-      assert.equal(logic.getPieceSide('saruman'      ), 'dark');
-      assert.equal(logic.getPieceSide('flying nazgul'), 'dark'); 
-      assert.equal(logic.getPieceSide('barlog'       ), 'dark');
-      assert.equal(logic.getPieceSide('warg'         ), 'dark');
-      assert.equal(logic.getPieceSide('black rider'  ), 'dark');
-      assert.equal(logic.getPieceSide('witch king'   ), 'dark');
-      assert.equal(logic.getPieceSide('cave troll'   ), 'dark');
-    });
-
     it('#getValidMoveTiles', function() {
       var path = require('path');
       var data_dir = './test/data';

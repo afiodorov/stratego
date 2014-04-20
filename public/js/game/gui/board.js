@@ -3,15 +3,14 @@
 /// <reference path="piece.js" />
 /// <reference path="side.js" />
 
-var side = require('./side.js');
+var side = require('../structs/side.js');
 
 var makeBoard = function (gameState) {
   // We are defining the tiles' position by its' location in the array.
   // All postional relatives will be assuming that the Shire is South, and that Mordor is North.
   // The shire will be at the top of the board with a 0 row index, Mordor at the bottom, with the highest row index.
   var tiles = require('./tiles.js');
-
-  var allPieces = require('./pieces.js');
+  var allPieces = require('../structs/pieces.js');
 
   var friendlyPieces = allPieces.filter(function (piece) { allPieces.map(function(p) {return p.name;}).indexOf(piece.name) !== -1 });
 

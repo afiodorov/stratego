@@ -5,7 +5,7 @@ var tileLayer = function (boardWidth, boardHeight) {
   var MAXPIECESINCOL = 7;
 
   var Kinetic = require('../../../vendor/kinetic-v5.0.1.min.js');
-  var boardMod = require("../structs/board.js");
+  var boardMod = require("../gui/board.js");
   var tileGroups = [];
 
   var board = boardMod.makeBoard(boardMod.SIDE_DARK);

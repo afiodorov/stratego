@@ -1,13 +1,13 @@
 'use strict';
 var callConstructor = require('../../lib/callConstructor.js');
 
-var Position = function(col, row) {
+var Position = function(row, col) {
   if (!(this instanceof Position)) {
     return callConstructor.apply(Position, arguments);
   }
 
-  this.col = col;
   this.row = row;
+  this.col = col;
 };
 
 module.exports = Position;

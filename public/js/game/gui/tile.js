@@ -1,5 +1,5 @@
 ﻿/// <reference path="side.js" />
-var side = require('./side.js');
+var side = require('../structs/side.js');
 
 var tile = function (name, capacity, position) {  
 
