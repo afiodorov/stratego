@@ -2,12 +2,14 @@
 
 var tiles = [];
 var _ = require('../../lib/underscore.js');
-_.range(7).forEach(function(i) { tiles[i] = []; });
 
 var Tile = require('./tile.js');
 var Position = require('./position.js');
 
 var addTile = function(name, cap, col, row) {
+  if(!_.isArray(tiles[row])) {
+    tiles[row] = [];
+  }
   tiles[row][col] = new Tile(name, cap, new Position(row, col));
 };
 

@@ -4,4 +4,5 @@ var side = {};
 side.DARK = '4325897_';
 side.LIGHT = '203423487_';
 
-module.exports = Object.freeze(side);
+Object.freeze(side);
+module.exports = side;

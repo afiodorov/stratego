@@ -1,42 +1,32 @@
 'use strict';
-var gameStructs = require("./structs.js");
+var tiles = require("./structs.js").tiles;
+var pieces = require("./structs.js").pieces;
+var side = require('./structs/side.js');
+var Position = require('./structs/position.js');
+
 var _ = require('../lib/underscore.js');
-var allowedSides = ['light', 'dark'];
 var events = require("./../events.js");
 
-var getPieceSide = function(piece) {
-  if(_.keys(gameStructs.pieces.dark).indexOf(piece) !== -1) {
-    return 'dark';
-  }
+var _startingPositions;
 
-  if(_.keys(gameStructs.pieces.light).indexOf(piece) !== -1) {
-    return 'light';
-  }
+_startingPositions[side.LIGHT] = _.times(4, new Position(0, 0)).concat(
+        _.union(tiles[1], tiles[2]).map(
+        _.pick.bind(null, 'position')));
 
-  return null;
-};
-
-var _startingPositions =  {
-  light: _.times(4, _.constant([0,0]))
-    .concat(
-        _.union(gameStructs.tiles[1], gameStructs.tiles[2]).map(
-        _.pick.bind(null, 'index'))),
-  dark: _.times(4, _.constant([gameStructs.tiles.numRows-1,0]))
-    .concat(
-       gameStructs.tiles.filter(
-         function(tile) {return tile.index[0] === gameStructs.tiles.numRows - 2
-           || tile.index[0] === gameStructs.tiles.numRows - 3;})
-       .map(
-         function(tile) {return tile.index;})
-       )
-};
+_startingPositions[side.DARK] = (function() {
+  var numRows = tiles.length;
+  return _.times(4, new Position(numRows - 1, 0)).concat(
+    _.union(tiles[numRows - 2], tiles[numRows - 3]).map(
+    _.pick.bind(null, 'position'))
+  );
+}());
 
 /** Random position for a dark/light side 
  * used in initialising a game state */
 var generateStartPosition = function(side) {
-  var pieces = gameStructs.pieces[side];
+  var sidePieces = pieces[side];
   return _.zip(
-      _.keys(pieces),
+      _.keys(sidePieces),
       _.shuffle(_startingPositions[side])
       ).map(_.object.bind(null, ['name', 'position']));
 };
@@ -91,7 +81,7 @@ var isMyTurn = function(mySide, stateHolder) {
 };
 
 var getStandardLightMoves = function(pieceLocation) {
-  var moves = gameStructs.tiles[pieceLocation].getForwardTiles();
+  var moves = tiles[pieceLocation].getForwardTiles();
   // no switch on reference types => convert [1,1] to '1 1'
   switch(pieceLocation.join(' ')) {
     case '3 2':
@@ -106,7 +96,7 @@ var getStandardLightMoves = function(pieceLocation) {
 };
 
 var getStandardDarkMoves = function(pieceLocation) {
-  return gameStructs.tiles[pieceLocation].getBackwardTiles();
+  return tiles[pieceLocation].getBackwardTiles();
 };
 
 var getStandardMoves = function(side, pieceLocation) {
@@ -123,8 +113,8 @@ var getValidMoveTiles = function(stateHolder, piece) {
 
   switch(piece) {
     case 'aragorn':
-      var sideTiles = gameStructs.tiles[pieceLocation].getReachableSideTiles();
-      var backTiles = gameStructs.tiles[pieceLocation].getBackwardTiles();
+      var sideTiles = tiles[pieceLocation].getReachableSideTiles();
+      var backTiles = tiles[pieceLocation].getBackwardTiles();
       var attackTiles = _.union(sideTiles, backTiles).filter(stateHolder.isTileWithEnemy);
       return _.union(attackTiles, moves);
     case 'flying nazgul':
@@ -133,11 +123,11 @@ var getValidMoveTiles = function(stateHolder, piece) {
       });
       return _.union(attackTiles, moves);
     case 'witch king':
-      var attackTiles = gameStructs.tiles[pieceLocation].getReachableSideTiles().filter(stateHolder.isTileWithEnemy);
+      var attackTiles = tiles[pieceLocation].getReachableSideTiles().filter(stateHolder.isTileWithEnemy);
       return _.union(attackTiles, moves);
     case 'black rider':
       var attackTiles = new Array(0);
-      preorder(attackTiles, gameStructs.tiles[pieceLocation],
+      preorder(attackTiles, tiles[pieceLocation],
         function(tile){return !stateHolder.isTileWithEnemy;});
       return _.union(attackTiles, moves);
   }
