@@ -12,7 +12,6 @@ _startingPositions[side.LIGHT] = _.times(4,_.constant(new Position(0, 0)))
         .concat(
         _.union(tiles[1], tiles[2]).map(
         _.property('position')));
-var tst = _.union(tiles[1], tiles[2]);
 
 _startingPositions[side.DARK] = (function() {
   var numRows = tiles.length;
