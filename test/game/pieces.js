@@ -19,5 +19,4 @@ describe('pieces', function() {
     assert.equal(pieces.gandalf.strength, 5);
     assert.equal(pieces['flying nazgul'].strength, 3);
   });
-
 });

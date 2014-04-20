@@ -60,4 +60,5 @@ addPiece('cave troll',
   });
 }());
 
-module.exports = Object.freeze(pieces);
+Object.freeze(pieces);
+module.exports = pieces;

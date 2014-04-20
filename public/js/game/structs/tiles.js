@@ -29,6 +29,13 @@ addTile('Dagorlad', 2, 1, 5);
 addTile('Mordor', 4, 0, 6);
 
 (function defineGetProperty () {
+  /**
+  * Get a tile
+  * @param {object|...number} position of tile, can be called with (0, 0)
+  * @config {number} [row] row of a tile on a board
+  * @config {number} [col] column of a tile on a board
+  * @return {object} the tile at the position
+  */
   var getTile = function(position) {
     var row, col;
     if (arguments.length === 1) {
@@ -45,10 +52,12 @@ addTile('Mordor', 4, 0, 6);
     return tiles[row][col];
   };
 
+  tiles.get = getTile;
   Object.defineProperty(tiles, 'get', {
     enumerable: false,
-    value: getTile
   });
 }());
 
-module.exports = Object.freeze(tiles);
+Object.freeze(tiles);
+
+module.exports = tiles;
