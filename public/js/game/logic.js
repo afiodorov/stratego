@@ -28,7 +28,7 @@ var generateStartPosition = function(side) {
   return _.zip(
       sidePieces.map(_.property('name')),
       _.shuffle(_startingPositions[side])
-      ).map(_.object.bind(null, ['name', 'position']));
+      ).map(_.partial(_.object, ['name', 'position']));
 };
 
 var hasRequiredFields = function(o, requiredFields) {
