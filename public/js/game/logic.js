@@ -1,4 +1,3 @@
-/*global Enumerable*/
 'use strict';
 var gameStructs = require("./structs.js");
 var _ = require('../lib/underscore.js');
@@ -188,13 +187,3 @@ module.exports = {
   getValidMoveTiles : getValidMoveTiles,
   _startingPositions : _startingPositions
 };
-
-/* autocompletion now works */
-if(false) {
-  var StateHolder = require('./stateHolder.js');
-  var stateHolder = new StateHolder();
-  var moveEvent = new events.Move();
-  isAttack(stateHolder, moveEvent);
-  isMoveValid(stateHolder, moveEvent);
-  getValidMoveTiles(stateHolder, moveEvent.piece);
-}
