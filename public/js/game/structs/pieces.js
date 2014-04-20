@@ -7,7 +7,7 @@ var makePiece = require('./piece.js');
 
 var addPiece = function (name, desc, str, side) {
   var piece = makePiece.apply(null, arguments);
-  piece[name] = piece;
+  pieces[name] = piece;
 };
 
 addPiece('gandalf',
@@ -51,11 +51,13 @@ addPiece('witch king',
 addPiece('cave troll',
   'The Dark Player\'s card has no value or effect', 9, side.DARK);
 
-side.all.forEach(function(side) {
-  Object.defineProperty(pieces, side, {
-    enumerable: false,
-    value: _.values(pieces).filter(function(piece) {return piece.side === side;})
+(function defineSideKeys() {
+  _.values(side).forEach(function(side) {
+    Object.defineProperty(pieces, side, {
+      enumerable: false,
+      value: _.values(pieces).filter(function(piece) {return piece.side === side;})
+    });
   });
-});
+}());
 
 module.exports = Object.freeze(pieces);

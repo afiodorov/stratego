@@ -1,16 +1,7 @@
 ﻿'use strict';
-var DARK = '4325897_';
-var LIGHT = '203423487_';
 
+var side = {};
+side.DARK = '4325897_';
+side.LIGHT = '203423487_';
 
-var darkString = 'dark';
-var lightString = 'light';
-
-module.exports =
-  {
-    DARK: DARK,
-    LIGHT: LIGHT,
-    darkString: darkString,
-    lightString: lightString,
-    all: [DARK, LIGHT]
-  };
+module.exports = Object.freeze(side);
