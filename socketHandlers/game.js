@@ -3,10 +3,13 @@ var logger = require('../lib/logger');
 var Game = require('./../models/Game.js');
 var gameutils = require('./../models/utils/gameutils.js');
 
-function addNewGame(opponent, opsession, inviteToPlayer) {
+/**
+ *
+ */
+function start(opponent, opsession, opponentSide) {
   var socket = this.socket;
   var session = this.session;
-  Game.create(opponent.sid, socket.sid, inviteToPlayer.opponentSide).
+  Game.create(opponent.sid, socket.sid, opponentSide).
     then(function(game) {
       opponent.socket.join(game.id);
       socket.join(game.id);

@@ -36,23 +36,23 @@ function makePromise(instance) {
   });
 }
 
-function addPlayers(instance, player1, player2, player1Side) {
+function addPlayers(instance, player1Sid, player2Sid, player1Side) {
   var player2Side;
   switch(player1Side) {
     case side.LIGHT:
     case side.DARK:
-      player2Side = logic.getOppSide(player1Side);
+      player2Side = side.opposite(player1Side);
     break;
     case 'random':
-      player2Side = logic.generateRandomSide();
-      player1Side = logic.getOppSide(player2Side);
-    break;
+    // same as default
     default:
-      throw new Error('unrecognised side');
+      player2Side = side.random();
+      player1Side = side.opposite(player2Side);
+    break;
   }
 
-  instance.players = [{sid: player1, side: player1Side}, 
-    {sid: player2, side: player2Side}];
+  instance.players = [{sid: player1Sid, side: player1Side}, 
+    {sid: player2Sid, side: player2Side}];
 }
 
 function initialiseCards(instance) {
@@ -77,11 +77,11 @@ function saveInstance(instance) {
   return makePromise(instance);
 }
 
-function create(player1, player2, player1Side) {
+function create(player1Sid, player2Sid, player1Side) {
   var pInstance = getInstancePromise();
   return pInstance.then(
   function(instance) {
-    addPlayers(instance, player1, player2, player1Side);
+    addPlayers(instance, player1Sid, player2Sid, player1Side);
     initialiseState(instance);
     initialiseCards(instance);
     initialisePieces(instance);

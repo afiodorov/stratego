@@ -27,5 +27,19 @@ Object.defineProperty(side, 'random', {
   enumerable: false
 });
 
+/**
+ * @param {string} side_ side.DARK || side.LIGHT
+ * @return {string} opposite side
+ */
+side.opposite = function(side_) {
+  if (side_ === side.LIGHT) {
+    return side.DARK;
+  }
+  return side.LIGHT;
+};
+Object.defineProperty(side, 'opposite', {
+  enumerable: false
+});
+
 Object.freeze(side);
 module.exports = side;

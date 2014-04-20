@@ -52,13 +52,13 @@ var makeStruct = require('./public/js/lib/structFactory.js');
 var ActiveConnection = makeStruct('io socket session');
 sessionSocket.of('/lobby').on('connection', function(err, socket, session) {
   if(err) {
-    logger.log('error', "bad session");
+    logger.log('error', 'bad session');
     logger.log('error', err);
     return;
   }
 
   if (!session) {
-    logger.log('error', "no session present");
+    logger.log('error', 'no session present');
     return;
   }
   

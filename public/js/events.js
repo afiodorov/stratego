@@ -1,7 +1,7 @@
 'use strict';
 var _ = require('./lib/underscore.js');
 var acceptedInviteSides = ['light', 'dark', 'random'];
-var gameLogic = require('./game/logic.js');
+var logic = require('./game/logic.js');
 var gameStructs = require('./game/structs.js');
 
 function notNull(prop) {
