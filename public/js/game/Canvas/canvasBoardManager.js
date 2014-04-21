@@ -5,8 +5,8 @@ var BOARD_WIDTH = 600;
 var BOARD_HEIGHT = 600;
 
 // Animation.....................................................
-function draw() {
-  var stage = new Kinetic.Stage({ container: "canvasPlayground", width: BOARD_WIDTH, height: BOARD_HEIGHT });
+function draw(container) {
+  var stage = new Kinetic.Stage({ container: container, width: BOARD_WIDTH, height: BOARD_HEIGHT });
   var tileLayer = require('./tileLayer.js')(BOARD_WIDTH, BOARD_HEIGHT)
     
   var layer = new Kinetic.Layer();
@@ -28,5 +28,4 @@ function draw() {
   //tileLayer.setZIndex(3);
 }
 
-draw();
-
+module.exports = draw;

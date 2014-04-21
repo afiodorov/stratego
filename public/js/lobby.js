@@ -135,6 +135,7 @@ function AppViewModel(lobby_) {
           _currentGame = game;
           self.activeTab(-1);
         }
+        require('./game/Canvas/canvasBoardManager.js')(game._id);
 
         lobby.emit('requestChatLog', game._id);
         console.log(game);

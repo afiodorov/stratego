@@ -6,7 +6,7 @@
     "url": "git://github.com/afiodorv/stratego.git"
   },
   "browser": {
-    "jquery": "./public/vendor/jquery.min.js",
+    "jquery": "./public/vendor/jquery-1.11.0.js",
     "pnotify": "./public/vendor/pnotify/jquery.pnotify.min.js",
     "jquery-ui": "./public/vendor/jquery-ui.min.js",
     "knockout": "./public/vendor/knockout-2.2.1.js",
@@ -18,9 +18,6 @@
     "jquery-ui": {"exports": null, "depends": ["jquery"]},
     "knockout": {"exports": "ko", "depends": ["jquery"]},
     "knockout-jquery": {"exports": null}
-  },
-  "browserify": {
-    "transform": [ "browserify-shim" ]
   },
   "dependencies": {
     "socket.io": "~0.9.16",

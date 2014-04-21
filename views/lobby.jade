@@ -49,7 +49,7 @@ html
                   input(type='radio' value='none' data-bind='checked: invitesAccepted, click: changeInvitesAccepted')
           // ko foreach: games
           div(data-bind='attr: {id: _id}')
-            canvas.game-canvas(width='750', height='500') Canvas not supported
+            section(data-bind='attr: {id: _id}').game-canvas
             .chat
               .messages(data-bind='foreach: messages')
                 .message

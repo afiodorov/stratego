@@ -5,7 +5,7 @@
 
 var side = require('../structs/side.js');
 
-var allPieces = require('./pieces.js');
+var allPieces = require('./../structs/pieces.js');
 
 var makeBoard = function (gameState) {
   // We are defining the tiles' position by its' location in the array.
@@ -22,7 +22,7 @@ var makeBoard = function (gameState) {
     for (var i = 0; i < gameState.friendlyPieces.length; i++) {
       getTile(gameState.friendlyPieces[i].position).addPiece(allPieces[gameState.friendlyPieces[i].name]);
     };
-    var makePiece = require('./piece.js');
+    var makePiece = require('./../structs/piece.js');
     for (var i = 0; i < gameState.enemyPieces.length; i++) {
       //The only part of the enemy pieces that get used should be the name, and not the real name.
       //If anything else is called from enemy pieces found in the tile, there should be many an error.
