@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 var _ = require('../../lib/underscore.js');
 var side = require('./side.js');
 

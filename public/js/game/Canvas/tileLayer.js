@@ -1,4 +1,7 @@
 ﻿/// <reference path="../structs/board.js" />
+/// <reference path="../structs/side.js" />
+
+var side = require('../structs/side.js');
 
 var tileLayer = function (boardWidth, boardHeight) {
   var MAXPIECESINROW = 6;
@@ -8,11 +11,12 @@ var tileLayer = function (boardWidth, boardHeight) {
   var boardMod = require("../gui/board.js");
   var tileGroups = [];
 
-  var board = boardMod.makeBoard(boardMod.SIDE_DARK);
-
-  board.tiles[1][1].addPiece(board.lightPieces[0]);
-  board.tiles[1][1].addPiece(board.lightPieces[1]);
-  board.tiles[2][1].addPiece(board.lightPieces[2]);
+  var board = boardMod.makeBoard({
+    turn: side.DARK,
+    //stage: stage.start | stage.move | stage.battle | stage.finish,
+    friendlyPieces: [{ name: "saruman", position: { row: 2, col: 1 } }],
+    enemyPieces: [{ position: { row: 5, col: 1 } }, { position: { row: 6, col: 0 } }, { position: { row: 6, col: 0 } }, { position: { row: 6, col: 0 } }]
+  });
 
   function getTileGroup(tile, rectWidth, rectHeight, rectX, rectY) {
     var group = new Kinetic.Group({
@@ -40,7 +44,7 @@ var tileLayer = function (boardWidth, boardHeight) {
     }));
 
     for (var i = 0; i < tile.getPieces().length; i++) {
-      var pieceGroup = getPieceGroup(tile.getPieces()[i], i * rectWidth / tile.getPieces().length );
+      var pieceGroup = getPieceGroup(tile.getPieces()[i], i * rectWidth / tile.getPieces().length);
       group.add(pieceGroup);
     }
     return group;
