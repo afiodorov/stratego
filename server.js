@@ -28,11 +28,11 @@ app.configure('production', function(){
 
 app.use(express.static(__dirname + '/public/'));
 
-app.get('/lobby', function(req, res){
+app.get('/', function(req, res){
   res.render('lobby');
 });
 
-app.get('/', function(req, res){
+app.get('/canvas', function(req, res){
   res.render('canvasPlayground');
 });
 
@@ -54,6 +54,7 @@ sessionSocket.of('/lobby').on('connection', function(err, socket, session) {
   if(err) {
     logger.log('error', 'bad session');
     logger.log('error', err);
+    console.log('error', new Error().stack);
     return;
   }
 

@@ -173,7 +173,7 @@ function acceptGame(uInvite) {
 
     var wasInvited = (inviteRecordIndex !== -1);
     if (wasInvited) {
-      _addNewGame.call(self, opponent, opsession, inviteToPlayer.opponentSide);
+      //_addNewGame.call(self, opponent, opsession, inviteToPlayer.opponentSide);
       opsession.invites.splice(inviteRecordIndex, 1);
       db.mongoStore.set(opponent.sid, opsession);
     } else {
