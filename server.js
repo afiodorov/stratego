@@ -65,8 +65,8 @@ sessionSocket.of('/lobby').on('connection', function(err, socket, session) {
   
   var activeConnection = new ActiveConnection(io, socket, session);
   (function() {
-    lobby.main.call(activeConnection);
-    game.main.call(activeConnection);
-    chat.main.call(activeConnection);
+    lobby.registerHandlers.call(activeConnection);
+    game.registerHandlers.call(activeConnection);
+    chat.registerHandlers.call(activeConnection);
   }());
 });

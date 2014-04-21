@@ -3,7 +3,7 @@ var Game = require('../Game.js').Model;
 var Q = require('q');
 var _ = require('../../public/js/lib/underscore.js');
 var makeStruct = require('../../public/js/lib/structFactory.js');
-var GameLogic = require('../../public/js/game/logic.js');
+var logic = require('../../public/js/game/logic.js');
 
 function _getOpponentSid(game, playerSid) {
   var players = game.players;
@@ -35,7 +35,7 @@ function nullifyPosition(o) {
 }
 
 function removeOpponentPieces(game) {
-  var opponentSide = GameLogic.getOppSide(game.state.mySide);
+  var opponentSide = logic.getOppSide(game.state.mySide);
   game.state[opponentSide].pieces =
     game.state[opponentSide].pieces.map(nullifyPosition);
 }
