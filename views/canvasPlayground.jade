@@ -1,9 +1,8 @@
-// Jade
 html
   head
     title Canvas Fun Times
-    script(src='/app/bundle.js')
-    script(type='text/javascript')
-      window.draw('canvas')
   body
-    section#canvas
+    #mycanvas
+  script(src='/app/bundle.js')
+  script(type='text/javascript')
+    window.draw('mycanvas');

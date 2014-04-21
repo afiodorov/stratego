@@ -29,5 +29,4 @@ function draw(container) {
 }
 
 window.draw = draw;
-
 module.exports = draw;
