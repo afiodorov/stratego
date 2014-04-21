@@ -28,4 +28,6 @@ function draw(container) {
   //tileLayer.setZIndex(3);
 }
 
+window.draw = draw;
+
 module.exports = draw;
