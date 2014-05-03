@@ -23,7 +23,8 @@ function connect() {
   socket.session = session;
 
   var onlineClients = io.of('/lobby').clients();
-  _joinRooms.call(this);
+  // each game has a corresponding socket room
+  _joinGameRooms.call(this);
   _checkForDuplicateSession.call(this, onlineClients);
   _setSocketPlayerName.call(this, clients);
   _initialisePlayer.call(this);
@@ -31,13 +32,12 @@ function connect() {
   _sendListOfPlayers.call(this, onlineClients);
 
   clients[session.playerName] = new Client(socket, session.id);
-  
-  socket.broadcast.emit('addNewPlayer', _cNewPlayer(session, false));
+  socket.broadcast.emit('addNewPlayer', _buildPlayerEvent(session, false));
 }
 
 function disconnect() {
     this.io.of('/lobby').emit('removePlayerName', 
-    {playerName: this.session.playerName, isSelf: false});
+      {playerName: this.session.playerName, isSelf: false});
 }
 
 function resignGame(gameId) {
@@ -55,78 +55,78 @@ function resignGame(gameId) {
 }
 
 function changeMyPlayerName(playerName) {
-  var socket = this.socket
-    , session = this.session;
+  var socket = this.socket;
+  var session = this.session;
 
-    if(!playerName) {
-      socket.emit('failChangingName', 'No player name provided');  
-      return;
-    }
+  if(!playerName) {
+    socket.emit('failChangingName', 'No player name provided');  
+    return;
+  }
 
-    if(clients.indexOf(playerName) !== -1) {
-      socket.emit('failChangingName', 'Duplicate player name');  
-      return;
-    }
+  if(clients.indexOf(playerName) !== -1) {
+    socket.emit('failChangingName', 'Duplicate player name');  
+    return;
+  }
 
-    delete clients[session.playerName];
-    socket.broadcast.emit('removePlayerName', _cNewPlayer(session, false));
-    socket.emit('removePlayerName', _cNewPlayer(session, true));
-    session.playerName = playerName;
-    session.save();
-    clients[session.playerName] = new Client(socket, socket.sid);
-    socket.broadcast.emit('addNewPlayer', _cNewPlayer(session, false));
-    socket.emit('addNewPlayer', _cNewPlayer(session, true));
+  delete clients[session.playerName];
+  socket.broadcast.emit('removePlayerName', _buildPlayerEvent(session, false));
+  socket.emit('removePlayerName', _buildPlayerEvent(session, true));
+  session.playerName = playerName;
+  session.save();
+  clients[session.playerName] = new Client(socket, socket.sid);
+  socket.broadcast.emit('addNewPlayer', _buildPlayerEvent(session, false));
+  socket.emit('addNewPlayer', _buildPlayerEvent(session, true));
 }
 
 function requestGame(uInvite) {
-    var session = this.session;
-    var inviteFromPlayer = new events.InviteFromPlayer(uInvite);
-    if(!inviteFromPlayer.isValid) {
+  var session = this.session;
+  var inviteFromPlayer = new events.InviteFromPlayer(uInvite);
+  if(!inviteFromPlayer.isValid) {
+    return;
+  }
+  try {
+    var opponent = clients[inviteFromPlayer.opponentName];
+    if(!opponent) {
+      logger.log('info', 'couldn\'t find an opponent');
       return;
     }
-    try {
-      var opponent = clients[inviteFromPlayer.opponentName];
-      if(!opponent) {
-        logger.log('info', 'couldn\'t find an opponent');
+    var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
+    getSession(opponent.sid).then(function(opSession) {
+
+      if(opSession.acceptedInvites === 'none') {
+        logger.log('info', 'invite not accepted: none accepted');
         return;
       }
-      var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
-      getSession(opponent.sid).then(function(opSession) {
 
-        if(opSession.acceptedInvites === 'none') {
-          logger.log('info', 'invite not accepted: none accepted');
+      if(opSession.acceptedInvites === 'dark'
+        && inviteFromPlayer.mySide !== 'light') {
+          logger.log('info', 'invite not accepted: dark accepted');
           return;
-        }
-
-        if(opSession.acceptedInvites === 'dark'
-          && inviteFromPlayer.mySide !== 'light') {
-            logger.log('info', 'invite not accepted: dark accepted');
-            return;
-        }
-
-        if(opSession.acceptedInvites === 'light'
-          && inviteFromPlayer.mySide !== 'dark') {
-            logger.log('info', 'invite not accepted: light accepted');
-            return;
-        }
-
-        opponent.socket.emit('requestGame', 
-          {opponentName: session.playerName,
-            opponentSide: inviteFromPlayer.mySide});
-      });
-      if (typeof session.invites === "undefined") {
-        session.invites = [];
       }
-      // I am inviting the opponent to the game
-      var inviteRecord = new InviteRecord(opponent.sid, uInvite.mySide);
-      if(!_.findWhere(session.invites, inviteRecord)) {
-        session.invites.push(inviteRecord);
-        session.save();
+
+      if(opSession.acceptedInvites === 'light'
+        && inviteFromPlayer.mySide !== 'dark') {
+          logger.log('info', 'invite not accepted: light accepted');
+          return;
       }
-    } catch(e) {
-      logger.log('warn', 'can\'t fetch the game');
-      logger.log('warn', e);
+
+      opponent.socket.emit('requestGame', 
+        {opponentName: session.playerName,
+          opponentSide: inviteFromPlayer.mySide});
+    });
+    if (typeof session.invites === "undefined") {
+      session.invites = [];
     }
+    // I am inviting the opponent to the game
+    var inviteRecord = new InviteRecord(opponent.sid, uInvite.mySide);
+    if(!_.findWhere(session.invites, inviteRecord)) {
+      session.invites.push(inviteRecord);
+      session.save();
+    }
+  } catch(e) {
+    logger.log('warn', 'can\'t fetch the game');
+    logger.log('warn', e);
+  }
 }
 
 function changeInvitesAccepted(invitesAccepted) {
@@ -136,10 +136,10 @@ function changeInvitesAccepted(invitesAccepted) {
     session.invitesAccepted = invitesAccepted;
     session.save();
     socket.emit('setInvitesAccepted', invitesAccepted);
-    socket.broadcast.emit('removePlayerName', _cNewPlayer(session, false));
-    socket.emit('removePlayerName', _cNewPlayer(session, true));
-    socket.broadcast.emit('addNewPlayer', _cNewPlayer(session, false));
-    socket.emit('addNewPlayer', _cNewPlayer(session, true));
+    socket.broadcast.emit('removePlayerName', _buildPlayerEvent(session, false));
+    socket.emit('removePlayerName', _buildPlayerEvent(session, true));
+    socket.broadcast.emit('addNewPlayer', _buildPlayerEvent(session, false));
+    socket.emit('addNewPlayer', _buildPlayerEvent(session, true));
   }
 }
 
@@ -190,10 +190,10 @@ function _initialisePlayer() {
 }
 
 function _isNewClient() {
-  return (typeof this.session.playerName === "undefined");
+  return (typeof this.session.playerName === 'undefined');
 }
 
-function _joinRooms() {
+function _joinGameRooms() {
   var socket = this.socket;
   var session = this.session;
   Game.getInstances(session.id).then(function(games) {
@@ -258,17 +258,17 @@ function _sendListOfPlayers(onlineClients) {
     var isSelf = (client.sid === socket.sid);
     var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
     getSession(client.sid).then(function(session) {
-      socket.emit('addNewPlayer', _cNewPlayer(session, isSelf));
+      socket.emit('addNewPlayer', _buildPlayerEvent(session, isSelf));
     });
   });
 }
 
-function _cNewPlayer(session, isSelf) {
-  return {
+function _buildPlayerEvent(session, isSelf) {
+  return new events.Player ({
       playerName: session.playerName,
       invitesAccepted: session.invitesAccepted,
       isSelf: isSelf
-    };
+    });
 }
 
 function main() {

@@ -54,7 +54,7 @@ sessionSocket.of('/lobby').on('connection', function(err, socket, session) {
   if(err) {
     logger.log('error', 'bad session');
     logger.log('error', err);
-    console.log('error', new Error().stack);
+    logger.log('error', new Error().stack);
     return;
   }
 

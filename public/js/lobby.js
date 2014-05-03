@@ -5,13 +5,13 @@ var _ = require('./lib/underscore.js');
 var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');
-var lobby = io.connect(location.origin + '/lobby');
+var lobbySocket = io.connect(location.origin + '/lobby');
 require('knockout-jquery');
 var events = require('./events.js');
 
-function AppViewModel(lobby_) {
+function AppViewModel(lobbySocket_) {
     var self = this;
-    var lobby = lobby_;
+    var lobbySocket = lobbySocket_;
     var _playerInvited = null;
     Object.defineProperty(self, 'playerInvited', 
       {get : function(){ return _playerInvited; }});
@@ -44,16 +44,16 @@ function AppViewModel(lobby_) {
     };
 
     self.changeInvitesAccepted = function() {
-      lobby.emit('setInvitesAccepted', self.invitesAccepted());
+      lobbySocket.emit('setInvitesAccepted', self.invitesAccepted());
     };
 
     self.emitResignGame = function(game) {
-      lobby.emit('resignGame', game._id);
+      lobbySocket.emit('resignGame', game._id);
     };
 
     self.sendChatInput = function() {
       if(_currentGame) {
-        lobby.emit('addChatMessage', {gameId: _currentGame._id, message: self.chatInput()});
+        lobbySocket.emit('addChatMessage', {gameId: _currentGame._id, message: self.chatInput()});
         self.chatInput('');
       } else {
         // TODO display error
@@ -93,7 +93,7 @@ function AppViewModel(lobby_) {
     };
 
     self.requestGame = function(mySide) {
-      lobby.emit('requestGame', {opponentName: _playerInvited.playerName, mySide: mySide});
+      lobbySocket.emit('requestGame', {opponentName: _playerInvited.playerName, mySide: mySide});
     };
 
     self.emitRequestGame = null;
@@ -137,7 +137,7 @@ function AppViewModel(lobby_) {
         }
         require('./game/Canvas/canvasBoardManager.js')(game._id);
 
-        lobby.emit('requestChatLog', game._id);
+        lobbySocket.emit('requestChatLog', game._id);
         console.log(game);
     };
 
@@ -200,7 +200,7 @@ function AppViewModel(lobby_) {
         '<a href="#" id="acc' + encodeURI(inviteToPlayer.opponentName) + '">Accept</a>.'
       });
       $("a[id=acc" + encodeURI(inviteToPlayer.opponentName) + "]").click(function(){
-        lobby.emit('acceptGame', data);
+        lobbySocket.emit('acceptGame', data);
       return false;});
       return self.onRemoveGame;
     };
@@ -263,7 +263,7 @@ function AppViewModel(lobby_) {
         if(self.hasOwnProperty(prop)) {
           if(prop.match(/^on/) && typeof self[prop] === 'function') {
             eventName = prop[2].toLowerCase() + prop.slice(3);
-            lobby.on(eventName, self[prop]);
+            lobbySocket.on(eventName, self[prop]);
           }
         }
       }
@@ -274,7 +274,7 @@ function AppViewModel(lobby_) {
       var eventName;
       var makeSocketEmitter = function(eventName, objectToEmit) {
         var _eventName = eventName;
-        (function(){lobby.emit(_eventName, objectToEmit);}());
+        (function(){lobbySocket.emit(_eventName, objectToEmit);}());
       };
 
       for(prop in self) {
@@ -301,7 +301,7 @@ $(function() {
       }
   };
 
-  var appViewModel = new AppViewModel(lobby);
+  var appViewModel = new AppViewModel(lobbySocket);
   appViewModel.bindSocketEmitters();
   ko.applyBindings(appViewModel);
   appViewModel.bindSocketHandlers();

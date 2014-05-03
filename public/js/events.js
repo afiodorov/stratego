@@ -1,5 +1,6 @@
 'use strict';
-var _ = require('./lib/underscore.js');
+var _ = require('./lib/lodash.js');
+_.negate = require('./lib/negate.js');
 var acceptedInviteSides = ['light', 'dark', 'random'];
 var logic = require('./game/logic.js');
 var gameStructs = require('./game/structs.js');
@@ -12,11 +13,25 @@ var allPropertiesAreNotNull = function() {
   return _.every(Object.getOwnPropertyNames(this), notNull, this);
 };
 
-function Event() {}
+var Event = function() {};
+
 Event.prototype = {
   get isValid() {
     return allPropertiesAreNotNull.call(this);
-  }
+  },
+  set isValid() {},
+  get json() {
+    var getProperty = function(prop) {return this[prop];};
+    var self = this;
+    return _.reduceRight(
+      _.keys(this).filter(_.compose(_.negate(_.isFunction), getProperty.bind(this))),
+      function(object, prop) {
+        object[prop] = self[prop];
+        return object;
+      }, {});
+    return thisWithoutFunctions;
+  },
+  set json() {}
 };
 
 var cardEvent = function(json) {
