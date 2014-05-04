@@ -40,13 +40,13 @@ html
               span
                 span Accept invites:
                   span All
-                  input(type='radio' value='all' data-bind='checked: invitesAccepted, click: changeInvitesAccepted')
+                  input(type='radio' value='all' data-bind='checked: invitesAccepted, click: emitChangeInvitesAccepted.bind(this, invitesAccepted())')
                   span Dark Only
-                  input(type='radio' value='dark' data-bind='checked: invitesAccepted, click: changeInvitesAccepted')
+                  input(type='radio' value='dark' data-bind='checked: invitesAccepted, click: emitChangeInvitesAccepted.bind(this, invitesAccepted())')
                   span Light Only
-                  input(type='radio' value='light' data-bind='checked: invitesAccepted, click: changeInvitesAccepted')
+                  input(type='radio' value='light' data-bind='checked: invitesAccepted, click: emitChangeInvitesAccepted.bind(this, invitesAccepted())')
                   span None
-                  input(type='radio' value='none' data-bind='checked: invitesAccepted, click: changeInvitesAccepted')
+                  input(type='radio' value='none' data-bind='checked: invitesAccepted, click: emitChangeInvitesAccepted.bind(this, invitesAccepted())')
           // ko foreach: games
           div(data-bind='attr: {id: _id}')
             section(data-bind='attr: {id: _id}').game-canvas

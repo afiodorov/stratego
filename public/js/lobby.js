@@ -2,13 +2,13 @@
 'use strict';
 var io = require('./lib/socket.io.js');
 var _ = require('./lib/underscore.js');
-var inviteTypes = require('./inviteTypes.js');
 var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');
 var lobbySocket = io.connect(location.origin + '/lobby');
 require('knockout-jquery');
 var events = require('./events.js');
+var errors = require('./errors.js');
 
 function AppViewModel(lobbySocket_) {
     var self = this;
@@ -44,10 +44,6 @@ function AppViewModel(lobbySocket_) {
       localStorage.setItem('currentGameId', game._id);
     };
 
-    self.changeInvitesAccepted = function() {
-      lobbySocket.emit('setInvitesAccepted', self.invitesAccepted());
-    };
-
     self.emitResignGame = function(game) {
       lobbySocket.emit('resignGame', game._id);
     };
@@ -68,6 +64,7 @@ function AppViewModel(lobbySocket_) {
       self.opponentNameOfGameToBeClosed(this.opponentName);
     };
 
+    // this call is bound to a player in self.players 
     self.openInviteGameDialog = function() {
       self.invitesAvailable([]);
       self.isInviteGameDialogOpen(true);
@@ -94,19 +91,22 @@ function AppViewModel(lobbySocket_) {
     };
 
     self.requestGame = function(mySide) {
-      var gameRequestEvent = new events.GameRequest({
-        opponentName: _playerInvited.invitesAccepted,
+      var inviteFromPlayer = new events.InviteFromPlayer({
+        opponentName: _playerInvited.playerName,
         mySide: mySide
       });
-      if(!gameRequestEvent.isValid) {
-        lobbySocket.emit('requestGame', gameRequestEvent.json);
+      if(inviteFromPlayer.isValid) {
+        lobbySocket.emit('requestGame', inviteFromPlayer.json);
       } else {
-        console.log('trying to send not valid event');
+        console.log(errors.EMIT_NOT_VALID_EVENT);
+        console.log('requestGame');
+        console.log(inviteFromPlayer);
       }
     };
 
     self.emitRequestGame = null;
     self.emitChangeMyPlayerName = null;
+    self.emitChangeInvitesAccepted = null;
     
     var findGame = function(gameId) {
       var correspondingGame;
@@ -128,7 +128,7 @@ function AppViewModel(lobbySocket_) {
 
     self.onSetChatLog = function(log) {
       var correspondingGame = findGame(log.gameId);
-      if(typeof correspondingGame !== "undefined") {
+      if(typeof correspondingGame !== 'undefined') {
         correspondingGame.messages(log.log);
       } else {
         console.log("received a chat log for a non-existing game");
@@ -152,8 +152,8 @@ function AppViewModel(lobbySocket_) {
 
     self.onAddChatMessage = function(chat) {
       var game = findGame(chat.gameId);
-      if(typeof game === "undefined") {
-        console.log("received a chat message to an non-existing game");
+      if(typeof game === 'undefined') {
+        console.log('received a chat message to an non-existing game');
         return self.onAddChatMessage;
       }
 
@@ -161,30 +161,41 @@ function AppViewModel(lobbySocket_) {
         game.messages.shift();
       }
       game.messages.push(chat);
-
-      return self.onAddChatMessage;
     };
 
-    self.onAddPlayerName = function(data) {
-      var player = new events.Player(data);
-      self.players.push(player);
-      return self.onAddPlayerName;
+    self.onAddPlayerName = function(playerData) {
+      var uPlayer = new events.Player(playerData);
+      if(uPlayer.isValid) {
+        var player = uPlayer;
+        self.players.push(player);
+      } else {
+        console.log(errors.RECEIVED_NOT_VALID_EVENT);
+      }
     };
 
-    self.onRemovePlayerName = function(data) {
-      var player = new events.Player(data);
+    self.onRemovePlayerName = function(playerData) {
+      var uPlayer = new events.Player(playerData);
+      if(!uPlayer.isValid) {
+        console.log(errors.RECEIVED_NOT_VALID_EVENT);
+        return;
+      }
+      var player = uPlayer;
+
       self.players.remove(
-        function(playerIt) {
-          return playerIt.playerName === player.playerName;
+        function(playerIter) {
+          return playerIter.playerName === player.playerName;
         }
       );
-      return self.onRemovePlayerName;
     };
 
-    self.onSetMyPlayerName = function(data) {
-      var player = new events.Player(data);
+    self.onSetMyPlayerName = function(playerData) {
+      var uPlayer = new events.Player(playerData);
+      if(!uPlayer.isValid) {
+        console.log(errors.RECEIVED_NOT_VALID_EVENT);
+        return;
+      }
+      var player = uPlayer;
       self.myPlayerName(player.playerName);
-      return self.onSetMyPlayerName;
     };
 
     self.onRemoveGame = function(gameId) {
@@ -197,11 +208,16 @@ function AppViewModel(lobbySocket_) {
         _currentGame = null;
         localStorage.removeItem('currentGameId');
       }
-      return self.onRemoveGame;
     };
       
-    self.onRequestGame = function(data) {
-      var inviteToPlayer = new events.InviteToPlayer(data);
+    self.onRequestGame = function(inviteData) {
+      var uInviteToPlayer = new events.InviteToPlayer(inviteData);
+      if(!uInviteToPlayer.isValid) {
+        console.log(errors.RECEIVED_NOT_VALID_EVENT);
+        return;
+      }
+      var inviteToPlayer = uInviteToPlayer;
+
       $.pnotify({
         title: 'Game Request',
         text: inviteToPlayer.opponentName + ' requested a game. ' +
@@ -209,9 +225,8 @@ function AppViewModel(lobbySocket_) {
         '<a href="#" id="acc' + encodeURI(inviteToPlayer.opponentName) + '">Accept</a>.'
       });
       $("a[id=acc" + encodeURI(inviteToPlayer.opponentName) + "]").click(function(){
-        lobbySocket.emit('acceptGame', data);
+        lobbySocket.emit('acceptGame', inviteToPlayer.json);
       return false;});
-      return self.onRemoveGame;
     };
 
     self.onGameStarted = function(game) {
@@ -219,7 +234,6 @@ function AppViewModel(lobbySocket_) {
           title: 'New Game started',
           text: game.playerName + ' started a game with you!'
         });
-      return self.onGameStarted;
     };
 
     self.onFailChangingName = function(data) {
@@ -229,7 +243,6 @@ function AppViewModel(lobbySocket_) {
         type: 'error',
         icon: false
       });
-      return self.onFailChangingName;
     };
 
     self.onOpponentResigned = function(opponentName) {
@@ -239,7 +252,6 @@ function AppViewModel(lobbySocket_) {
         type: 'success',
         icon: 'ui-icon ui-icon-flag'
         });
-      return self.onOpponentResigned;
     };
 
     self.onAddNewPlayer = function(data) {
@@ -250,11 +262,16 @@ function AppViewModel(lobbySocket_) {
         self.onSetMyPlayerName(newPlayer);
         self.onSetInvitesAccepted(newPlayer.invitesAccepted);
       }
-      return self.onAddNewPlayer;
     };
 
     self.onSetShouldShowPage = function(data) {
-      var shouldShowPage = new events.ShouldShowPage(data);
+      var uShouldShowPage = new events.ShouldShowPage(data);
+      if(!uShouldShowPage.isValid) {
+        console.log(errors.RECEIVED_NOT_VALID_EVENT);
+        return;
+      }
+      var shouldShowPage = uShouldShowPage;
+
       self.shouldShowPage(shouldShowPage.bool);
       $("#blockingMsg").text(shouldShowPage.err);
       $("#blockingMsg").dialog({
@@ -262,7 +279,6 @@ function AppViewModel(lobbySocket_) {
          open: function(event, ui) 
                 {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
       });
-      return self.onSetShouldShowPage;
     };
     
     self.bindSocketHandlers = function() {
@@ -282,8 +298,8 @@ function AppViewModel(lobbySocket_) {
       var prop;
       var eventName;
       var makeSocketEmitter = function(eventName, objectToEmit) {
-        var _eventName = eventName;
-        (function(){lobbySocket.emit(_eventName, objectToEmit);}());
+        lobbySocket.emit(eventName, objectToEmit);
+        console.log(eventName, objectToEmit);
       };
 
       for(prop in self) {

@@ -6,7 +6,7 @@ var makeStruct = require('../public/js/lib/structFactory.js');
 var Client = makeStruct("socket sid");
 var InviteRecord = makeStruct("opponentSid mySide");
 var Game = require('./../models/Game.js');
-var _ = require('./../public/js/lib/underscore.js');
+var _ = require('./../public/js/lib/lodash.js');
 var gameutils = require('./../models/utils/gameutils.js');
 var events = require('./../public/js/events.js');
 
@@ -277,7 +277,7 @@ function main() {
   this.socket.on('requestGame', requestGame.bind(this));
   this.socket.on('acceptGame', acceptGame.bind(this));
   this.socket.on('resignGame', resignGame.bind(this));
-  this.socket.on('setInvitesAccepted', changeInvitesAccepted.bind(this));
+  this.socket.on('changeInvitesAccepted', changeInvitesAccepted.bind(this));
   this.socket.on('disconnect', disconnect.bind(this));
 }
 

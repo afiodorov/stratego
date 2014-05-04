@@ -10,7 +10,7 @@ function notNull(prop) {
 }
 
 var allPropertiesAreNotNull = function() {
-  return _.every(Object.getOwnPropertyNames(this), notNull, this);
+  return _.every(_.keys(this), notNull, this);
 };
 
 var Event = function() {};
@@ -34,7 +34,7 @@ Event.prototype = {
   set json() {}
 };
 
-var cardEvent = function(json) {
+var CardEvent = function(json) {
   o = new Event();
   o.card = json.card;
 
