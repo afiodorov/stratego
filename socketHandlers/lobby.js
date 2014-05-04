@@ -6,8 +6,8 @@ var makeStruct = require('../public/js/lib/structFactory.js');
 var Client = makeStruct("socket sid");
 var InviteRecord = makeStruct("opponentSid mySide");
 var Game = require('./../models/Game.js');
+var gameSocketHandler = require('./game.js');
 var _ = require('./../public/js/lib/lodash.js');
-var gameutils = require('./../models/utils/gameutils.js');
 var events = require('./../public/js/events.js');
 
 // first one is default
@@ -28,7 +28,7 @@ function connect() {
   _checkForDuplicateSession.call(this, onlineClients);
   _setSocketPlayerName.call(this, clients);
   _initialisePlayer.call(this);
-  _sendListOfGames.call(this);
+  // _sendListOfGames.call(this);
   _sendListOfPlayers.call(this, onlineClients);
 
   clients[session.playerName] = new Client(socket, session.id);
@@ -151,6 +151,7 @@ function acceptGame(uInvite) {
   var socket = this.socket;
   var self = this;
 
+  console.log(inviteToPlayer);
   var opponent = clients[inviteToPlayer.opponentName];
   db.mongoStore.get(opponent.sid, function (err, opsession) {
     if(err) {
@@ -173,7 +174,7 @@ function acceptGame(uInvite) {
 
     var wasInvited = (inviteRecordIndex !== -1);
     if (wasInvited) {
-      //_addNewGame.call(self, opponent, opsession, inviteToPlayer.opponentSide);
+      gameSocketHandler.start.call(self, opponent, opsession, inviteToPlayer.opponentSide);
       opsession.invites.splice(inviteRecordIndex, 1);
       db.mongoStore.set(opponent.sid, opsession);
     } else {
