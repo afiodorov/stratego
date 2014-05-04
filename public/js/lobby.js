@@ -2,6 +2,7 @@
 'use strict';
 var io = require('./lib/socket.io.js');
 var _ = require('./lib/underscore.js');
+var inviteTypes = require('./inviteTypes.js');
 var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');
@@ -93,7 +94,15 @@ function AppViewModel(lobbySocket_) {
     };
 
     self.requestGame = function(mySide) {
-      lobbySocket.emit('requestGame', {opponentName: _playerInvited.playerName, mySide: mySide});
+      var gameRequestEvent = new events.GameRequest({
+        opponentName: _playerInvited.invitesAccepted,
+        mySide: mySide
+      });
+      if(!gameRequestEvent.isValid) {
+        lobbySocket.emit('requestGame', gameRequestEvent.json);
+      } else {
+        console.log('trying to send not valid event');
+      }
     };
 
     self.emitRequestGame = null;

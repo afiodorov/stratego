@@ -25,9 +25,9 @@ Event.prototype = {
     var self = this;
     return _.reduceRight(
       _.keys(this).filter(_.compose(_.negate(_.isFunction), getProperty.bind(this))),
-      function(object, prop) {
-        object[prop] = self[prop];
-        return object;
+      function(thisWithoutFunctions, prop) {
+        thisWithoutFunctions[prop] = self[prop];
+        return thisWithoutFunctions;
       }, {});
     return thisWithoutFunctions;
   },
