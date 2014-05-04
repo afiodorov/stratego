@@ -81,6 +81,12 @@ var InviteToPlayer = function(json) {
   return o;
 };
 
+var RemovePlayer = function(json) {
+  var o = new Event();
+  o.playerName = json.playerName;
+  return o;
+};
+
 var Player = function(json) {
   var o = new Event();
   o.playerName = json.playerName;
@@ -102,5 +108,6 @@ module.exports = {
   InviteToPlayer : InviteToPlayer,
   Player : Player,
   ShouldShowPage : ShouldShowPage,
+  RemovePlayer : RemovePlayer,
   Move : Move
 };

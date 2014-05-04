@@ -19,8 +19,10 @@ function start(opponent, opsession, opponentSide) {
     opponentName: session.playerName,
     gameState: {
       requiredInteraction: 'chooseStartingPositions',
-      friendlyPieces: logic.randomStartPositions(side.DARK),
-      enemyPieces: logic.randomStartPositions(side.LIGHT)
+      friendlyPieces: logic.randomStartPositions(side.DARK).map(
+        _.property('name')).map(_.partial(_.object, ['name'])),
+      enemyPieces: logic.randomStartPositions(side.LIGHT).map(
+        _.property('position')).map(_.partial(_.object, ['position']))
     }
   });
 
@@ -29,11 +31,12 @@ function start(opponent, opsession, opponentSide) {
     opponentName: opsession.playerName,
     gameState: {
       requiredInteraction: 'chooseStartingPositions',
-      friendlyPieces: logic.randomStartPositions(side.LIGHT),
-      enemyPieces: logic.randomStartPositions(side.DARK)
-    }
+      friendlyPieces: logic.randomStartPositions(side.LIGHT).map(
+        _.property('name')).map(_.partial(_.object, ['name'])),
+      enemyPieces: logic.randomStartPositions(side.DARK).map(
+        _.property('position')).map(_.partial(_.object, ['position']))
+      }
   });
-
 }
 
 

@@ -37,7 +37,7 @@ function connect() {
 
 function disconnect() {
     this.io.of('/lobby').emit('removePlayerName', 
-      {playerName: this.session.playerName, isSelf: false});
+      {playerName: this.session.playerName});
 }
 
 function resignGame(gameId) {
@@ -151,7 +151,6 @@ function acceptGame(uInvite) {
   var socket = this.socket;
   var self = this;
 
-  console.log(inviteToPlayer);
   var opponent = clients[inviteToPlayer.opponentName];
   db.mongoStore.get(opponent.sid, function (err, opsession) {
     if(err) {

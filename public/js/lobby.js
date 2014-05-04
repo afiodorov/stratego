@@ -144,8 +144,7 @@ function AppViewModel(lobbySocket_) {
           _currentGame = game;
           self.activeTab(-1);
         }
-        require('./game/Canvas/canvasBoardManager.js')(game._id);
-
+        //require('./game/Canvas/canvasBoardManager.js')(game._id);
         lobbySocket.emit('requestChatLog', game._id);
         console.log(game);
     };
@@ -174,7 +173,7 @@ function AppViewModel(lobbySocket_) {
     };
 
     self.onRemovePlayerName = function(playerData) {
-      var uPlayer = new events.Player(playerData);
+      var uPlayer = new events.RemovePlayer(playerData);
       if(!uPlayer.isValid) {
         console.log(errors.RECEIVED_NOT_VALID_EVENT);
         return;
@@ -299,7 +298,6 @@ function AppViewModel(lobbySocket_) {
       var eventName;
       var makeSocketEmitter = function(eventName, objectToEmit) {
         lobbySocket.emit(eventName, objectToEmit);
-        console.log(eventName, objectToEmit);
       };
 
       for(prop in self) {
