@@ -36,12 +36,12 @@ function requestChatLog(gameId) {
   });
 }
 
-function main() {
+function registerHandlers() {
   var self = this;
   self.socket.on('addChatMessage', addChatMessage.bind(self));
   self.socket.on('requestChatLog', requestChatLog.bind(self));
 }
 
 module.exports = {
-  registerHandlers: main
+  registerHandlers: registerHandlers
 };
