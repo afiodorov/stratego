@@ -1,11 +1,12 @@
+'use strict';
 var clients = [];
 var Q = require('q');
-var db = require('./../lib/db.js');
 var lobbyutils = require('./../lib/lobbyutils.js');
 var makeStruct = require('../public/js/lib/structFactory.js');
 var Client = makeStruct("socket sid");
 var InviteRecord = makeStruct("opponentSid mySide");
 var Game = require('./../models/Game.js');
+var Session = require('./../models/Session.js');
 var gameSocketHandler = require('./game.js');
 var _ = require('./../public/js/lib/lodash.js');
 var events = require('./../public/js/events.js');
@@ -85,14 +86,12 @@ function requestGame(uInvite) {
     return;
   }
   try {
-    var opponent = clients[inviteFromPlayer.opponentName];
-    if(!opponent) {
+    var opponentClient = clients[inviteFromPlayer.opponentName];
+    if(!opponentClient) {
       logger.log('info', 'couldn\'t find an opponent');
       return;
     }
-    var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
-    getSession(opponent.sid).then(function(opSession) {
-
+    Session.get(opponentClient.sid).then(function(opSession) {
       if(opSession.acceptedInvites === 'none') {
         logger.log('info', 'invite not accepted: none accepted');
         return;
@@ -110,15 +109,15 @@ function requestGame(uInvite) {
           return;
       }
 
-      opponent.socket.emit('requestGame', 
+      opponentClient.socket.emit('requestGame', 
         {opponentName: session.playerName,
           opponentSide: inviteFromPlayer.mySide});
     });
-    if (typeof session.invites === "undefined") {
+    if (typeof session.invites === 'undefined') {
       session.invites = [];
     }
     // I am inviting the opponent to the game
-    var inviteRecord = new InviteRecord(opponent.sid, uInvite.mySide);
+    var inviteRecord = new InviteRecord(opponentClient.sid, inviteFromPlayer.mySide);
     if(!_.findWhere(session.invites, inviteRecord)) {
       session.invites.push(inviteRecord);
       session.save();
@@ -151,14 +150,8 @@ function acceptGame(uInvite) {
   var socket = this.socket;
   var self = this;
 
-  var opponent = clients[inviteToPlayer.opponentName];
-  db.mongoStore.get(opponent.sid, function (err, opsession) {
-    if(err) {
-      logger.log('warn', 'failed to fetch the opponent from db');
-      logger.log('warn', err);
-      return;
-    }
-
+  var opponentClient = clients[inviteToPlayer.opponentName];
+  Session.get(opponentClient.sid).then(function (opsession) {
     var i;
     var inviteRecordIndex = -1;
     var inviteRecord;
@@ -173,13 +166,16 @@ function acceptGame(uInvite) {
 
     var wasInvited = (inviteRecordIndex !== -1);
     if (wasInvited) {
-      gameSocketHandler.start.call(self, opponent, opsession, inviteToPlayer.opponentSide);
+      gameSocketHandler.start.call(self, opponentClient, opsession, inviteToPlayer.opponentSide);
       opsession.invites.splice(inviteRecordIndex, 1);
-      db.mongoStore.set(opponent.sid, opsession);
+      Session.saveNew(opponentClient.sid, opsession);
     } else {
       socket.emit('error', "The player has not invited you.");
     }
- });
+  }).fail(function(err) {
+    logger.log('warn', 'failed to fetch the opponent from db');
+    logger.log('warn', err);
+  });
 }
 
 function _initialisePlayer() {
@@ -256,8 +252,7 @@ function _sendListOfPlayers(onlineClients) {
   var socket = this.socket;
   onlineClients.forEach(function(client) {
     var isSelf = (client.sid === socket.sid);
-    var getSession = Q.nbind(db.mongoStore.get, db.mongoStore);
-    getSession(client.sid).then(function(session) {
+    Session.get(client.sid).then(function(session) {
       socket.emit('addNewPlayer', _buildPlayerEvent(session, isSelf));
     });
   });

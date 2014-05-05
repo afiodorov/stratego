@@ -15,12 +15,21 @@ var GameSchema = new db.Schema({
     {
       turn: String,
       stage: String,
-      dark: {pieces: [PiecesSchema],
-            cards: [CardsSchema]},
-      light: {pieces: [PiecesSchema],
-            cards: [CardsSchema]}
+      dark: {
+        pieces: [PiecesSchema],
+        cards: [CardsSchema]
+      },
+      light: {
+        pieces: [PiecesSchema],
+        cards: [CardsSchema]
+      }
     }
 });
+
+GameSchema.methods.getClientStateJson = function(clientSid) {
+  var gameClientJson = _.clone(this.toObject());
+  return gameClientJson;
+};
 
 var Game = db.mongoose.model('Game', GameSchema);
 
@@ -59,8 +68,8 @@ function initialiseCards(instance) {
 }
 
 function initialisePieces(instance) {
-  instance.state.light.pieces = logic.generateStartPosition(side.LIGHT);
-  instance.state.dark.pieces = logic.generateStartPosition(side.DARK);
+  instance.state.light.pieces = logic.randomStartPositions(side.LIGHT);
+  instance.state.dark.pieces = logic.randomStartPositions(side.DARK);
 }
 
 function initialiseState(instance) {
@@ -92,15 +101,15 @@ function create(player1Sid, player2Sid, player1Side) {
   });
 }
 
-var gameFind = Q.nfbind(Game.find.bind(Game));
-var gameFindOne = Q.nfbind(Game.findOne.bind(Game));
+var BoundFind = Q.nfbind(Game.find.bind(Game));
+var BoundFindOne = Q.nfbind(Game.findOne.bind(Game));
 
 function getInstances(playerSid) {
-  return gameFind({players: {$elemMatch: {'sid': playerSid}}});
+  return BoundFind({players: {$elemMatch: {'sid': playerSid}}});
 }
 
 function findOne(gameId, playerSid) {
-  return gameFindOne({'_id': gameId, players: {$elemMatch: {'sid':
+  return BoundFindOne({'_id': gameId, players: {$elemMatch: {'sid':
    playerSid}}});
 }
 

@@ -10,11 +10,16 @@ var side = require('./../public/js/game/structs/side.js');
 /**
  *
  */
-function start(opponent, opsession, opponentSide) {
+function start(opponentClient, opsession, opponentSide) {
   var socket = this.socket;
   var session = this.session;
 
-  opponent.socket.emit('addGame', {
+  Game.create(opponentClient.sid, socket.sid, opponentSide)
+    .then(function(gameInstance) {
+    console.log(gameInstance.getClientStateJson());
+  });
+
+  opponentClient.socket.emit('addGame', {
     _id: 1,
     opponentName: session.playerName,
     gameState: {
