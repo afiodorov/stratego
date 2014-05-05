@@ -53,7 +53,7 @@ var tile = function (name, capacity){//, position) {
 
     //position: position,
 
-    isAtMaxCap: atMaxCap
+    //isAtMaxCap: atMaxCap
 
   };
 };

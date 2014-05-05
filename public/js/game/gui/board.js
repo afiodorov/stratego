@@ -1,7 +1,7 @@
 ﻿/// <reference path="tile.js" />
 /// <reference path="../../lib/underscore.js" />
-/// <reference path="piece.js" />
 /// <reference path="side.js" />
+/// <reference path="../structs/piece.js" />
 
 var side = require('../structs/side.js');
 
@@ -19,7 +19,7 @@ var makeBoard = function (gameState) {
   function getTile(pos) {
     return tiles[pos.row][pos.col];
   }
-
+  
   (function assignPiecePositions() {
     for (var i = 0; i < gameState.friendlyPieces.length; i++) {
       piecePositions.push({
@@ -33,11 +33,14 @@ var makeBoard = function (gameState) {
       //If anything else is called from enemy pieces found in the tile, there should be many an error.
       piecePositions.push({
         tile: getTile(gameState.enemyPieces[i].position),
-        piece: makePiece('???', undefined, undefined, undefined)
+        piece: enemyPiece
       });
     };
   })();
 
+  function getPiecesInTile(tile) {
+     return piecePositions.filter(function (pp) { return pp.tile === tile; }).map(function (pp) { return pp.piece; });
+  }
 
   //var playerSide = friendlyPieces[0].side;
 
@@ -118,7 +121,8 @@ var makeBoard = function (gameState) {
 
   return {
     tiles: tiles,
-    piecePositions: piecePositions
+    piecePositions: piecePositions,
+    getPiecesInTile: getPiecesInTile
     //validMoveFuncs: validMoveFuncs,
     //friendlyPieces: friendlyPieces,
     //enemyPieceLocs: enemyPieceLocs,

@@ -7,7 +7,7 @@ var tiles = (function () {
   _.range(7).forEach(function (i) { tilesArr[i] = []; });
 
   var addTile = function (name, cap, col, row) {
-    if (!_.isArray(tiles[row])) {
+    if (!_.isArray(tilesArr[row])) {
       tilesArr[row] = [];
     }
     tilesArr[row][col] = makeTile(name, cap);
