@@ -1,12 +1,12 @@
 'use strict';
-var events = require('./../events.js');
-console.log(events);
-var EventBase = events.EventBase;
+var Event = require('./event.js');
 var interactions = require('../game/structs/interactions.js');
 var _ = require('../lib/lodash.js');
+_.negate = require('../lib/negate.js');
+_.isDefined = _.negate(_.isUndefined);
 
 var StartingPostionsState = function(json) {
-  var o = new EventBase();
+  var o = new Event();
 
   o.isValid = _.every([json.friendlyPieces, json.enemyPieces], _.isArray);
   if (!o.isValid) {
@@ -22,7 +22,8 @@ var StartingPostionsState = function(json) {
 
   o.enemyPieces = [];
   json.enemyPieces.forEach(function(piece) {
-    if (piece.position && piece.position.row && piece.position.col) {
+    if (_.every([piece.position,
+        piece.position.row, piece.position.col], _.isDefined)) {
       o.enemyPieces.push(
         {
           position: {
@@ -33,6 +34,8 @@ var StartingPostionsState = function(json) {
       );
     }
   });
+
+  o.requiredInteraction = interactions.chooseStartingPositions;
 
   // some addinoal checks
   o.isValid = true;
@@ -45,7 +48,7 @@ var makeState = function(json) {
   }
 
   // failed to construct a state
-  var o = new EventBase();
+  var o = new Event();
   o.isValid = false;
   return o;
 };

@@ -29,7 +29,7 @@ describe('events', function() {
 
 describe('game', function() {
   it('json conversion to game', function() {
-    var game = {
+    var gameJson = {
      opponentName: 'john',
      _id: '305_',
      state: {
@@ -59,7 +59,7 @@ describe('game', function() {
      }
     };
 
-    var gameEvent = new events.Game(game);
-    console.log(gameEvent);
+    var gameEvent = new events.Game(gameJson);
+    assert.deepEqual(gameEvent.json, gameJson);
   });
 });

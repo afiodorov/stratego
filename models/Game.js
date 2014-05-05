@@ -47,15 +47,17 @@ GameSchema.methods.getGameEvent = function(clientSid) {
     function(opSession) {
       var candidateEvent = _.clone(self.toObject());
       candidateEvent.opponentName = opSession.playerName;
+      candidateEvent.state.friendlyPieces = candidateEvent.state.pieces.filter(function(piece){ return piece.ownerSid === clientSid; });
+      candidateEvent.state.enemyPieces = candidateEvent.state.pieces.filter(function(piece){ return piece.ownerSid === opponentSid; });
 
       if(self.state.stage === stage.START) {
         candidateEvent.state.requiredInteraction = interactions.chooseStartingPositions;
     }
-      //var gameEvent = new GameEvent(candidateEvent);
-      //if(gameEvent.isValid) {
-        //return makePromise(gameEvent);
-      //}
-      //throw new Error('Couldn\'t constuct the event');
+      var gameEvent = new GameEvent(candidateEvent);
+      if(gameEvent.isValid) {
+        return makePromise(gameEvent);
+      }
+      throw new Error('Couldn\'t constuct the event');
     });
 };
 
