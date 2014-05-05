@@ -238,7 +238,7 @@ function _sendListOfGames() {
   Game.getAll(this.socket.sid)
     .then(function(games) {
       games.forEach(function(game) {
-        game.getClientStateJson(socket.sid).then(function(state) {
+        game.getGameEvent(socket.sid).then(function(state) {
           socket.emit('addGame', state);
         }).fail(function(err) {
           logger.log('info', 'couldn\'t send new game');

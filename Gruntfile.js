@@ -27,14 +27,14 @@ module.exports = function(grunt) {
         options: {
           reporter: 'spec'
         },
-        src: ['test/game/*.js']
+        src: ['test/game/*.js', 'test/events/*.js']
       }
     },
     nodemon: {
       dev: {
         script: 'server.js',
         options: {
-          nodeArgs: ['--debug'],
+          nodeArgs: ['--debug', '--stack-trace-limit=1000'],
           ignore: ['node_modules/**'],
           env: {
           },

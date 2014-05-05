@@ -21,8 +21,8 @@ function start(opponentClient, opsession, opponentSide) {
         {playerName: session.playerName});
 
       [client, opponentClient].forEach(function(client) {
-        gameInstance.getClientStateJson(client.sid).then(function(clientJson) {
-          client.socket.emit('addGame', clientJson);
+        gameInstance.getGameEvent(client.sid).then(function(GameEvent) {
+          client.socket.emit('addGame', GameEvent.json);
         }).fail(function(err) {
           logger.log('warn', 'can not start a game');
           logger.log('warn', err);

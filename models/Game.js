@@ -8,6 +8,7 @@ var logger = require('../lib/logger.js');
 var side = require('../public/js/game/structs/side.js');
 var stage = require('./structs/stage.js');
 var interactions = require('../public/js/game/structs/interactions.js');
+var GameEvent = require('../public/js/events.js').Game;
 
 function makePromise(toBePromised) {
   return Q.fcall(function() {
@@ -33,45 +34,29 @@ var GameSchema = new db.Schema({
   }
 });
 
-GameSchema.methods.omitPiecesProperty = function(playerSid, propertyName) {
-  return this.state.pieces.filter(function(piece) {
-    return piece.ownerSid === playerSid;
-  }).map(_.partialRight(_.omit, propertyName));
-};
-
-
 GameSchema.methods.getOpponentSid = function (playerSid) {
   return this.players.filter(function(SidSidePair) {
     return SidSidePair.sid !== playerSid;
   })[0].sid;
 };
 
-GameSchema.methods.getClientStateJson = function(clientSid) {
+GameSchema.methods.getGameEvent = function(clientSid) {
   var self = this;
   var opponentSid = this.getOpponentSid(clientSid);
   return Session.get(opponentSid).then(
     function(opSession) {
-      var gameClientJson = _.clone(self.toObject());
-      gameClientJson.opponentName = opSession.playerName;
-      delete gameClientJson.players;
+      var candidateEvent = _.clone(self.toObject());
+      candidateEvent.opponentName = opSession.playerName;
 
-      var pieces = []; 
       if(self.state.stage === stage.START) {
-        delete gameClientJson.state.stage;
-        delete gameClientJson.state.turn;
-
-        gameClientJson.state.requiredInteraction = interactions.chooseStartingPositions;
-      pieces.push.apply(pieces,
-        self.omitPiecesProperty(clientSid, 'position'));
-      }
-      pieces.push.apply(pieces,
-        self.omitPiecesProperty(opponentSid, 'name'));
-
-      gameClientJson.state.pieces = pieces;
-
-      return makePromise(gameClientJson); 
+        candidateEvent.state.requiredInteraction = interactions.chooseStartingPositions;
     }
-  );
+      //var gameEvent = new GameEvent(candidateEvent);
+      //if(gameEvent.isValid) {
+        //return makePromise(gameEvent);
+      //}
+      //throw new Error('Couldn\'t constuct the event');
+    });
 };
 
 var Game = db.mongoose.model('Game', GameSchema);

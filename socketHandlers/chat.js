@@ -19,7 +19,7 @@ function addChatMessage(data) {
      if (chatMessage.isValid) {
        io.of('/lobby').in(chat.gameId).emit('addChatMessage', chatMessage.json);
      } else {
-      logger.log('warn', 'invalid chat message');
+       logger.log('warn', 'invalid chat message');
      }
    }
   });
