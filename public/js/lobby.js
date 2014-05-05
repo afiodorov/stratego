@@ -50,8 +50,17 @@ function AppViewModel(lobbySocket_) {
 
     self.sendChatInput = function() {
       if(_currentGame) {
-        lobbySocket.emit('addChatMessage', {gameId: _currentGame._id, message: self.chatInput()});
-        self.chatInput('');
+        var chatMessage = new events.ChatMessageToServer(
+        {
+          gameId: _currentGame._id,
+          message: self.chatInput()
+        });
+        if(chatMessage.isValid) {
+          lobbySocket.emit('addChatMessage', chatMessage);
+          self.chatInput('');
+        } else {
+          console.log(errors.EMIT_NOT_VALID_EVENT);
+        }
       } else {
         // TODO display error
         console.log('no chat selected');
@@ -149,8 +158,14 @@ function AppViewModel(lobbySocket_) {
         console.log(game);
     };
 
-    self.onAddChatMessage = function(chat) {
-      var game = findGame(chat.gameId);
+    self.onAddChatMessage = function(uChat) {
+      var chatMessage = new events.ChatMessageFromServer(uChat);
+      if(!chatMessage.isValid) {
+        console.log(errors.RECEIVED_NOT_VALID_EVENT);
+        return;
+      }
+
+      var game = findGame(chatMessage.gameId);
       if(typeof game === 'undefined') {
         console.log('received a chat message to an non-existing game');
         return self.onAddChatMessage;
@@ -159,7 +174,8 @@ function AppViewModel(lobbySocket_) {
       if(game.messages().length > 20) {
         game.messages.shift();
       }
-      game.messages.push(chat);
+
+      game.messages.push(chatMessage);
     };
 
     self.onAddPlayerName = function(playerData) {

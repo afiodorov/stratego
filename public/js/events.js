@@ -19,7 +19,6 @@ Event.prototype = {
   get isValid() {
     return allPropertiesAreNotNull.call(this);
   },
-  set isValid() {},
   get json() {
     var getProperty = function(prop) {return this[prop];};
     var self = this;
@@ -31,7 +30,6 @@ Event.prototype = {
       }, {});
     return thisWithoutFunctions;
   },
-  set json() {}
 };
 
 var CardEvent = function(json) {
@@ -81,6 +79,24 @@ var InviteToPlayer = function(json) {
   return o;
 };
 
+var ChatMessageFromServer = function(json) {
+  var o = new Event();
+  o.gameId = json.gameId;
+  o.message = json.message;
+  o.date = json.date;
+  o.playerName = json.playerName;
+
+  return o;
+}
+
+var ChatMessageToServer = function(json) {
+  var o = new Event();
+  o.gameId = json.gameId;
+  o.message = json.message;
+
+  return o;
+}
+
 var RemovePlayer = function(json) {
   var o = new Event();
   o.playerName = json.playerName;
@@ -104,10 +120,12 @@ var ShouldShowPage = function(json) {
 };
 
 module.exports = {
-  InviteFromPlayer : InviteFromPlayer,
-  InviteToPlayer : InviteToPlayer,
-  Player : Player,
-  ShouldShowPage : ShouldShowPage,
-  RemovePlayer : RemovePlayer,
-  Move : Move
+  InviteFromPlayer: InviteFromPlayer,
+  InviteToPlayer: InviteToPlayer,
+  Player: Player,
+  ShouldShowPage: ShouldShowPage,
+  RemovePlayer: RemovePlayer,
+  ChatMessageToServer: ChatMessageToServer,
+  ChatMessageFromServer: ChatMessageFromServer,
+  Move: Move
 };

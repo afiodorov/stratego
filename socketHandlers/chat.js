@@ -1,8 +1,9 @@
 var db = require('../lib/db');
 var makeStruct = require('../public/js/lib/structFactory.js');
-var Chat = require('../models/Chat');
+var Chat = require('../models/Chat.js');
 var ChatStruct = makeStruct('gameId player message playerName');
 var logger = require('../lib/logger');
+var events = require('../public/js/events.js');
 var INITIAL_CHAT_SIZE = 20;
 
 function addChatMessage(data) {
@@ -14,7 +15,12 @@ function addChatMessage(data) {
     logger.log('error', 'couldn\'t push chat message');
     logger.log(err);
    } else {
-     io.of('/lobby').in(chat.gameId).emit('addChatMessage', chat);
+     var chatMessage = new events.ChatMessageFromServer(chat.toObject());
+     if (chatMessage.isValid) {
+       io.of('/lobby').in(chat.gameId).emit('addChatMessage', chatMessage.json);
+     } else {
+      logger.log('warn', 'invalid chat message');
+     }
    }
   });
 }

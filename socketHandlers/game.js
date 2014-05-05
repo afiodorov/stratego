@@ -24,6 +24,7 @@ function start(opponentClient, opsession, opponentSide) {
         gameInstance.getClientStateJson(client.sid).then(function(clientJson) {
           client.socket.emit('addGame', clientJson);
         }).fail(function(err) {
+          logger.log('warn', 'can not start a game');
           logger.log('warn', err);
         });
       });
