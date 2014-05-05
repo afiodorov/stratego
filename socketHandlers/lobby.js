@@ -29,7 +29,7 @@ function connect() {
   _checkForDuplicateSession.call(this, onlineClients);
   _setSocketPlayerName.call(this, clients);
   _initialisePlayer.call(this);
-  // _sendListOfGames.call(this);
+  _sendListOfGames.call(this);
   _sendListOfPlayers.call(this, onlineClients);
 
   clients[session.playerName] = new Client(socket, session.id);
@@ -192,7 +192,7 @@ function _isNewClient() {
 function _joinGameRooms() {
   var socket = this.socket;
   var session = this.session;
-  Game.getInstances(session.id).then(function(games) {
+  Game.getAll(session.id).then(function(games) {
     games.forEach(function(game){
       socket.join(game.id);
     });
@@ -235,10 +235,10 @@ function _checkForDuplicateSession(onlineClients) {
 
 function _sendListOfGames() {
   var socket = this.socket;
-  Game.getInstances(this.socket.sid)
+  Game.getAll(this.socket.sid)
     .then(function(games) {
       games.forEach(function(game) {
-        gameutils.getClientStateJson(game.toObject(), socket.sid).then(function(state) {
+        game.getClientStateJson().then(function(state) {
           socket.emit('addGame', state);
         }).fail(function(err) {
           logger.log('info', 'couldn\'t send new game');

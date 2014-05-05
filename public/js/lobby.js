@@ -203,7 +203,7 @@ function AppViewModel(lobbySocket_) {
           return gameIt._id === gameId;
         }
       );
-      if(gameId === _currentGame._id) {
+      if(_currentGame && gameId === _currentGame._id) {
         _currentGame = null;
         localStorage.removeItem('currentGameId');
       }

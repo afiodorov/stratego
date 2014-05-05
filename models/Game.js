@@ -6,6 +6,8 @@ var Q = require('q');
 var _ = require('../public/js/lib/lodash.js');
 var logger = require('../lib/logger.js');
 var side = require('../public/js/game/structs/side.js');
+var stage = require('./structs/stage.js');
+var interactions = require('../public/js/game/structs/interactions.js');
 
 function makePromise(toBePromised) {
   return Q.fcall(function() {
@@ -54,11 +56,16 @@ GameSchema.methods.getClientStateJson = function(clientSid) {
       delete gameClientJson.players;
 
       var pieces = []; 
+      if(self.state.stage === stage.START) {
+        delete gameClientJson.state.stage;
+        delete gameClientJson.state.turn;
+
+        gameClientJson.state.requiredInteraction = interactions.chooseStartingPositions;
       pieces.push.apply(pieces,
         self.omitPiecesProperty(clientSid, 'position'));
+      }
       pieces.push.apply(pieces,
         self.omitPiecesProperty(opponentSid, 'name'));
-      console.log(pieces);
 
       gameClientJson.state.pieces = pieces;
 
@@ -112,7 +119,7 @@ function initialisePieces(instance) {
 
 function initialiseState(instance) {
   instance.state.turn = side.DARK;
-  instance.state.stage = 'start';
+  instance.state.stage = stage.initial;
 }
 
 function saveInstance(instance) {
@@ -129,7 +136,7 @@ function create(player1Sid, player2Sid, player1Side) {
   return pInstance.then(
   function(instance) {
     addPlayers(instance, player1Sid, player2Sid, player1Side);
-    instance.state = initialiseState(instance);
+    initialiseState(instance);
     initialiseCards(instance);
     initialisePieces(instance);
     return makePromise(instance);
@@ -142,7 +149,7 @@ function create(player1Sid, player2Sid, player1Side) {
 var BoundFind = Q.nfbind(Game.find.bind(Game));
 var BoundFindOne = Q.nfbind(Game.findOne.bind(Game));
 
-function getInstances(playerSid) {
+function getAll(playerSid) {
   return BoundFind({players: {$elemMatch: {'sid': playerSid}}});
 }
 
@@ -156,7 +163,7 @@ module.exports = {
     Game.find().sort('_id', 'descending').limit(5).exec(callback);
   },
   create: create,
-  getInstances: getInstances,
+  getAll: getAll,
   findOne: findOne,
   Schema: GameSchema,
   Model: Game
