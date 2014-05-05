@@ -4,7 +4,7 @@
 var side = require('../structs/side.js');
 
 var tileLayer = function (boardWidth, boardHeight) {
-  var MAXPIECESINROW = 6;
+  var MAXPIECESINROW = 6;//TODO: make these calculated.
   var MAXPIECESINCOL = 7;
 
   var Kinetic = require('../../../vendor/kinetic-v5.0.1.min.js');
@@ -43,8 +43,9 @@ var tileLayer = function (boardWidth, boardHeight) {
       align: 'center'
     }));
 
-    for (var i = 0; i < tile.getPieces().length; i++) {
-      var pieceGroup = getPieceGroup(tile.getPieces()[i], i * rectWidth / tile.getPieces().length);
+    var containedPieces = board.piecePositions.filter(function (pp) { pp.tile = tile; }).map(function (pp) { return pp.piece; });
+    for (var i = 0; i < containedPieces.length; i++) {
+      var pieceGroup = getPieceGroup(containedPieces[i], i * rectWidth / containedPieces.length);
       group.add(pieceGroup);
     }
     return group;

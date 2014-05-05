@@ -6,8 +6,11 @@ var tiles = (function () {
   var tilesArr = [];
   _.range(7).forEach(function (i) { tilesArr[i] = []; });
 
-  var addTile = function (name, cap, xpos, ypos) {
-    tilesArr[ypos][xpos] = makeTile(name, cap, { x: xpos, y: ypos });
+  var addTile = function (name, cap, col, row) {
+    if (!_.isArray(tiles[row])) {
+      tilesArr[row] = [];
+    }
+    tilesArr[row][col] = makeTile(name, cap);
   }
   addTile('The Shire', 4, 0, 0);
   addTile('Arthedam', 2, 0, 1);

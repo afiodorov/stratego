@@ -1,55 +1,57 @@
 ﻿/// <reference path="side.js" />
 var side = require('../structs/side.js');
 
-var tile = function (name, capacity, position) {  
+//Changed mind, no more pieces in tiles!
+//Which I think will mean this doens't need position either
+var tile = function (name, capacity){//, position) {  
 
-  var pieces = [];
+  //var pieces = [];
 
-  var getDefendingSide = function () {
-    if (pieces.length === 0) {
-      return undefined;
-    }
-    return pieces[0].side;
-  }
+  //var getDefendingSide = function () {
+  //  if (pieces.length === 0) {
+  //    return undefined;
+  //  }
+  //  return pieces[0].side;
+  //}
 
-  var addPiece = function (piece) {
-    if (pieces.indexOf(piece) !== -1) {
-      throw "Piece already here!";
-    }
-    if (pieces.length > 0 && piece.side !== pieces[0].side) {
-      //BATTTTLTLTLTLELLELELELELEELELELLLELELELELELLELLLLEEE
-      //I dont think it should be dealt with here.
-    }
-    if (atMaxCap()) {
-      throw "No more space";
-    }
-    pieces.push(piece);
-  }
+  //var addPiece = function (piece) {
+  //  if (pieces.indexOf(piece) !== -1) {
+  //    throw "Piece already here!";
+  //  }
+  //  if (pieces.length > 0 && piece.side !== pieces[0].side) {
+  //    //BATTTTLTLTLTLELLELELELELEELELELLLELELELELELLELLLLEEE
+  //    //I dont think it should be dealt with here.
+  //  }
+  //  if (atMaxCap()) {
+  //    throw "No more space";
+  //  }
+  //  pieces.push(piece);
+  //}
 
-  var removePiece = function (piece) {
-    if (pieces.indexOf(piece) === -1) {
-      throw "Piece not found!";
-    }
-    return pieces.pop(piece);
-  }
+  //var removePiece = function (piece) {
+  //  if (pieces.indexOf(piece) === -1) {
+  //    throw "Piece not found!";
+  //  }
+  //  return pieces.pop(piece);
+  //}
 
-  var atMaxCap = function () {
-    return pieces.length === capacity;
-  }
+  //var atMaxCap = function () {
+  //  return pieces.length === capacity;
+  //}
 
   return {
     name: name,
     capacity: capacity,
 
-    getPieces: function () {
-      return pieces;
-    },
+    //getPieces: function () {
+    //  return pieces;
+    //},
 
-    addPiece: addPiece,
+    //addPiece: addPiece,
 
-    removePiece: removePiece,
+    //removePiece: removePiece,
 
-    position: position,
+    //position: position,
 
     isAtMaxCap: atMaxCap
 
