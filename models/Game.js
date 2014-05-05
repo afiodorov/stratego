@@ -1,34 +1,70 @@
 'use strict';
 var db = require('../lib/db.js');
 var logic = require('../public/js/game/logic.js');
+var Session = require('./Session.js');
 var Q = require('q');
-var PlayerSchema = new db.Schema({sid: String, side: String});
-var PiecesSchema = new db.Schema({name: String, position: String});
-var CardsSchema = new db.Schema({name: String});
 var _ = require('../public/js/lib/lodash.js');
 var logger = require('../lib/logger.js');
 var side = require('../public/js/game/structs/side.js');
 
-var GameSchema = new db.Schema({
-  players: [PlayerSchema],
-  state: 
-    {
-      turn: String,
-      stage: String,
-      dark: {
-        pieces: [PiecesSchema],
-        cards: [CardsSchema]
-      },
-      light: {
-        pieces: [PiecesSchema],
-        cards: [CardsSchema]
-      }
-    }
+function makePromise(toBePromised) {
+  return Q.fcall(function() {
+    return toBePromised;
+  });
+}
+
+var PlayerSchema = new db.Schema({sid: String, side: String});
+var PiecesSchema = new db.Schema({
+  name: String,
+  position: {col: Number, row: Number},
+  ownerSid: String
 });
 
+var CardsSchema = new db.Schema({name: String});
+var GameSchema = new db.Schema({
+  players: [PlayerSchema],
+  state: {
+    turn: String,
+    stage: String,
+    pieces: [PiecesSchema],
+    cards: [CardsSchema]
+  }
+});
+
+GameSchema.methods.omitPiecesProperty = function(playerSid, propertyName) {
+  return this.state.pieces.filter(function(piece) {
+    return piece.ownerSid === playerSid;
+  }).map(_.partialRight(_.omit, propertyName));
+};
+
+
+GameSchema.methods.getOpponentSid = function (playerSid) {
+  return this.players.filter(function(SidSidePair) {
+    return SidSidePair.sid !== playerSid;
+  })[0].sid;
+};
+
 GameSchema.methods.getClientStateJson = function(clientSid) {
-  var gameClientJson = _.clone(this.toObject());
-  return gameClientJson;
+  var self = this;
+  var opponentSid = this.getOpponentSid(clientSid);
+  return Session.get(opponentSid).then(
+    function(opSession) {
+      var gameClientJson = _.clone(self.toObject());
+      gameClientJson.opponentName = opSession.playerName;
+      delete gameClientJson.players;
+
+      var pieces = []; 
+      pieces.push.apply(pieces,
+        self.omitPiecesProperty(clientSid, 'position'));
+      pieces.push.apply(pieces,
+        self.omitPiecesProperty(opponentSid, 'name'));
+      console.log(pieces);
+
+      gameClientJson.state.pieces = pieces;
+
+      return makePromise(gameClientJson); 
+    }
+  );
 };
 
 var Game = db.mongoose.model('Game', GameSchema);
@@ -36,12 +72,6 @@ var Game = db.mongoose.model('Game', GameSchema);
 function getInstancePromise() {
   return Q.fcall(function() {
     return new Game();
-  });
-}
-
-function makePromise(instance) {
-  return Q.fcall(function() {
-    return instance;
   });
 }
 
@@ -68,8 +98,16 @@ function initialiseCards(instance) {
 }
 
 function initialisePieces(instance) {
-  instance.state.light.pieces = logic.randomStartPositions(side.LIGHT);
-  instance.state.dark.pieces = logic.randomStartPositions(side.DARK);
+  instance.state.pieces = [];
+  instance.players.forEach(function(playerSidSide) {
+    instance.state.pieces = instance.state.pieces.concat(
+      logic.randomStartPositions(playerSidSide.side).map(
+        function(piece) {
+          piece.ownerSid = playerSidSide.sid;
+          return piece;
+        })
+    );
+  });
 }
 
 function initialiseState(instance) {
@@ -91,7 +129,7 @@ function create(player1Sid, player2Sid, player1Side) {
   return pInstance.then(
   function(instance) {
     addPlayers(instance, player1Sid, player2Sid, player1Side);
-    initialiseState(instance);
+    instance.state = initialiseState(instance);
     initialiseCards(instance);
     initialisePieces(instance);
     return makePromise(instance);
@@ -120,5 +158,6 @@ module.exports = {
   create: create,
   getInstances: getInstances,
   findOne: findOne,
+  Schema: GameSchema,
   Model: Game
 };

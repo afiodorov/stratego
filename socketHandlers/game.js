@@ -6,41 +6,27 @@ var pieces = require('./../public/js/game/structs/pieces.js');
 var _ = require('./../public/js/lib/lodash.js');
 var logic = require('./../public/js/game/logic.js');
 var side = require('./../public/js/game/structs/side.js');
+var Client = require('./structs/client.js');
 
-/**
- *
- */
 function start(opponentClient, opsession, opponentSide) {
   var socket = this.socket;
   var session = this.session;
+  var client = new Client(socket, socket.sid);
 
   Game.create(opponentClient.sid, socket.sid, opponentSide)
     .then(function(gameInstance) {
-    console.log(gameInstance.getClientStateJson());
-  });
+      socket.join(gameInstance._id);
+      socket.emit('gameStarted', {playerName: opsession.playerName});
+      opponentClient.socket.emit('gameStarted',
+        {playerName: session.playerName});
 
-  opponentClient.socket.emit('addGame', {
-    _id: 1,
-    opponentName: session.playerName,
-    gameState: {
-      requiredInteraction: 'chooseStartingPositions',
-      friendlyPieces: logic.randomStartPositions(side.DARK).map(
-        _.property('name')).map(_.partial(_.object, ['name'])),
-      enemyPieces: logic.randomStartPositions(side.LIGHT).map(
-        _.property('position')).map(_.partial(_.object, ['position']))
-    }
-  });
-
-  socket.emit('addGame', {
-    _id: 1,
-    opponentName: opsession.playerName,
-    gameState: {
-      requiredInteraction: 'chooseStartingPositions',
-      friendlyPieces: logic.randomStartPositions(side.LIGHT).map(
-        _.property('name')).map(_.partial(_.object, ['name'])),
-      enemyPieces: logic.randomStartPositions(side.DARK).map(
-        _.property('position')).map(_.partial(_.object, ['position']))
-      }
+      [client, opponentClient].forEach(function(client) {
+        gameInstance.getClientStateJson(client.sid).then(function(clientJson) {
+          client.socket.emit('addGame', clientJson);
+        }).fail(function(err) {
+          logger.log('warn', err);
+        });
+      });
   });
 }
 
