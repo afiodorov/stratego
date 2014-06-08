@@ -3,7 +3,7 @@
 var assert = require('assert');
 var events = require('./../../public/js/events.js');
 var interactions = require('./../../public/js/game/structs/interactions.js');
-var _ = require('../../public/js/lib/lodash.js');
+var _ = require('lodash');
 
 describe('events', function() {
   it('json conversion', function() {

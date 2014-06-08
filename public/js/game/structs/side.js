@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-var _ = require('../../lib/lodash.js');
+var _ = require('lodash');
 
 var side = {};
 side.DARK = '__dark__';

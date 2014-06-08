@@ -8,7 +8,7 @@ var InviteRecord = makeStruct("opponentSid mySide");
 var Game = require('./../models/Game.js');
 var Session = require('./../models/Session.js');
 var gameSocketHandler = require('./game.js');
-var _ = require('./../public/js/lib/lodash.js');
+var _ = require('lodash');
 var events = require('./../public/js/events.js');
 
 // first one is default

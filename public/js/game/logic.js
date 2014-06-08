@@ -3,7 +3,7 @@ var tiles = require('./structs/tiles.js');
 var pieces = require('./structs/pieces.js');
 var side = require('./structs/side.js');
 var Position = require('./structs/position.js');
-var _ = require('../lib/lodash.js');
+var _ = require('lodash');
 var events = require("./../events.js");
 
 var _startingPositions = {};

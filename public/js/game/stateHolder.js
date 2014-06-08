@@ -1,5 +1,5 @@
 'use strict';
-var _ = require('../lib/underscore.js');
+var _ = require('lodash');
 var GameStructs = require('./structs.js');
 var GameLogic = require('./logic.js');
 

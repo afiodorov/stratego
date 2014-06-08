@@ -1,7 +1,7 @@
 var db = require('../../lib/db.js');
 var Game = require('../Game.js').Model;
 var Q = require('q');
-var _ = require('../../public/js/lib/underscore.js');
+var _ = require('lodash');
 var makeStruct = require('../../public/js/lib/structFactory.js');
 var logic = require('../../public/js/game/logic.js');
 

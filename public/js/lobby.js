@@ -1,7 +1,7 @@
 /*global location, localStorage*/
 'use strict';
 var io = require('./lib/socket.io.js');
-var _ = require('./lib/underscore.js');
+var _ = require('lodash');
 var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');

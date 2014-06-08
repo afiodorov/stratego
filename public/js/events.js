@@ -1,6 +1,6 @@
 'use strict';
 var Event = require('./events/event.js');
-var _ = require('./lib/lodash.js');
+var _ = require('lodash');
 _.negate = require('./lib/negate.js');
 
 var acceptedInviteSides = ['light', 'dark', 'random'];

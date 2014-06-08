@@ -1,5 +1,5 @@
 'use strict';
-var _ = require('./../lib/lodash.js');
+var _ = require('lodash');
 _.negate = require('./../lib/negate.js');
 
 var Event = function() {};

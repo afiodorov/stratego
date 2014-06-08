@@ -1,7 +1,7 @@
 /*global describe, it*/
 'use strict';
 var assert = require('assert');
-var _ = require('../../public/js/lib/lodash.js');
+var _ = require('lodash');
 var Game = require('../../models/Game.js');
 
 //describe('#omitPiecesProperty', function() {

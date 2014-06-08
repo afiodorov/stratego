@@ -1,7 +1,7 @@
 'use strict';
 var Event = require('./event.js');
 var interactions = require('../game/structs/interactions.js');
-var _ = require('../lib/lodash.js');
+var _ = require('lodash');
 _.negate = require('../lib/negate.js');
 _.isDefined = _.negate(_.isUndefined);
 

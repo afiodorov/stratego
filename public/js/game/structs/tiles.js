@@ -1,7 +1,7 @@
 'use strict';
 
 var tiles = [];
-var _ = require('../../lib/underscore.js');
+var _ = require('lodash');
 
 var Tile = require('./tile.js');
 var Position = require('./position.js');

@@ -2,7 +2,7 @@
 
 'use strict';
 var assert = require('assert');
-var _ = require('../../public/js/lib/underscore.js');
+var _ = require('lodash');
 var pieces = require('../../public/js/game/structs/pieces.js');
 var side = require('../../public/js/game/structs/side.js');
 
