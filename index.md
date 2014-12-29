@@ -1,6 +1,7 @@
 # GUI
 
 classes:
+
 * Board - represent a board
 * Tile - represent each tile on the board
 * Piece - represent an individual enemy or friendly piece

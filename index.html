@@ -1,0 +1,41 @@
+<h1 id="gui">GUI</h1>
+<p>classes:</p>
+<ul>
+<li>Board - represent a board</li>
+<li>Tile - represent each tile on the board</li>
+<li>Piece - represent an individual enemy or friendly piece</li>
+<li>GameManager - holds states and manages all elements of the interface</li>
+<li>Card - represent a battle card</li>
+<li>Hand - holds cards</li>
+<li>PlayingArea - during battle player puts a card here, at the start all pieces are here</li>
+<li>Button - represents a button</li>
+<li>Interface - holds board, hand and all buttons (such as undo or end turn)</li>
+</ul>
+<h2 id="board">Board</h2>
+<p>.show() - displays the board</p>
+<h2 id="tile">Tile</h2>
+<p>.highlight() - highlights the tile as a visual aid .addPiece(piece) - adds a piece to the tile .removePiece(piece) - removes a piece from the tile</p>
+<h2 id="piece">Piece</h2>
+<p>.desc - describes the piece for visual aid .name - name of the piece for display from the rules</p>
+<h2 id="gamemanager">GameManager</h2>
+<p>.setState(state) - sets the state of the game .accentuate() - makes board and pieces visible if not shown, refreshes otherwise</p>
+<h2 id="card">Card</h2>
+<p>.desc - describes a card .name - name for the card as in the rules</p>
+<h2 id="hand">Hand</h2>
+<p>.show() - displays the hand .addCard(card) .removeCard(card)</p>
+<h2 id="cardarea">CardArea</h2>
+<p>.show() - displayes the area .hide() - hides the area .addCard(card) .addPiece(piece) .empty() - empties the area</p>
+<h2 id="button">Button</h2>
+<p>.show() .hide()</p>
+<p>Instances: * Submit * Cancel</p>
+<h1 id="interface">Interface</h1>
+<p>just a layer with all the GUI elements, not sure about methods yet</p>
+<h1 id="jsons">JSONs</h1>
+<h2 id="stage-start">stage: start</h2>
+<p>{stage: &quot;start&quot;, side: dark | light}</p>
+<p>nothing to be communicated really</p>
+<h2 id="stage-movepiece">stage: movePiece</h2>
+<p>{stage: &quot;removePiece&quot;, pieces: [{name: &quot;Gandalf&quot;, position: [0,0], prevPositon: [0,0]}], cards: [{name: &quot;6&quot;}, {name: &quot;7&quot;}] }</p>
+<h2 id="stage-battle">stage: battle</h2>
+<p>{stage: &quot;battle&quot;, pieces: [{name: &quot;Gandalf&quot;, position: [0,0], prevPositon: [0,0]}], cards: [{name: &quot;6&quot;}, {name: &quot;7&quot;}] }</p>
+<p>(previous position for animations)</p>
