@@ -1,34 +1,23 @@
 ﻿/*global window*/
-var Kinetic = require('kinetic');
+var fabric = require('fabric').fabric;
 
 var BOARD_WIDTH = 600;
 var BOARD_HEIGHT = 600;
 
-// Animation.....................................................
 function draw(container) {
-  var stage = new Kinetic.Stage({ container: container, width: BOARD_WIDTH,
-    height: BOARD_HEIGHT });
-  var tileLayer = require('./tileLayer.js')(BOARD_WIDTH, BOARD_HEIGHT);
-
-  var layer = new Kinetic.Layer();
-
-  var circle = new Kinetic.Circle({
-    x: stage.getWidth() / 2,
-    y: stage.getHeight() / 2,
-    radius: 70,
+  var canvas = new fabric.Canvas(container);
+  var rect = new fabric.Rect({
+    left: 100,
+    top: 100,
     fill: 'red',
-    stroke: 'black',
-    strokeWidth: 4
+    width: 20,
+    height: 20,
+    angle: 45
   });
 
-  // add the shape to the layer
-  layer.add(circle);
-
-  //stage.add(layer);
-  stage.add(tileLayer);
-  //tileLayer.setZIndex(3);
+  canvas.add(rect);
 }
 
-//window.draw = draw;
+window.draw = draw;
 //draw();
 //module.exports = draw;
