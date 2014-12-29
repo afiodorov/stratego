@@ -1,21 +1,12 @@
 ﻿/*global window*/
 var fabric = require('fabric').fabric;
-
-var BOARD_WIDTH = 600;
-var BOARD_HEIGHT = 600;
+var Board = require('../gui/board.js');
 
 function draw(container) {
   var canvas = new fabric.Canvas(container);
-  var rect = new fabric.Rect({
-    left: 100,
-    top: 100,
-    fill: 'red',
-    width: 20,
-    height: 20,
-    angle: 45
-  });
+  var board = new Board();
 
-  canvas.add(rect);
+  canvas.add(board);
 }
 
 window.draw = draw;

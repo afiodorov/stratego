@@ -1,5 +1,4 @@
-﻿
-var Kinetic = require('../../../vendor/kinetic-v5.0.1.min.js');
+﻿var Kinetic = require('../../../vendor/kinetic-v5.0.1.min.js');
 
 //expects piece.name to be undefined if it's on the enemy team.
 var pieceGroup = function(piece) {
@@ -49,5 +48,3 @@ function getPieceGroup(piece) {
 }
 //gameState.dark.pieces = [{position: [2,2]}, ... ];
 //gameState.light.pieces = [{name: "gandalf", position: [2,2]}, ... ];
-
-

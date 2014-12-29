@@ -1,59 +1,24 @@
-﻿/// <reference path="side.js" />
-var side = require('../structs/side.js');
+'use strict';
 
-var tile = function (name, capacity, position) {  
+var fabric = require('fabric').fabric;
 
-  var pieces = [];
+var Tile = function(text, width, height, top, left) {
+  var textEl = new fabric.Text(text, {
+    fontSize: 30,
+    originX: 'center',
+    originY: 'center',
+    fill: 'white'
+  });
 
-  var getDefendingSide = function () {
-    if (pieces.length === 0) {
-      return undefined;
-    }
-    return pieces[0].side;
-  }
+  var rect = new fabric.Rect({
+    width: width,
+    height: height
+  });
 
-  var addPiece = function (piece) {
-    if (pieces.indexOf(piece) !== -1) {
-      throw "Piece already here!";
-    }
-    if (pieces.length > 0 && piece.side !== pieces[0].side) {
-      //BATTTTLTLTLTLELLELELELELEELELELLLELELELELELLELLLLEEE
-      //I dont think it should be dealt with here.
-    }
-    if (atMaxCap()) {
-      throw "No more space";
-    }
-    pieces.push(piece);
-  }
-
-  var removePiece = function (piece) {
-    if (pieces.indexOf(piece) === -1) {
-      throw "Piece not found!";
-    }
-    return pieces.pop(piece);
-  }
-
-  var atMaxCap = function () {
-    return pieces.length === capacity;
-  }
-
-  return {
-    name: name,
-    capacity: capacity,
-
-    getPieces: function () {
-      return pieces;
-    },
-
-    addPiece: addPiece,
-
-    removePiece: removePiece,
-
-    position: position,
-
-    isAtMaxCap: atMaxCap
-
-  };
+  return new fabric.Group([textEl, rect], {
+    top: top,
+    left: left
+  });
 };
 
-module.exports = tile;
+module.exports = Tile;
