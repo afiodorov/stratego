@@ -25,13 +25,13 @@ function draw(container) {
 
   for(i = 0; i<lightPieces.length; i++) {
     piece = new Piece(lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
-      (PIECE_HEIGHT+2) * i, PIECE_WIDTH);
+      (PIECE_HEIGHT+2) * i, BOARD_WIDTH + 5);
     canvas.add(piece.gui);
   }
 
   for(i = 0; i<darkPieces.length; i++) {
     piece = new Piece(darkPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
-      (PIECE_HEIGHT+2) * i, PIECE_WIDTH * 2 + 10);
+      (PIECE_HEIGHT+2) * i, BOARD_WIDTH + PIECE_WIDTH + 10);
     canvas.add(piece.gui);
   }
 }
