@@ -4,7 +4,7 @@
     description: desc,
     strength: str,
     side: side
-  }
+  };
 }
 
 module.exports = makePiece;

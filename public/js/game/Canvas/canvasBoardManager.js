@@ -1,15 +1,39 @@
 ﻿/*global window*/
 var fabric = require('fabric').fabric;
 var Board = require('../gui/board.js');
+var Piece = require('../gui/piece.js');
+var pieces = require('../structs/pieces.js');
+var _ = require('lodash');
 
 function draw(container) {
   var BOARD_WIDTH = 600;
   var BOARD_HEIGHT = 600;
+  var PIECE_WIDTH = BOARD_WIDTH / 4 - 6;
+  var PIECE_HEIGHT = BOARD_HEIGHT / 7 - 6;
 
   var canvas = new fabric.Canvas(container);
   var board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
 
   canvas.add(board.gui);
+
+  var i = 0;
+  var piece;
+  var lightPieces = _.values(pieces).filter(function(piece) {
+    return piece.side === '__light__';});
+  var darkPieces = _.values(pieces).filter(function(piece) {
+    return piece.side === '__dark__';});
+
+  for(i = 0; i<lightPieces.length; i++) {
+    piece = new Piece(lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
+      (PIECE_HEIGHT+2) * i, PIECE_WIDTH);
+    canvas.add(piece.gui);
+  }
+
+  for(i = 0; i<darkPieces.length; i++) {
+    piece = new Piece(darkPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
+      (PIECE_HEIGHT+2) * i, PIECE_WIDTH * 2 + 10);
+    canvas.add(piece.gui);
+  }
 }
 
 window.draw = draw;

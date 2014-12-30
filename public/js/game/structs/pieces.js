@@ -6,50 +6,50 @@ var pieces = {};
 var makePiece = require('./piece.js');
 
 var addPiece = function (name, desc, str, side) {
-  var piece = makePiece.apply(null, arguments);
+  var piece = makePiece(name, desc, str, side);
   pieces[name] = piece;
 };
 
-addPiece('gandalf',
-  'Dark Player must play his card first', 5, side.LIGHT);
-addPiece('aragorn',
-  'May attack any adjacent region', 4, side.LIGHT);
-addPiece('boromir',
-  'Both Boromir and Enemy character are instantly defeated', 0, side.LIGHT);
-addPiece('frodo',
-  'When attacked, may retreat sideways', 1, side.LIGHT);
-addPiece('gimly',
-  'Instantly defeats the Orcs', 3, side.LIGHT);
-addPiece('legolas',
-  'Instantly defeats the Flying Nazgul', 3, side.LIGHT);
-addPiece('merry',
-  'Instantly defeats the Witch King', 2, side.LIGHT);
-addPiece('pippin',
-  'When attacking may retreat backwards', 1, side.LIGHT);
-addPiece('sam',
-  'When with Frodo, is Strength 4 & may replace Frodo in battle',
+addPiece('Gandalf',
+  'Dark Player\nmust play\nhis card first', 5, side.LIGHT);
+addPiece('Aragorn',
+  'May attack\nany adjacent\nregion', 4, side.LIGHT);
+addPiece('Boromir',
+  'Both Boromir\nand Enemy are\ninstantly defeated', 0, side.LIGHT);
+addPiece('Frodo',
+  'When attacked,\nmay retreat\nsideways', 1, side.LIGHT);
+addPiece('Gimly',
+  'Instantly defeats\nthe Orcs', 3, side.LIGHT);
+addPiece('Legolas',
+  'Instantly defeats\nthe Flying Nazgul', 3, side.LIGHT);
+addPiece('Merry',
+  'Instantly\ndefeats the\nWitch King', 2, side.LIGHT);
+addPiece('Pippin',
+  'When attacking\nmay retreat\nbackwards', 1, side.LIGHT);
+addPiece('Sam',
+  'If with Frodo, is\n4 & may replace\nhim in battle',
   2, side.LIGHT);
 
-addPiece('orcs',
-  'When attacking instantly defeats the first character', 2, side.DARK);
-addPiece('shelob',
-  'After Shelob defeats an Enemy character' +
-  ', she is immediately returned to Gondor', 5, side.DARK);
-addPiece('saruman',
-  'May decide that no cards are played', 4, side.DARK);
-addPiece('flying nazgul',
-  'May attack a single Light character anywhere on the board', 3, side.DARK);
-addPiece('barlog',
-  'When in Moria instantly defeats' +
-  'any Character using the Tunnel', 5, side.DARK);
-addPiece('warg',
-  'Enemy character\'s text is ignored', 2, side.DARK);
-addPiece('black rider',
-  'May move forward any number of regions to attack', 4, side.DARK);
-addPiece('witch king',
-  'May attack sideways', 5, side.DARK);
-addPiece('cave troll',
-  'The Dark Player\'s card has no value or effect', 9, side.DARK);
+addPiece('Orcs',
+  'When attacking\ninstantly defeats\nthe first character', 2, side.DARK);
+addPiece('Shelob',
+  'After Shelob\nwins, ' +
+  'she\nreturns to Gondor', 5, side.DARK);
+addPiece('Saruman',
+  'May decide that\nno cards\nare played', 4, side.DARK);
+addPiece('Flying Nazgul',
+  'May attack a\nsingle character\nanywhere', 3, side.DARK);
+addPiece('Barlog',
+  'If in Moria\ndefeats anyone\n' +
+  'using the Tunnel', 5, side.DARK);
+addPiece('Warg',
+  'Enemy character\'s\ntext is ignored', 2, side.DARK);
+addPiece('Black Rider',
+  'May move\nforward anywhere\nto attack', 4, side.DARK);
+addPiece('Witch King',
+  'May attack\nsideways', 5, side.DARK);
+addPiece('Cave Troll',
+  'The Dark Player\'s\ncard has no\nvalue or effect', 9, side.DARK);
 
 (function defineSideKeys() {
   _.values(side).forEach(function(side) {
