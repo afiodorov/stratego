@@ -3,10 +3,13 @@ var fabric = require('fabric').fabric;
 var Board = require('../gui/board.js');
 
 function draw(container) {
-  var canvas = new fabric.Canvas(container);
-  var board = new Board();
+  var BOARD_WIDTH = 600;
+  var BOARD_HEIGHT = 600;
 
-  canvas.add(board);
+  var canvas = new fabric.Canvas(container);
+  var board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
+
+  canvas.add(board.gui);
 }
 
 window.draw = draw;

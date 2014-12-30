@@ -6,21 +6,27 @@ var Tile = require('./tile.js');
 var fabric = require('fabric').fabric;
 var _ = require('lodash');
 
-var BOARD_WIDTH = 600;
-var BOARD_HEIGHT = 600;
+var Board = function(boardWidth, boardHeight) {
 
-var Board = function() {
+  var tilesGroup = _.flatten(tiles).map(function(tileStruct) {
+    var width = boardWidth / tiles[tileStruct.position.row].length;
+    var height = boardHeight / tiles.length;
+    var top = tileStruct.position.row * height;
+    var left = tileStruct.position.col * width;
 
-  var tilesGroup = _.flatten(tiles).map(function(tile) {
-    var width = BOARD_WIDTH / tiles[tile.position.row].length;
-    var height = BOARD_HEIGHT / tiles.length;
-    var top = tile.position.row * height;
-    var left = tile.position.col * width;
-
-    return new Tile(tile.name, width, height, top, left);
+    return new Tile(tileStruct, width, height, top, left);
   });
 
-  return new fabric.Group(tilesGroup);
+  this.gui = new fabric.Group(_.pluck(tilesGroup, 'gui'));
+
+  var self = this;
+  self.tiles = [];
+  tilesGroup.forEach(function(tile) {
+    if(!_.isArray(self.tiles[tile.position.row])) {
+      self.tiles[tile.position.row] = [];
+    }
+    self.tiles[tile.position.row][tile.position.col] = tile;
+  });
 };
 
 module.exports = Board;
