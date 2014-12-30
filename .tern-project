@@ -1,7 +1,9 @@
 {
     "libs": [
     ],
-
+    "loadEagerly": [
+      "./node_modules/fabric/dist/fabric.js"
+    ],
     "plugins": {
       "node": {}
     }

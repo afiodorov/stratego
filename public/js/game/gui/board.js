@@ -22,6 +22,7 @@ var Board = function(canvas, boardWidth, boardHeight) {
   });
 
   this.canvas = canvas;
+  this.canvas.interfaceManager.registerBoard(this);
 
   var self = this;
   self.tiles = [];

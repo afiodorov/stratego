@@ -1,0 +1,38 @@
+/*global module*/
+'use strict';
+
+var _ = require('lodash');
+
+var InterfaceManager = function(canvas) {
+  this.canvas = canvas;
+  this.pieces = [];
+  this.tiles = [];
+};
+
+InterfaceManager.onMove = function(options) {
+  var canvas = this;
+
+  if(_.pluck(canvas.interfaceManager.pieces, 'gui')
+    .indexOf(options.target) !== -1) {
+    options.target.setCoords();
+    canvas.interfaceManager.tiles.forEach(function(tile) {
+      tile.gui.item(0).setCoords();
+      var hasIntersection = tile.gui.item(0).intersectsWithObject(options.target);
+      tile.gui.setOpacity(hasIntersection ? 0.5 : 1);
+    });
+  }
+};
+
+InterfaceManager.prototype.registerBoard = function(board) {
+  this.board = board;
+};
+
+InterfaceManager.prototype.registerPiece = function(piece) {
+  this.pieces.push(piece);
+};
+
+InterfaceManager.prototype.registerTile = function(tile) {
+  this.tiles.push(tile);
+};
+
+module.exports = InterfaceManager;

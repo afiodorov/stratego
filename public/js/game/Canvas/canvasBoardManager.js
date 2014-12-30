@@ -3,6 +3,7 @@ var fabric = require('fabric').fabric;
 var Board = require('../gui/board.js');
 var Piece = require('../gui/piece.js');
 var pieces = require('../structs/pieces.js');
+var InterfaceManager = require('../gui/interfaceManager.js');
 var _ = require('lodash');
 
 function draw(container) {
@@ -12,11 +13,13 @@ function draw(container) {
   var PIECE_HEIGHT = BOARD_HEIGHT / 7 - 12;
 
   var canvas = new fabric.Canvas(container);
+  var interfaceManager = new InterfaceManager(canvas);
+  canvas.interfaceManager = interfaceManager;
+
   var board = new Board(canvas, BOARD_WIDTH, BOARD_HEIGHT);
+  interfaceManager.registerBoard(board);
 
   canvas.add(board.gui);
-
-  board.tiles[0][0].fadeOut();
 
   var i = 0;
   var piece;
@@ -36,6 +39,8 @@ function draw(container) {
       (PIECE_HEIGHT+2) * i, BOARD_WIDTH + PIECE_WIDTH + 10);
     canvas.add(piece.gui);
   }
+
+  canvas.on({'object:moving': InterfaceManager.onMove});
 }
 
 window.draw = draw;

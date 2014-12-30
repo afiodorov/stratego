@@ -7,8 +7,9 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
   var textEl = new fabric.Text(tileStruct.name, {
     originX: 'center',
     originY: 'center',
-    fontSize: 21,
-    fill: 'white'
+    fontSize: 17,
+    fill: 'white',
+    fontFamily: 'Ubuntu'
   });
 
   var rect = new fabric.Rect({
@@ -30,6 +31,7 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
   });
 
   tile.canvas = canvas;
+  canvas.interfaceManager.registerTile(tile);
 
   return tile;
 };
@@ -39,6 +41,10 @@ Tile.prototype.fadeOut = function() {
     onChange: this.canvas.renderAll.bind(this.canvas),
     duration: 2000
   });
-}
+};
+
+Tile.prototype.highlightSpaces = function() {
+  this.fadeOut();
+};
 
 module.exports = Tile;

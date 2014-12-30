@@ -7,27 +7,30 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
 
   var piece = this;
   piece.canvas = canvas;
+  canvas.interfaceManager.registerPiece(piece);
 
   _.assign(piece, pieceStruct);
 
   var name = new fabric.Text(pieceStruct.name, {
-    fontSize: 20,
+    fontSize: 19,
     top: 0,
-    left: 20
+    left: 4,
+    fontFamily: 'Ubuntu'
   });
 
   var strength = new fabric.Text(pieceStruct.strength.toString(), {
     fontSize: 40,
     top: pieceHeight - 50,
-    left: 5
+    left: 3
   });
 
   var desc = new fabric.Text(pieceStruct.description, {
     fontSize: 13,
     top: 31,
-    left: 45,
+    left: 32,
     textAlign: 'right',
-    lineHeight: 1
+    lineHeight: 1,
+    fontFamily: 'Ubuntu'
   });
 
   var rect = new fabric.Rect({

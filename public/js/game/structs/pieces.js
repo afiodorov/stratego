@@ -15,13 +15,13 @@ addPiece('Gandalf',
 addPiece('Aragorn',
   'May attack\nany adjacent\nregion', 4, side.LIGHT);
 addPiece('Boromir',
-  'Both Boromir\nand Enemy are\ninstantly defeated', 0, side.LIGHT);
+  'Both Boromir\nand Enemy\nare defeated', 0, side.LIGHT);
 addPiece('Frodo',
   'When attacked,\nmay retreat\nsideways', 1, side.LIGHT);
 addPiece('Gimly',
   'Instantly defeats\nthe Orcs', 3, side.LIGHT);
 addPiece('Legolas',
-  'Instantly defeats\nthe Flying Nazgul', 3, side.LIGHT);
+  'Instantly\ndefeats the\nFlying Nazgul', 3, side.LIGHT);
 addPiece('Merry',
   'Instantly defeats\n the Witch King', 2, side.LIGHT);
 addPiece('Pippin',
@@ -31,12 +31,12 @@ addPiece('Sam',
   2, side.LIGHT);
 
 addPiece('Orcs',
-  'When attacking\ninstantly defeats\nthe first character', 2, side.DARK);
+  'If attacking\ndefeats the\nfirst character', 2, side.DARK);
 addPiece('Shelob',
-  'After Shelob\nwins, ' +
-  'she\nreturns to Gondor', 5, side.DARK);
+  'If Shelob wins,\n' +
+  'she returns\nto Gondor', 5, side.DARK);
 addPiece('Saruman',
-  'May decide that\nno cards\nare played', 4, side.DARK);
+  'Decides\nwhether cards\nare played', 4, side.DARK);
 addPiece('Flying Nazgul',
   'May attack a\nsingle character\nanywhere', 3, side.DARK);
 addPiece('Barlog',
