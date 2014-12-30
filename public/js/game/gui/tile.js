@@ -4,18 +4,20 @@ var fabric = require('fabric').fabric;
 
 var Tile = function(text, width, height, top, left) {
   var textEl = new fabric.Text(text, {
-    fontSize: 30,
     originX: 'center',
     originY: 'center',
-    fill: 'white'
+    fontSize: 15,
+    fill: 'red'
   });
 
   var rect = new fabric.Rect({
-    width: width,
-    height: height
+    originX: 'center',
+    originY: 'center',
+    width: width - 1,
+    height: height - 1
   });
 
-  return new fabric.Group([textEl, rect], {
+  return new fabric.Group([rect, textEl], {
     top: top,
     left: left
   });
