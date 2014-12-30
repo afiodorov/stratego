@@ -7,7 +7,7 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
   var textEl = new fabric.Text(tileStruct.name, {
     originX: 'center',
     originY: 'center',
-    fontSize: 22,
+    fontSize: 21,
     fill: 'white'
   });
 

@@ -27,7 +27,7 @@ addPiece('Merry',
 addPiece('Pippin',
   'When attacking\nmay retreat\nbackwards', 1, side.LIGHT);
 addPiece('Sam',
-  'If with Frodo, is\n4 & may replace\nhim in battle',
+  'If with Frodo, is\n4 & may replace\nFrodo in battle',
   2, side.LIGHT);
 
 addPiece('Orcs',
