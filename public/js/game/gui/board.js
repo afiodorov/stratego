@@ -6,7 +6,7 @@ var Tile = require('./tile.js');
 var fabric = require('fabric').fabric;
 var _ = require('lodash');
 
-var Board = function(boardWidth, boardHeight) {
+var Board = function(canvas, boardWidth, boardHeight) {
 
   var tilesGroup = _.flatten(tiles).map(function(tileStruct) {
     var width = boardWidth / tiles[tileStruct.position.row].length;
@@ -14,10 +14,14 @@ var Board = function(boardWidth, boardHeight) {
     var top = tileStruct.position.row * height;
     var left = tileStruct.position.col * width;
 
-    return new Tile(tileStruct, width, height, top, left);
+    return new Tile(canvas, tileStruct, width, height, top, left);
   });
 
-  this.gui = new fabric.Group(_.pluck(tilesGroup, 'gui'));
+  this.gui = new fabric.Group(_.pluck(tilesGroup, 'gui'), {
+    selectable: false
+  });
+
+  this.canvas = canvas;
 
   var self = this;
   self.tiles = [];

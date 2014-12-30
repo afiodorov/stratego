@@ -12,9 +12,11 @@ function draw(container) {
   var PIECE_HEIGHT = BOARD_HEIGHT / 7 - 6;
 
   var canvas = new fabric.Canvas(container);
-  var board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
+  var board = new Board(canvas, BOARD_WIDTH, BOARD_HEIGHT);
 
   canvas.add(board.gui);
+
+  board.tiles[0][0].fadeOut();
 
   var i = 0;
   var piece;
