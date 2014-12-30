@@ -7,8 +7,8 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
   var textEl = new fabric.Text(tileStruct.name, {
     originX: 'center',
     originY: 'center',
-    fontSize: 15,
-    fill: 'red'
+    fontSize: 22,
+    fill: 'white'
   });
 
   var rect = new fabric.Rect({
@@ -35,7 +35,7 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
 };
 
 Tile.prototype.fadeOut = function() {
-  this.gui.animate('opacity', 0.7, {
+  this.gui.item(0).animate('opacity', 0.7, {
     onChange: this.canvas.renderAll.bind(this.canvas),
     duration: 2000
   });

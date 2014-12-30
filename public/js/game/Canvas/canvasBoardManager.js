@@ -8,8 +8,8 @@ var _ = require('lodash');
 function draw(container) {
   var BOARD_WIDTH = 600;
   var BOARD_HEIGHT = 600;
-  var PIECE_WIDTH = BOARD_WIDTH / 4 - 6;
-  var PIECE_HEIGHT = BOARD_HEIGHT / 7 - 6;
+  var PIECE_WIDTH = BOARD_WIDTH / 4 - 10;
+  var PIECE_HEIGHT = BOARD_HEIGHT / 7 - 12;
 
   var canvas = new fabric.Canvas(container);
   var board = new Board(canvas, BOARD_WIDTH, BOARD_HEIGHT);
@@ -26,13 +26,13 @@ function draw(container) {
     return piece.side === '__dark__';});
 
   for(i = 0; i<lightPieces.length; i++) {
-    piece = new Piece(lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
+    piece = new Piece(canvas, lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
       (PIECE_HEIGHT+2) * i, BOARD_WIDTH + 5);
     canvas.add(piece.gui);
   }
 
   for(i = 0; i<darkPieces.length; i++) {
-    piece = new Piece(darkPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
+    piece = new Piece(canvas, darkPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
       (PIECE_HEIGHT+2) * i, BOARD_WIDTH + PIECE_WIDTH + 10);
     canvas.add(piece.gui);
   }

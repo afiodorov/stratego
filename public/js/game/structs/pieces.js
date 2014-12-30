@@ -23,7 +23,7 @@ addPiece('Gimly',
 addPiece('Legolas',
   'Instantly defeats\nthe Flying Nazgul', 3, side.LIGHT);
 addPiece('Merry',
-  'Instantly\ndefeats the\nWitch King', 2, side.LIGHT);
+  'Instantly defeats\n the Witch King', 2, side.LIGHT);
 addPiece('Pippin',
   'When attacking\nmay retreat\nbackwards', 1, side.LIGHT);
 addPiece('Sam',
@@ -43,13 +43,13 @@ addPiece('Barlog',
   'If in Moria\ndefeats anyone\n' +
   'using the Tunnel', 5, side.DARK);
 addPiece('Warg',
-  'Enemy character\'s\ntext is ignored', 2, side.DARK);
+  'Enemy\ncharacter\'s\ntext is ignored', 2, side.DARK);
 addPiece('Black Rider',
-  'May move\nforward anywhere\nto attack', 4, side.DARK);
+  'Moves forward\nanywhere\nto attack', 4, side.DARK);
 addPiece('Witch King',
   'May attack\nsideways', 5, side.DARK);
 addPiece('Cave Troll',
-  'The Dark Player\'s\ncard has no\nvalue or effect', 9, side.DARK);
+  'Dark Player\'s\ncard has no\nvalue or effect', 9, side.DARK);
 
 (function defineSideKeys() {
   _.values(side).forEach(function(side) {
