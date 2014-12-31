@@ -19,7 +19,9 @@ function draw(container) {
   var board = new Board(canvas, BOARD_WIDTH, BOARD_HEIGHT);
   interfaceManager.registerBoard(board);
 
-  canvas.add(board.gui);
+  _.pluck(_.flatten(board.tiles), 'gui').forEach(function(tile) {
+    canvas.add(tile);
+  });
 
   var i = 0;
   var piece;

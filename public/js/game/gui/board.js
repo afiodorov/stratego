@@ -17,10 +17,6 @@ var Board = function(canvas, boardWidth, boardHeight) {
     return new Tile(canvas, tileStruct, width, height, top, left);
   });
 
-  this.gui = new fabric.Group(_.pluck(tilesGroup, 'gui'), {
-    selectable: false
-  });
-
   this.canvas = canvas;
   this.canvas.interfaceManager.registerBoard(this);
 

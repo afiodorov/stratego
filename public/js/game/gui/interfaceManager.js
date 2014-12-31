@@ -16,9 +16,14 @@ InterfaceManager.onMove = function(options) {
     .indexOf(options.target) !== -1) {
     options.target.setCoords();
     canvas.interfaceManager.tiles.forEach(function(tile) {
-      tile.gui.item(0).setCoords();
-      var hasIntersection = tile.gui.item(0).intersectsWithObject(options.target);
-      tile.gui.setOpacity(hasIntersection ? 0.5 : 1);
+      var hasIntersection = tile.gui.containsPoint(
+        options.target.getCenterPoint());
+
+      if(hasIntersection) {
+        tile.fadeOut();
+      } else {
+        tile.undoFadeOut();
+      }
     });
   }
 };

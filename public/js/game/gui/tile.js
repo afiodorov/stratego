@@ -28,6 +28,7 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
   tile.gui = new fabric.Group([rect, textEl], {
     top: top,
     left: left,
+    selectable: false
   });
 
   tile.canvas = canvas;
@@ -37,10 +38,16 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
 };
 
 Tile.prototype.fadeOut = function() {
-  this.gui.item(0).animate('opacity', 0.7, {
-    onChange: this.canvas.renderAll.bind(this.canvas),
-    duration: 2000
-  });
+  this.isFaded = true;
+  this.gui.item(0).setOpacity(0.7);
+};
+
+Tile.prototype.undoFadeOut = function() {
+  if(!this.isFaded) {
+    return;
+  }
+  this.gui.item(0).setOpacity(1);
+  this.isFaded = false;
 };
 
 Tile.prototype.highlightSpaces = function() {
