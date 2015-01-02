@@ -11,20 +11,12 @@ var InterfaceManager = function(canvas) {
 
 InterfaceManager.onMove = function(options) {
   var canvas = this;
+  var self = canvas.interfaceManager;
 
+  /* moving a piece */
   if(_.pluck(canvas.interfaceManager.pieces, 'gui')
     .indexOf(options.target) !== -1) {
-    options.target.setCoords();
-    canvas.interfaceManager.tiles.forEach(function(tile) {
-      var hasIntersection = tile.gui.containsPoint(
-        options.target.getCenterPoint());
-
-      if(hasIntersection) {
-        tile.fadeOut();
-      } else {
-        tile.undoFadeOut();
-      }
-    });
+    self.onPieceMove(options.target);
   }
 };
 
@@ -38,6 +30,22 @@ InterfaceManager.prototype.registerPiece = function(piece) {
 
 InterfaceManager.prototype.registerTile = function(tile) {
   this.tiles.push(tile);
+};
+
+InterfaceManager.prototype.onPieceMove = function(pieceGui) {
+
+  pieceGui.setCoords();
+
+  this.tiles.forEach(function(tile) {
+    var hasIntersection = tile.gui.containsPoint(
+      pieceGui.getCenterPoint());
+
+    if(hasIntersection) {
+      tile.fadeOut();
+    } else {
+      tile.undoFadeOut();
+    }
+  });
 };
 
 module.exports = InterfaceManager;
