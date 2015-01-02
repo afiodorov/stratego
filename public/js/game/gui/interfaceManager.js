@@ -43,7 +43,7 @@ InterfaceManager.prototype.onPieceMove = function(pieceGui) {
     if(hasIntersection) {
       tile.fadeOut();
     } else {
-      tile.undoFadeOut();
+      tile.fadeIn();
     }
   });
 };

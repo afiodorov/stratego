@@ -42,7 +42,7 @@ Tile.prototype.fadeOut = function() {
   this.gui.item(0).setOpacity(0.7);
 };
 
-Tile.prototype.undoFadeOut = function() {
+Tile.prototype.fadeIn = function() {
   if(!this.isFaded) {
     return;
   }
