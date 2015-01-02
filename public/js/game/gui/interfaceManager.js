@@ -7,6 +7,11 @@ var InterfaceManager = function(canvas) {
   this.canvas = canvas;
   this.pieces = [];
   this.tiles = [];
+
+  this.BOARD_WIDTH = 600;
+  this.BOARD_HEIGHT = 600;
+  this.PIECE_WIDTH = this.BOARD_WIDTH / 4 - 10;
+  this.PIECE_HEIGHT = this.BOARD_HEIGHT / 7 - 12;
 };
 
 InterfaceManager.onMove = function(options) {

@@ -1,3 +1,4 @@
+/*global module*/
 'use strict';
 
 var fabric = require('fabric').fabric;
@@ -12,7 +13,7 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
     fontFamily: 'Ubuntu'
   });
 
-  var rect = new fabric.Rect({
+  var outerRect = new fabric.Rect({
     originX: 'center',
     originY: 'center',
     width: width,
@@ -25,7 +26,7 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
   var tile = this;
   _.assign(tile, tileStruct);
 
-  tile.gui = new fabric.Group([rect, textEl], {
+  tile.gui = new fabric.Group([outerRect, textEl], {
     top: top,
     left: left,
     selectable: false
