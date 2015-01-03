@@ -1,4 +1,6 @@
-﻿/*global window*/
+﻿'use strict';
+/*jslint node: true*/
+/*global window*/
 var fabric = require('fabric').fabric;
 var Board = require('../gui/board.js');
 var Piece = require('../gui/piece.js');
@@ -36,21 +38,23 @@ function draw(container) {
   pile.gui.setLeft(interfaceManager.BOARD_WIDTH + 5);
   canvas.add(pile.gui);
 
-  for(i = 2; i<lightPieces.length; i++) {
+  for (i = 2; i < lightPieces.length; i++) {
     piece = new Piece(canvas, lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
-      (PIECE_HEIGHT+2) * i, interfaceManager.BOARD_WIDTH + 5);
+      (PIECE_HEIGHT + 2) * i, interfaceManager.BOARD_WIDTH + 5);
     canvas.add(piece.gui);
   }
 
-  for(i = 0; i<darkPieces.length; i++) {
+  for (i = 0; i < darkPieces.length; i++) {
     piece = new Piece(canvas, darkPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
-      (PIECE_HEIGHT+2) * i, interfaceManager.BOARD_WIDTH + PIECE_WIDTH + 10);
+      (PIECE_HEIGHT + 2) * i, interfaceManager.BOARD_WIDTH + PIECE_WIDTH + 10);
     canvas.add(piece.gui);
   }
 
   canvas.on({'object:moving': InterfaceManager.onMove});
 }
 
+/**
+ */
 window.draw = draw;
 //draw();
 //module.exports = draw;
