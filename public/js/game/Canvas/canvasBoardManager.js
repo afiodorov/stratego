@@ -2,6 +2,7 @@
 var fabric = require('fabric').fabric;
 var Board = require('../gui/board.js');
 var Piece = require('../gui/piece.js');
+var Pile = require('../gui/pile.js');
 var pieces = require('../structs/pieces.js');
 var InterfaceManager = require('../gui/interfaceManager.js');
 var _ = require('lodash');
@@ -13,7 +14,6 @@ function draw(container) {
 
   var board = new Board(canvas, interfaceManager.BOARD_WIDTH,
     interfaceManager.BOARD_HEIGHT);
-  interfaceManager.registerBoard(board);
 
   _.pluck(_.flatten(board.tiles), 'gui').forEach(function(tile) {
     canvas.add(tile);
@@ -29,7 +29,14 @@ function draw(container) {
   var PIECE_HEIGHT = interfaceManager.PIECE_HEIGHT;
   var PIECE_WIDTH = interfaceManager.PIECE_WIDTH;
 
-  for(i = 0; i<lightPieces.length; i++) {
+  var pile = new Pile(canvas, 2,
+    [new Piece(canvas, lightPieces[0], PIECE_WIDTH, PIECE_HEIGHT, 0, 0),
+    new Piece(canvas, lightPieces[1], PIECE_WIDTH, PIECE_HEIGHT, 0, 0)],
+    25, 32);
+  pile.gui.setLeft(interfaceManager.BOARD_WIDTH + 5);
+  canvas.add(pile.gui);
+
+  for(i = 2; i<lightPieces.length; i++) {
     piece = new Piece(canvas, lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
       (PIECE_HEIGHT+2) * i, interfaceManager.BOARD_WIDTH + 5);
     canvas.add(piece.gui);
