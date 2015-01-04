@@ -50,7 +50,7 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
   self.fabricObj.on(
   {
     'moving': function() {self.onMove.call(this.holder);},
-    'mouseup': function() {console.log('hi'); self.onStopMove.call(this.holder);}
+    'mouseup': function() {self.onStopMove.call(this.holder);}
   });
   self.fabricObj.setupState();
   canvas.interfaceManager.registerPiece(self);
@@ -68,9 +68,10 @@ Piece.prototype.onMove = function() {
   self.fabricObj.setCoords();
 
   self.setCandidateTile(null);
+  var boundingRect = self.fabricObj.getBoundingRect();
+  var leftCorner = new fabric.Point(boundingRect.left, boundingRect.top);
   this.canvas.interfaceManager.tiles.forEach(function(tile) {
-    var hasIntersection = tile.fabricObj.containsPoint(
-      self.fabricObj.getCenterPoint());
+    var hasIntersection = tile.fabricObj.containsPoint(leftCorner);
 
     if (hasIntersection) {
       self.setCandidateTile(tile);
@@ -106,12 +107,19 @@ Piece.prototype.onStopMove = function() {
     self.getCandidateTile().add(self);
   } else {
     // nowhere to add this piece
-    var fabricObj = self.fabricObj;
-    var onChangeO = {onChange: self.canvas.renderAll.bind(self.canvas)};
-    fabricObj.animate('top', fabricObj.originalState.top, onChangeO);
-    fabricObj.animate('left', fabricObj.originalState.left, onChangeO);
+    self.animatedReturn();
   }
 
+};
+
+/**
+ */
+Piece.prototype.animatedReturn = function() {
+  var self = this;
+  var fabricObj = self.fabricObj;
+  var onChangeO = {onChange: self.canvas.renderAll.bind(self.canvas)};
+  fabricObj.animate('top', fabricObj.originalState.top, onChangeO);
+  fabricObj.animate('left', fabricObj.originalState.left, onChangeO);
 };
 
 /**
