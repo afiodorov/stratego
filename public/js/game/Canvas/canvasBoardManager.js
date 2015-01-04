@@ -31,26 +31,37 @@ function draw(container) {
   var PIECE_HEIGHT = interfaceManager.PIECE_HEIGHT;
   var PIECE_WIDTH = interfaceManager.PIECE_WIDTH;
 
-  var pile = new Pile(canvas, 2,
-    [new Piece(canvas, lightPieces[0], PIECE_WIDTH, PIECE_HEIGHT, 0, 0),
-    new Piece(canvas, lightPieces[1], PIECE_WIDTH, PIECE_HEIGHT, 0, 0)],
-    25, 32);
-  pile.gui.setLeft(interfaceManager.BOARD_WIDTH + 5);
+  var pile = new Pile(canvas,
+    [
+      new Piece(canvas, lightPieces[0], PIECE_WIDTH, PIECE_HEIGHT),
+      new Piece(canvas, lightPieces[1], PIECE_WIDTH, PIECE_HEIGHT)
+    ],
+    {
+      topOfset: 25,
+      leftOfset: 32,
+      left: interfaceManager.BOARD_WIDTH + 5
+    });
+
+  pile.gui.getObjects().forEach(function(object) {
+    canvas.add(object);
+  });
   canvas.add(pile.gui);
 
   for (i = 2; i < lightPieces.length; i++) {
-    piece = new Piece(canvas, lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
-      (PIECE_HEIGHT + 2) * i, interfaceManager.BOARD_WIDTH + 5);
+    piece = new Piece(canvas, lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT);
+    piece.gui.setTop((PIECE_HEIGHT + 2) * i);
+    piece.gui.setLeft(interfaceManager.BOARD_WIDTH + 5);
     canvas.add(piece.gui);
   }
 
   for (i = 0; i < darkPieces.length; i++) {
     piece = new Piece(canvas, darkPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
-      (PIECE_HEIGHT + 2) * i, interfaceManager.BOARD_WIDTH + PIECE_WIDTH + 10);
+      (PIECE_HEIGHT + 2) * i, interfaceManager.BOARD_WIDTH + PIECE_WIDTH + 45);
     canvas.add(piece.gui);
   }
 
   canvas.on({'object:moving': InterfaceManager.onMove});
+  canvas.renderAll();
 }
 
 /**

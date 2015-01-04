@@ -1,8 +1,12 @@
-/*global module*/
 'use strict';
+/*jslint node: true*/
 
 var _ = require('lodash');
 
+/**
+ * @constructor
+ * @param {fabric.Canvas} canvas
+ */
 var InterfaceManager = function(canvas) {
   this.BOARD_WIDTH = 600;
   this.BOARD_HEIGHT = 600;
@@ -10,33 +14,49 @@ var InterfaceManager = function(canvas) {
   this.PIECE_HEIGHT = 73;
 
   this.canvas = canvas;
-  this.pieces = [];
+  this.pieces = {};
   this.tiles = [];
 };
 
+/**
+ * @this {fabric.Canvas}
+ * @param {object.target} options object
+ */
 InterfaceManager.onMove = function(options) {
   var canvas = this;
   var self = canvas.interfaceManager;
 
   /* moving a piece */
-  if(_.pluck(canvas.interfaceManager.pieces, 'gui')
+  if (_.pluck(canvas.interfaceManager.pieces, 'gui')
     .indexOf(options.target) !== -1) {
     self.onPieceMove(options.target);
   }
 };
 
+/**
+ * @param {gui.Board} board
+ */
 InterfaceManager.prototype.registerBoard = function(board) {
   this.board = board;
 };
 
+/**
+ * @param {gui.Piece} piece
+ */
 InterfaceManager.prototype.registerPiece = function(piece) {
-  this.pieces.push(piece);
+  this.pieces[piece.name] = piece;
 };
 
+/**
+ * @param {gui.Tile} tile
+ */
 InterfaceManager.prototype.registerTile = function(tile) {
   this.tiles.push(tile);
 };
 
+/**
+ * @param {fabric.Object} pieceGui
+ */
 InterfaceManager.prototype.onPieceMove = function(pieceGui) {
 
   pieceGui.setCoords();
@@ -45,7 +65,7 @@ InterfaceManager.prototype.onPieceMove = function(pieceGui) {
     var hasIntersection = tile.gui.containsPoint(
       pieceGui.getCenterPoint());
 
-    if(hasIntersection) {
+    if (hasIntersection) {
       tile.fadeOut();
     } else {
       tile.fadeIn();
@@ -53,4 +73,6 @@ InterfaceManager.prototype.onPieceMove = function(pieceGui) {
   });
 };
 
+/**
+ */
 module.exports = InterfaceManager;

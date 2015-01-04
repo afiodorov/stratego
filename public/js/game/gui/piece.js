@@ -1,5 +1,5 @@
-/*global module*/
 'use strict';
+/*jslint node: true*/
 
 var fabric = require('fabric').fabric;
 var _ = require('lodash');
@@ -8,7 +8,6 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
 
   var piece = this;
   piece.canvas = canvas;
-  canvas.interfaceManager.registerPiece(piece);
 
   _.assign(piece, pieceStruct);
 
@@ -48,8 +47,11 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
     hasControls: false
   });
 
+  canvas.interfaceManager.registerPiece(piece);
   return piece;
 
 };
 
+/**
+ */
 module.exports = Piece;
