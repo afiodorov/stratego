@@ -2,14 +2,10 @@
 /*jslint node: true*/
 
 var fabric = require('fabric').fabric;
+var FabricMixin = require('./../../util/FabricMixin.js');
 var _ = require('lodash');
 
 var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
-
-  var piece = this;
-  piece.canvas = canvas;
-
-  _.assign(piece, pieceStruct);
 
   var name = new fabric.Text(pieceStruct.name, {
     fontSize: 19,
@@ -41,15 +37,41 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
     stroke: '#3B5323'
   });
 
-  piece.gui = new fabric.Group([rect, name, strength, desc], {
-    top: top,
-    left: left,
-    hasControls: false
+  var self = this;
+  self.canvas = canvas;
+  self.linkFabric(new fabric.Group([rect, name, strength, desc],
+    {
+      top: top,
+      left: left,
+      hasControls: false
+    })
+  );
+  _.assign(self, pieceStruct);
+  self.fabricObj.on({'moving': function() {self.onMove.call(this.holder);}});
+  canvas.interfaceManager.registerPiece(self);
+};
+
+Piece.prototype = new FabricMixin();
+/**
+ */
+Piece.prototype.constructor = Piece;
+/**
+ */
+Piece.prototype.onMove = function() {
+
+  var self = this;
+  self.fabricObj.setCoords();
+
+  this.canvas.interfaceManager.tiles.forEach(function(tile) {
+    var hasIntersection = tile.fabricObj.containsPoint(
+      self.fabricObj.getCenterPoint());
+
+    if (hasIntersection) {
+      tile.fadeOut();
+    } else {
+      tile.fadeIn();
+    }
   });
-
-  canvas.interfaceManager.registerPiece(piece);
-  return piece;
-
 };
 
 /**

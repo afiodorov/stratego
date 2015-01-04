@@ -29,13 +29,13 @@ var Pile = function(canvas, pieces, parameters) {
   _.assign(this, defaults(_.clone(parameters), defaultValues));
   this.pieces = pieces;
 
-  _.pluck(this.pieces, 'gui').forEach(function(fabricObject) {
+  _.pluck(this.pieces, 'fabricObj').forEach(function(fabricObject) {
     fabricObject.setTop(self.top);
     fabricObject.setLeft(self.left);
   });
 
   _.range(0, pieces.length).forEach(function(elNum) {
-    var fabricObject = pieces[elNum].gui;
+    var fabricObject = pieces[elNum].fabricObj;
     fabricObject.setTop(fabricObject.getTop() + self.topOfset * elNum);
     fabricObject.setLeft(fabricObject.getLeft() + self.leftOfset * elNum);
   });
@@ -66,11 +66,12 @@ Pile.prototype.remove = function(piece) {
 
   _.range(pieceIndex, this.pieces.length).forEach(
     function(i) {
-      self.pieces[i].gui.animate('top', '-=' + self.topOfset.toString(), {
+      self.pieces[i].fabricObj.animate('top', '-=' + self.topOfset.toString(), {
         onChange: self.canvas.renderAll.bind(self.canvas)
       });
-      self.pieces[i].gui.animate('left', '-=' + self.leftOfset.toString(), {
-        onChange: self.canvas.renderAll.bind(self.canvas)
+      self.pieces[i].fabricObj
+        .animate('left', '-=' + self.leftOfset.toString(), {
+          onChange: self.canvas.renderAll.bind(self.canvas)
       });
     });
 
@@ -81,7 +82,7 @@ Pile.prototype.remove = function(piece) {
  * @return {array<fabric.Object>}
  */
 Pile.prototype.getObjects = function() {
-  return _.pluck(this.pieces, 'gui');
+  return _.pluck(this.pieces, 'fabricObj');
 };
 
 /**

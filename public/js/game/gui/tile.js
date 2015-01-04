@@ -2,6 +2,7 @@
 'use strict';
 
 var fabric = require('fabric').fabric;
+var FabricMixin = require('./../../util/FabricMixin.js');
 var _ = require('lodash');
 
 var Tile = function(canvas, tileStruct, width, height, top, left) {
@@ -51,32 +52,36 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
     pieceSpaces = [];
   }
 
-  var tile = this;
-  _.assign(tile, tileStruct);
+  var self = this;
+  self.linkFabric(
+    new fabric.Group([outerRect].concat(pieceSpaces).concat([textEl]),
+    {
+      top: top,
+      left: left,
+      selectable: false
+    })
+  );
+  self.canvas = canvas;
+  _.assign(self, tileStruct);
 
-  tile.gui = new fabric.Group([outerRect].concat(pieceSpaces).concat([textEl]),
-  {
-    top: top,
-    left: left,
-    selectable: false
-  });
-
-  tile.canvas = canvas;
-  canvas.interfaceManager.registerTile(tile);
-
-  return tile;
+  canvas.interfaceManager.registerTile(self);
 };
+
+Tile.prototype = new FabricMixin();
+/**
+ */
+Tile.prototype.constructor = Tile;
 
 Tile.prototype.fadeOut = function() {
   this.isFaded = true;
-  this.gui.item(0).setOpacity(0.7);
+  this.fabricObj.item(0).setOpacity(0.7);
 };
 
 Tile.prototype.fadeIn = function() {
   if(!this.isFaded) {
     return;
   }
-  this.gui.item(0).setOpacity(1);
+  this.fabricObj.item(0).setOpacity(1);
   this.isFaded = false;
 };
 

@@ -17,7 +17,7 @@ function draw(container) {
   var board = new Board(canvas, interfaceManager.BOARD_WIDTH,
     interfaceManager.BOARD_HEIGHT);
 
-  _.pluck(_.flatten(board.tiles), 'gui').forEach(function(tile) {
+  _.pluck(_.flatten(board.tiles), 'fabricObj').forEach(function(tile) {
     canvas.add(tile);
   });
 
@@ -45,22 +45,20 @@ function draw(container) {
   pile.getObjects().forEach(function(object) {
     canvas.add(object);
   });
-  pile.remove(interfaceManager.pieces.Gandalf);
 
   for (i = 2; i < lightPieces.length; i++) {
     piece = new Piece(canvas, lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT);
-    piece.gui.setTop((PIECE_HEIGHT + 2) * i);
-    piece.gui.setLeft(interfaceManager.BOARD_WIDTH + 5);
-    canvas.add(piece.gui);
+    piece.fabricObj.setTop((PIECE_HEIGHT + 2) * i);
+    piece.fabricObj.setLeft(interfaceManager.BOARD_WIDTH + 5);
+    canvas.add(piece.fabricObj);
   }
 
   for (i = 0; i < darkPieces.length; i++) {
     piece = new Piece(canvas, darkPieces[i], PIECE_WIDTH, PIECE_HEIGHT,
       (PIECE_HEIGHT + 2) * i, interfaceManager.BOARD_WIDTH + PIECE_WIDTH + 45);
-    canvas.add(piece.gui);
+    canvas.add(piece.fabricObj);
   }
 
-  canvas.on({'object:moving': InterfaceManager.onMove});
   canvas.renderAll();
 }
 

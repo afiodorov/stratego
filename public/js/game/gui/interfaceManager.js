@@ -55,24 +55,5 @@ InterfaceManager.prototype.registerTile = function(tile) {
 };
 
 /**
- * @param {fabric.Object} pieceGui
- */
-InterfaceManager.prototype.onPieceMove = function(pieceGui) {
-
-  pieceGui.setCoords();
-
-  this.tiles.forEach(function(tile) {
-    var hasIntersection = tile.gui.containsPoint(
-      pieceGui.getCenterPoint());
-
-    if (hasIntersection) {
-      tile.fadeOut();
-    } else {
-      tile.fadeIn();
-    }
-  });
-};
-
-/**
  */
 module.exports = InterfaceManager;
