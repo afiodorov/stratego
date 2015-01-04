@@ -50,7 +50,8 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
   self.fabricObj.on(
   {
     'moving': function() {self.onMove.call(this.holder);},
-    'mouseup': function() {self.onStopMove.call(this.holder);}
+    'mouseup': function() {self.onStopMove.call(this.holder);},
+    'mousedown': function() {self.onStartMove.call(this.holder);}
   });
   self.fabricObj.setupState();
   canvas.interfaceManager.registerPiece(self);
@@ -110,6 +111,14 @@ Piece.prototype.onStopMove = function() {
     self.animatedReturn();
   }
 
+};
+
+/**
+ */
+Piece.prototype.onStartMove = function() {
+
+  var self = this;
+  /**TODO**/
 };
 
 /**
