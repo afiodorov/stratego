@@ -50,7 +50,7 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
   self.fabricObj.on(
   {
     'moving': function() {self.onMove.call(this.holder);},
-    'mouse:up': function() {console.log('hi'); self.onStopMove.call(this.holder);}
+    'mouseup': function() {console.log('hi'); self.onStopMove.call(this.holder);}
   });
   self.fabricObj.setupState();
   canvas.interfaceManager.registerPiece(self);
@@ -107,8 +107,9 @@ Piece.prototype.onStopMove = function() {
   } else {
     // nowhere to add this piece
     var fabricObj = self.fabricObj;
-    fabricObj.animate('top', fabricObj.originalState.top);
-    fabricObj.animate('left', fabricObj.originalState.left);
+    var onChangeO = {onChange: self.canvas.renderAll.bind(self.canvas)};
+    fabricObj.animate('top', fabricObj.originalState.top, onChangeO);
+    fabricObj.animate('left', fabricObj.originalState.left, onChangeO);
   }
 
 };
