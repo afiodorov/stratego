@@ -42,10 +42,10 @@ function draw(container) {
       left: interfaceManager.BOARD_WIDTH + 5
     });
 
-  pile.gui.getObjects().forEach(function(object) {
+  pile.getObjects().forEach(function(object) {
     canvas.add(object);
   });
-  canvas.add(pile.gui);
+  pile.remove(interfaceManager.pieces.Gandalf);
 
   for (i = 2; i < lightPieces.length; i++) {
     piece = new Piece(canvas, lightPieces[i], PIECE_WIDTH, PIECE_HEIGHT);

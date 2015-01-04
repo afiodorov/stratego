@@ -8,10 +8,10 @@ var fabric = require('fabric').fabric;
 /**
  * @constructor
  * @param {fabric.Canvas} canvas reference
- * @param {array} elements Initial elements in the pile
+ * @param {array.<gui.Piece>} pieces Initial elements in the pile
  * @param {struct} parameters
  */
-var Pile = function(canvas, elements, parameters) {
+var Pile = function(canvas, pieces, parameters) {
   var self = this;
 
   var defaults = _.partialRight(_.assign, function(a, b) {
@@ -27,21 +27,20 @@ var Pile = function(canvas, elements, parameters) {
   };
 
   _.assign(this, defaults(_.clone(parameters), defaultValues));
+  this.pieces = pieces;
 
-  this.gui = new LinkedObjects(_.pluck(elements, 'gui'));
-  this.gui.forEachObject(function(element) {
-    element.setTop(self.top);
-    element.setLeft(self.left);
+  _.pluck(this.pieces, 'gui').forEach(function(fabricObject) {
+    fabricObject.setTop(self.top);
+    fabricObject.setLeft(self.left);
   });
 
-  _.range(0, elements.length).forEach(function(elNum) {
-    var fabricObject = elements[elNum].gui;
+  _.range(0, pieces.length).forEach(function(elNum) {
+    var fabricObject = pieces[elNum].gui;
     fabricObject.setTop(fabricObject.getTop() + self.topOfset * elNum);
     fabricObject.setLeft(fabricObject.getLeft() + self.leftOfset * elNum);
   });
 
   this.canvas = canvas;
-  _.assign(this, parameters);
 };
 
 /**
@@ -52,33 +51,37 @@ Pile.prototype.add = function(element) {
 };
 
 /**
- * @param {object} element Removes an element from the pile
- * @return {object} removed element
+ * @param {gui.Piece} piece Removes an element from the pile
+ * @return {gui.Piece} removed element
  */
-Pile.prototype.remove = function(element) {
+Pile.prototype.remove = function(piece) {
   var self = this;
-  var elIndex = this.elements.indexOf(element);
+  var pieceIndex = this.pieces.indexOf(piece);
 
-  if (elIndex === -1) {
+  if (pieceIndex === -1) {
     throw new Error('out of bounds');
   }
 
-  this.elements.splice(elIndex);
+  this.pieces.splice(pieceIndex, 1);
 
-  this.gui.remove(element.gui);
-
-  // +1 since
-  _.range(elIndex, this.elements.length + 1).forEach(
+  _.range(pieceIndex, this.pieces.length).forEach(
     function(i) {
-      self.gui.item(i).animate('top', '-=' + self.topOfset.toString(), {
+      self.pieces[i].gui.animate('top', '-=' + self.topOfset.toString(), {
         onChange: self.canvas.renderAll.bind(self.canvas)
       });
-      self.gui.item(i).animate('left', '-=' + self.leftOfset.toString(), {
+      self.pieces[i].gui.animate('left', '-=' + self.leftOfset.toString(), {
         onChange: self.canvas.renderAll.bind(self.canvas)
       });
     });
 
-  return element;
+  return piece;
+};
+
+/**
+ * @return {array<fabric.Object>}
+ */
+Pile.prototype.getObjects = function() {
+  return _.pluck(this.pieces, 'gui');
 };
 
 /**
