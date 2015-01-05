@@ -54,7 +54,6 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
     'mousedown': function() {self.onStartMove.call(this.holder);}
   });
   self.fabricObj.setupState();
-  canvas.interfaceManager.registerPiece(self);
 };
 
 Piece.prototype = new FabricMixin();
@@ -71,7 +70,7 @@ Piece.prototype.onMove = function() {
   self.setCandidateTile(null);
   var boundingRect = self.fabricObj.getBoundingRect();
   var leftCorner = new fabric.Point(boundingRect.left, boundingRect.top);
-  this.canvas.interfaceManager.tiles.forEach(function(tile) {
+  _.flatten(this.canvas.gameManager.board.tiles).forEach(function(tile) {
     var hasIntersection = tile.fabricObj.containsPoint(leftCorner);
 
     if (hasIntersection) {

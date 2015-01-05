@@ -25,9 +25,9 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
   });
 
 
-  var im = canvas.interfaceManager;
   var spaceBetweenPieces = 5;
-  var spaceTotalWidth = im.PIECE_WIDTH + spaceBetweenPieces;
+  var dims = canvas.gameManager.dimensions;
+  var spaceTotalWidth = dims.PIECE_WIDTH + spaceBetweenPieces;
   var capacityMiddle = Math.floor(tileStruct.capacity / 2);
   var pieceSpaces =  _.range(-capacityMiddle,
     -capacityMiddle + tileStruct.capacity).map(function(centeredPieceSpaceNum) {
@@ -36,8 +36,8 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
       originY: 'center',
       /*TODO: remove if*/
       originX: (tileStruct.capacity === 1 ? 'center' : 'left'),
-      width: im.PIECE_WIDTH,
-      height: im.PIECE_HEIGHT,
+      width: dims.PIECE_WIDTH,
+      height: dims.PIECE_HEIGHT,
       left: centeredPieceSpaceNum * spaceTotalWidth,
       selectable: false,
       fill: 'none',
@@ -63,8 +63,6 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
   );
   self.canvas = canvas;
   _.assign(self, tileStruct);
-
-  canvas.interfaceManager.registerTile(self);
 };
 
 Tile.prototype = new FabricMixin();
