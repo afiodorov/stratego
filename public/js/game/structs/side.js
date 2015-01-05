@@ -1,7 +1,10 @@
 ﻿'use strict';
+/*jslint node: true*/
+
 var _ = require('lodash');
 
 var side = {};
+/**/
 side.DARK = '__dark__';
 side.LIGHT = '__light__';
 
@@ -41,4 +44,6 @@ Object.defineProperty(side, 'opposite', {
 });
 
 Object.freeze(side);
+/**
+ */
 module.exports = side;

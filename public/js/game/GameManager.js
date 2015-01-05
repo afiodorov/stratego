@@ -22,6 +22,14 @@ GameManager.prototype.setCanvasId = function(canvasId) {
 /**
  * @param {Progress} progress
  */
+GameManager.prototype.registerRules = function(progress) {
+  var Rules = require('./rules.js');
+  this.rules = new Rules(progress);
+};
+
+/**
+ * @param {Progress} progress
+ */
 GameManager.prototype.setProgress = function(progress) {
   this.progress = progress;
 };
