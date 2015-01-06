@@ -1,4 +1,5 @@
 'use strict';
+/*jslint node: true*/
 var callConstructor = require('../../lib/callConstructor.js');
 
 var Tile = function(name, capacity, position) {
@@ -11,4 +12,6 @@ var Tile = function(name, capacity, position) {
   this.position = position;
 };
 
+/**
+ */
 module.exports = Tile;

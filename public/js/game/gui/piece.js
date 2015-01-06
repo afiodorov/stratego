@@ -102,8 +102,10 @@ Piece.prototype.getCandidateTile = function() {
 Piece.prototype.onStopMove = function() {
 
   var self = this;
+  var gameManager = self.canvas.gameManager;
 
   if (self.getCandidateTile()) {
+    console.log(gameManager.rules.getAvailTiles(self));
     self.getCandidateTile().add(self);
   } else {
     // nowhere to add this piece
@@ -117,6 +119,9 @@ Piece.prototype.onStopMove = function() {
 Piece.prototype.onStartMove = function() {
 
   var self = this;
+  var progress = self.canvas.gameManager.progress;
+
+
   /**TODO**/
 };
 
