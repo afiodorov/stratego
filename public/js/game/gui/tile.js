@@ -101,8 +101,22 @@ Tile.prototype.highlightSpaces = function() {
 
 /**
  */
+Tile.prototype.remove = function(piece) {
+  var index = this.pieces.indexOf(piece);
+
+  if (index > -1) {
+    this.pieces.splice(piece, 1);
+  }
+};
+
+/**
+ */
 Tile.prototype.add = function(piece) {
-  this.pieces.push(piece);
+  var index = this.pieces.indexOf(piece);
+
+  if (index === -1) {
+    this.pieces.push(piece);
+  }
 };
 
 module.exports = Tile;

@@ -110,6 +110,10 @@ Piece.prototype.onStopMove = function() {
   if (candidateTile) {
     candidateTile.fadeIn();
     self.canvas.renderAll();
+
+    var allTiles = self.canvas.gameManager.board.tiles;
+    var otherTiles = _.without(_.flatten(allTiles), candidateTile);
+    _.invoke(otherTiles, 'remove', self);
     candidateTile.add(self);
   } else {
     // nowhere to add this piece
