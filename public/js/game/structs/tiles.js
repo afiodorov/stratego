@@ -6,11 +6,11 @@ var _ = require('lodash');
 var Tile = require('./tile.js');
 var Position = require('./position.js');
 
-var addTile = function(name, cap, col, row) {
+var addTile = function(name, maxCapacity, col, row) {
   if(!_.isArray(tiles[row])) {
     tiles[row] = [];
   }
-  tiles[row][col] = new Tile(name, cap, new Position(row, col));
+  tiles[row][col] = new Tile(name, maxCapacity, new Position(row, col));
 };
 
 addTile('The Shire', 4, 0, 0);

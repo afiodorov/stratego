@@ -65,6 +65,7 @@ Piece.prototype.constructor = Piece;
 Piece.prototype.onMove = function() {
 
   var self = this;
+  var rules = self.canvas.gameManager.rules;
   self.fabricObj.setCoords();
 
   self.setCandidateTile(null);
@@ -73,7 +74,9 @@ Piece.prototype.onMove = function() {
   _.flatten(this.canvas.gameManager.board.tiles).forEach(function(tile) {
     var hasIntersection = tile.fabricObj.containsPoint(leftCorner);
 
-    if (hasIntersection) {
+    if (hasIntersection &&
+      (rules.getAvailTiles(self).indexOf(tile.name) !== -1) &&
+      !tile.isFull()) {
       self.setCandidateTile(tile);
       tile.fadeOut();
     } else {
@@ -102,11 +105,12 @@ Piece.prototype.getCandidateTile = function() {
 Piece.prototype.onStopMove = function() {
 
   var self = this;
-  var gameManager = self.canvas.gameManager;
 
-  if (self.getCandidateTile()) {
-    console.log(gameManager.rules.getAvailTiles(self));
-    self.getCandidateTile().add(self);
+  var candidateTile  = self.getCandidateTile();
+  if (candidateTile) {
+    candidateTile.fadeIn();
+    self.canvas.renderAll();
+    candidateTile.add(self);
   } else {
     // nowhere to add this piece
     self.animatedReturn();

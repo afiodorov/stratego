@@ -6,6 +6,12 @@ var FabricMixin = require('./../../util/FabricMixin.js');
 var _ = require('lodash');
 
 var Tile = function(canvas, tileStruct, width, height, top, left) {
+  var self = this;
+  self.canvas = canvas;
+  _.assign(self, tileStruct);
+  self.capacity = canvas.gameManager.rules.getTileCapacity(self);
+  self.pieces = [];
+
   var textEl = new fabric.Text(tileStruct.name, {
     originX: 'center',
     originY: 'center',
@@ -28,14 +34,14 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
   var spaceBetweenPieces = 5;
   var dims = canvas.gameManager.dimensions;
   var spaceTotalWidth = dims.PIECE_WIDTH + spaceBetweenPieces;
-  var capacityMiddle = Math.floor(tileStruct.capacity / 2);
+  var capacityMiddle = Math.floor(self.capacity / 2);
   var pieceSpaces =  _.range(-capacityMiddle,
-    -capacityMiddle + tileStruct.capacity).map(function(centeredPieceSpaceNum) {
+    -capacityMiddle + self.capacity).map(function(centeredPieceSpaceNum) {
 
     return new fabric.Rect({
       originY: 'center',
       /*TODO: remove if*/
-      originX: (tileStruct.capacity === 1 ? 'center' : 'left'),
+      originX: (self.capacity === 1 ? 'center' : 'left'),
       width: dims.PIECE_WIDTH,
       height: dims.PIECE_HEIGHT,
       left: centeredPieceSpaceNum * spaceTotalWidth,
@@ -52,7 +58,6 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
     pieceSpaces = [];
   }
 
-  var self = this;
   self.linkFabric(
     new fabric.Group([outerRect].concat(pieceSpaces).concat([textEl]),
     {
@@ -61,8 +66,6 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
       selectable: false
     })
   );
-  self.canvas = canvas;
-  _.assign(self, tileStruct);
 };
 
 Tile.prototype = new FabricMixin();
@@ -71,6 +74,9 @@ Tile.prototype = new FabricMixin();
 Tile.prototype.constructor = Tile;
 
 Tile.prototype.fadeOut = function() {
+  if(this.isFaded) {
+    return;
+  }
   this.isFaded = true;
   this.fabricObj.item(0).setOpacity(0.7);
 };
@@ -79,12 +85,24 @@ Tile.prototype.fadeIn = function() {
   if(!this.isFaded) {
     return;
   }
-  this.fabricObj.item(0).setOpacity(1);
   this.isFaded = false;
+  this.fabricObj.item(0).setOpacity(1);
+};
+
+/**
+ */
+Tile.prototype.isFull = function() {
+  return this.capacity === this.pieces.length;
 };
 
 Tile.prototype.highlightSpaces = function() {
   this.fadeOut();
+};
+
+/**
+ */
+Tile.prototype.add = function(piece) {
+  this.pieces.push(piece);
 };
 
 module.exports = Tile;
