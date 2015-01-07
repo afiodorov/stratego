@@ -53,11 +53,6 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
     });
   });
 
-  /*TODO: remove it*/
-  if([2,4].indexOf(tileStruct.position.row) !== -1) {
-    pieceSpaces = [];
-  }
-
   self.linkFabric(
     new fabric.Group([outerRect].concat(pieceSpaces).concat([textEl]),
     {
