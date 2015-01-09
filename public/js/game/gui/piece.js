@@ -115,6 +115,7 @@ Piece.prototype.onStopMove = function() {
     var otherTiles = _.without(_.flatten(allTiles), candidateTile);
     _.invoke(otherTiles, 'remove', self);
     candidateTile.add(self);
+    self.setCandidateTile(null);
   } else {
     // nowhere to add this piece
     self.animatedReturn();

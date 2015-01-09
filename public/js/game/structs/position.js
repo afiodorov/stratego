@@ -1,4 +1,5 @@
 'use strict';
+/*jslint node: true*/
 var callConstructor = require('../../lib/callConstructor.js');
 
 var Position = function(row, col) {
@@ -10,4 +11,6 @@ var Position = function(row, col) {
   this.col = col;
 };
 
+/**
+ */
 module.exports = Position;
