@@ -18,12 +18,14 @@ var Button = function(imgElement, paramArgs) {
 
   var defaultValues = {
     width: dimensions.BUTTON_WIDTH,
-    height: dimensions.BUTTON_HEIGHT
+    height: dimensions.BUTTON_HEIGHT,
+    selectable: false
   };
 
   var params = defaults(_.clone(paramArgs), defaultValues);
 
   this.fabricObj = new fabric.Image(imgElement, params);
+  this.fabricObj.holder = this;
 };
 
 /**

@@ -39,14 +39,15 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
 
   var self = this;
   self.canvas = canvas;
-  self.linkFabric(new fabric.Group([rect, name, strength, desc],
+  self.fabricObj = new fabric.Group([rect, name, strength, desc],
     {
       top: top,
       left: left,
       hasControls: false
-    })
-  );
+    });
+  self.fabricObj.holder = self;
   _.assign(self, pieceStruct);
+
   self.fabricObj.on(
   {
     'moving': function() {self.onMove.call(this.holder);},
@@ -56,12 +57,6 @@ var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
   self.fabricObj.setupState();
 };
 
-Piece.prototype = new FabricMixin();
-/**
- */
-Piece.prototype.constructor = Piece;
-/**
- */
 Piece.prototype.onMove = function() {
 
   var self = this;

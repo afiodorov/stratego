@@ -53,20 +53,15 @@ var Tile = function(canvas, tileStruct, width, height, top, left) {
     });
   });
 
-  self.linkFabric(
-    new fabric.Group([outerRect].concat(pieceSpaces).concat([textEl]),
+  self.fabricObj = new fabric.Group(
+    [outerRect].concat(pieceSpaces).concat([textEl]),
     {
       top: top,
       left: left,
       selectable: false
-    })
-  );
+    });
+  self.fabricObj.holder = self;
 };
-
-Tile.prototype = new FabricMixin();
-/**
- */
-Tile.prototype.constructor = Tile;
 
 Tile.prototype.fadeOut = function() {
   if(this.isFaded) {
