@@ -1,3 +1,4 @@
+/*global document*/
 'use strict';
 /*jslint node: true*/
 var fabric = require('fabric').fabric;
@@ -5,6 +6,7 @@ var Board = require('./gui/board.js');
 var Piece = require('./gui/piece.js');
 var Pile = require('./gui/pile.js');
 var pieces = require('./structs/pieces.js');
+var Button = require('./gui/button.js');
 var _ = require('lodash');
 
 var GameManager = function() {
@@ -42,7 +44,12 @@ GameManager.prototype.initaliseGui = function() {
   canvas.gameManager = this;
 
   var dims = this.dimensions;
-  this.board = new Board(canvas, dims.BOARD_WIDTH, dims.BOARD_HEIGHT);
+  this.board = new Board(canvas, {
+    top: dims.BOARD_TOP,
+    left: dims.BOARD_LEFT,
+    height: dims.BOARD_HEIGHT,
+    width: dims.BOARD_WIDTH
+  });
 
   _.pluck(_.flatten(this.board.tiles), 'fabricObj').forEach(function(tile) {
     canvas.add(tile);
@@ -64,7 +71,7 @@ GameManager.prototype.initaliseGui = function() {
     {
       topOfset: 25,
       leftOfset: 32,
-      left: dims.BOARD_WIDTH + 5
+      left: dims.BOARD_WIDTH + dims.BOARD_LEFT + 5
     });
 
   pile.getObjects().forEach(function(object) {
@@ -76,16 +83,29 @@ GameManager.prototype.initaliseGui = function() {
       dims.PIECE_WIDTH, dims.PIECE_HEIGHT);
 
     piece.fabricObj.setTop((dims.PIECE_HEIGHT + 2) * i);
-    piece.fabricObj.setLeft(dims.BOARD_WIDTH + 5);
+    piece.fabricObj.setLeft(dims.BOARD_WIDTH + dims.BOARD_LEFT + 5);
     canvas.add(piece.fabricObj);
   }
 
   for (i = 0; i < darkPieces.length; i++) {
     piece = new Piece(canvas, darkPieces[i], dims.PIECE_WIDTH,
       dims.PIECE_HEIGHT, (dims.PIECE_HEIGHT + 2) * i,
-      dims.BOARD_WIDTH + dims.PIECE_WIDTH + 45);
+      dims.BOARD_WIDTH + dims.PIECE_WIDTH + dims.BOARD_LEFT + 30);
     canvas.add(piece.fabricObj);
   }
+
+  this.submitButton = new Button(document.getElementById('green-button'),
+  {
+    top: dims.SUBMIT_BUTTON_TOP,
+    left: dims.SUBMIT_BUTTON_LEFT
+  });
+  canvas.add(this.submitButton.fabricObj);
+  this.restoreButton = new Button(document.getElementById('red-button'),
+  {
+    top: dims.RESTORE_BUTTON_TOP,
+    left: dims.RESTORE_BUTTON_LEFT
+  });
+  canvas.add(this.restoreButton.fabricObj);
 
   canvas.renderAll();
 };

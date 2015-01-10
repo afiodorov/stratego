@@ -2,8 +2,11 @@ html
   head
     title Canvas Fun Times
     link(type='text/css', media='all', rel='stylesheet', href="/css/font.css")
+    link(type='text/css', media='all', rel='stylesheet', href="/css/canvas.css")
   body
     canvas#mycanvas(width='1000px', height='1000px')
+    img.hidden#green-button(src='/img/circle_green.png')
+    img.hidden#red-button(src='/img/circle_red.png')
   script(src='/app/bundle.js')
   script.
     window.draw('mycanvas');

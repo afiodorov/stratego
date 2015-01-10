@@ -10,16 +10,26 @@ var _ = require('lodash');
 /**
  * @constructor
  * @param {fabric.Canvas} canvas reference to instance
- * @param {number} boardWidth board's width in pixels
- * @param {number} boardHeight board's height in pixels
+ * @param {object} paramArgs parameters as in fabric.Object
  */
-var Board = function(canvas, boardWidth, boardHeight) {
+var Board = function(canvas, paramArgs) {
+
+  var defaults = _.partialRight(_.assign, function(a, b) {
+    return (a === undefined) ? b : a;
+  });
+
+  var defaultValues = {
+    top: 0,
+    left: 20
+  };
+
+  var params = defaults(_.clone(paramArgs), defaultValues);
 
   var tilesGroup = _.flatten(tiles).map(function(tileStruct) {
-    var width = boardWidth / tiles[tileStruct.position.row].length;
-    var height = boardHeight / tiles.length;
-    var top = tileStruct.position.row * height;
-    var left = tileStruct.position.col * width;
+    var width = params.width / tiles[tileStruct.position.row].length;
+    var height = params.height / tiles.length;
+    var top = params.top + tileStruct.position.row * height;
+    var left = params.left + tileStruct.position.col * width;
 
     return new Tile(canvas, tileStruct, width, height, top, left);
   });
