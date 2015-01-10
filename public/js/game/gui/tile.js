@@ -2,7 +2,6 @@
 'use strict';
 
 var fabric = require('fabric').fabric;
-var FabricMixin = require('./../../util/FabricMixin.js');
 var _ = require('lodash');
 
 var Tile = function(canvas, tileStruct, width, height, top, left) {

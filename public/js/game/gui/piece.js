@@ -2,7 +2,6 @@
 /*jslint node: true*/
 
 var fabric = require('fabric').fabric;
-var FabricMixin = require('./../../util/FabricMixin.js');
 var _ = require('lodash');
 
 var Piece = function(canvas, pieceStruct, pieceWidth, pieceHeight, top, left) {
