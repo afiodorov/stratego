@@ -47,5 +47,14 @@ var Board = function(canvas, paramArgs) {
 };
 
 /**
+ * @return {array<{tileName: string, pieces: array<string>}>}
+ */
+Board.prototype.getState = function() {
+  var tiles = _.flatten(this.tiles);
+
+  return _.object(_.pluck(tiles, 'name'), _.pluck(tiles, 'pieces'));
+};
+
+/**
  */
 module.exports = Board;

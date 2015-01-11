@@ -14,7 +14,8 @@ var Progress = function(json, gameManager) {
   this.gameManager = gameManager;
   this.pendingActions = [];
 
-  Object.observe(this.pendingActions, this.gameManager.onPendingActionChange);
+  Object.observe(this.pendingActions,
+    function(change) {gameManager.onPendingActionChange(change);});
 };
 
 /**

@@ -102,17 +102,21 @@ GameManager.prototype.initialiseGui = function() {
 
   canvas.add.apply(canvas, _.pluck(this.pieces, 'fabricObj'));
 
-  var submitButton = new Button(document.getElementById('green-button'),
-  {
-    top: dims.SUBMIT_BUTTON_TOP,
-    left: dims.SUBMIT_BUTTON_LEFT
-  });
+  var submitButton = new Button(canvas,
+    document.getElementById('green-button'),
+    {
+      top: dims.SUBMIT_BUTTON_TOP,
+      left: dims.SUBMIT_BUTTON_LEFT,
+      opacity: 0
+    });
 
-  var restoreButton = new Button(document.getElementById('red-button'),
-  {
-    top: dims.RESTORE_BUTTON_TOP,
-    left: dims.RESTORE_BUTTON_LEFT
-  });
+  var restoreButton = new Button(canvas,
+    document.getElementById('red-button'),
+    {
+      top: dims.RESTORE_BUTTON_TOP,
+      left: dims.RESTORE_BUTTON_LEFT,
+      opacity: 0
+    });
   restoreButton.fabricObj.on(
   {
     'mouseup': function() {self.onRestore();}
@@ -138,6 +142,18 @@ GameManager.prototype.onRestore = function() {
  * @param {object} change
  */
 GameManager.prototype.onPendingActionChange = function(change) {
+
+  if (this.progress.pendingActions.length === 0) {
+    this.buttons.restore.hide();
+  } else {
+    this.buttons.restore.show();
+  }
+
+  if (this.rules.isReadyToSubmit(this.board.getState())) {
+    this.buttons.submit.show();
+  } else {
+    this.buttons.submit.hide();
+  }
   console.log(change);
 };
 
