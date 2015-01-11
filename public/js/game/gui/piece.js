@@ -109,7 +109,6 @@ Piece.prototype.onStopMove = function() {
     var otherTiles = _.without(_.flatten(allTiles), candidateTile);
     _.invoke(otherTiles, 'remove', self);
     candidateTile.add(self);
-    self.canvas.gameManager.progress.moveCard(candidateTile, self);
     self.setCandidateTile(null);
   } else {
     // nowhere to add this piece
@@ -124,7 +123,6 @@ Piece.prototype.onStartMove = function() {
 
   var self = this;
   var progress = self.canvas.gameManager.progress;
-
 
   /**TODO**/
 };

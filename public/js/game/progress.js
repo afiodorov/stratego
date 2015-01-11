@@ -1,7 +1,7 @@
 'use strict';
 /*jslint node: true*/
 
-var MoveCard = require('./../events/moveCard.js');
+var MoveCardEvent = require('./../events/moveCard.js');
 var _ = require('lodash');
 
 /**
@@ -22,7 +22,20 @@ var Progress = function(json, gameManager) {
  * @param {struct.Piece} piece
  */
 Progress.prototype.moveCard = function(tile, piece) {
-  this.pendingActions.push(new MoveCard(tile.name, piece.name));
+  this.pendingActions.push(new MoveCardEvent(tile.name, piece.name));
+};
+
+/**
+ * @param {struct.Tile} tile
+ * @param {struct.Piece} piece
+ */
+Progress.prototype.cancelMoveCard = function(tile, piece) {
+  var actionIndex = _.findIndex(this.pendingActions,
+    _.partial(_.isEqual, new MoveCardEvent(tile.name, piece.name)));
+
+  if (actionIndex > -1) {
+    this.pendingActions.splice(actionIndex, 1);
+  }
 };
 
 /**

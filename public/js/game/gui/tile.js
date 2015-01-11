@@ -91,10 +91,12 @@ Tile.prototype.highlightSpaces = function() {
 /**
  */
 Tile.prototype.remove = function(piece) {
+  var self = this;
   var index = this.pieces.indexOf(piece);
 
   if (index > -1) {
     this.pieces.splice(piece, 1);
+    self.canvas.gameManager.progress.cancelMoveCard(self, piece);
   }
 };
 
@@ -103,10 +105,12 @@ Tile.prototype.remove = function(piece) {
  * @param {gui.Piece}
  */
 Tile.prototype.add = function(piece) {
+  var self = this;
   var index = this.pieces.indexOf(piece);
 
   if (index === -1) {
     this.pieces.push(piece);
+    self.canvas.gameManager.progress.moveCard(self, piece);
   }
 
   /* position the piece */
