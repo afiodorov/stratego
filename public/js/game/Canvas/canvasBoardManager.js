@@ -16,7 +16,7 @@ function draw(container) {
   };
   gameManager.setProgress(new Progress(progressJson, gameManager));
   gameManager.registerRules(gameManager.progress);
-  gameManager.initaliseGui();
+  gameManager.initialiseGui();
   document.gm = gameManager;
 }
 

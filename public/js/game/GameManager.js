@@ -39,7 +39,7 @@ GameManager.prototype.setProgress = function(progress) {
 /**
  *
  */
-GameManager.prototype.initaliseGui = function() {
+GameManager.prototype.initialiseGui = function() {
   var self = this;
 
   var canvas = new fabric.Canvas(this.canvasId);

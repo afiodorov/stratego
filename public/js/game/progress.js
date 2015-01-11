@@ -1,6 +1,9 @@
 'use strict';
 /*jslint node: true*/
 
+var MoveCard = require('./../events/moveCard.js');
+var _ = require('lodash');
+
 /**
  * @constructor
  * @param {string} json
@@ -19,15 +22,13 @@ var Progress = function(json, gameManager) {
  * @param {struct.Piece} piece
  */
 Progress.prototype.moveCard = function(tile, piece) {
-  this.pendingActions.push(
-    {'type': 'moveCard', 'destination': tile.name, 'piece': piece.name}
-  );
+  this.pendingActions.push(new MoveCard(tile.name, piece.name));
 };
 
 /**
  */
 Progress.prototype.clearPendingActions = function() {
-  this.pendingActions = [];
+  this.pendingActions.splice(0, this.pendingActions.length);
 };
 
 /**
