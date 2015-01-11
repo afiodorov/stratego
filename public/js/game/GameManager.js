@@ -40,7 +40,10 @@ GameManager.prototype.setProgress = function(progress) {
  *
  */
 GameManager.prototype.initaliseGui = function() {
+  var self = this;
+
   var canvas = new fabric.Canvas(this.canvasId);
+  canvas.hoverCursor = 'pointer';
   canvas.gameManager = this;
 
   var dims = this.dimensions;
@@ -55,6 +58,7 @@ GameManager.prototype.initaliseGui = function() {
     canvas.add(tile);
   });
 
+  /* temporary pieces initialisation directly on canvas */
   var i = 0;
   var piece;
   var lightPieces = _.values(pieces).filter(function(piece) {
@@ -74,40 +78,67 @@ GameManager.prototype.initaliseGui = function() {
       left: dims.BOARD_WIDTH + dims.BOARD_LEFT + 5
     });
 
-  pile.getObjects().forEach(function(object) {
-    canvas.add(object);
-  });
+  this.piles = [];
+  this.piles.push(pile);
 
+  canvas.add.apply(canvas, pile.getObjects());
+
+  this.pieces = [];
   for (i = 2; i < lightPieces.length; i++) {
     piece = new Piece(canvas, lightPieces[i],
       dims.PIECE_WIDTH, dims.PIECE_HEIGHT);
 
     piece.fabricObj.setTop((dims.PIECE_HEIGHT + 2) * i);
     piece.fabricObj.setLeft(dims.BOARD_WIDTH + dims.BOARD_LEFT + 5);
-    canvas.add(piece.fabricObj);
+    this.pieces.push(piece);
   }
 
   for (i = 0; i < darkPieces.length; i++) {
     piece = new Piece(canvas, darkPieces[i], dims.PIECE_WIDTH,
       dims.PIECE_HEIGHT, (dims.PIECE_HEIGHT + 2) * i,
       dims.BOARD_WIDTH + dims.PIECE_WIDTH + dims.BOARD_LEFT + 30);
-    canvas.add(piece.fabricObj);
+      this.pieces.push(piece);
   }
 
-  this.submitButton = new Button(document.getElementById('green-button'),
+  canvas.add.apply(canvas, _.pluck(this.pieces, 'fabricObj'));
+
+  var submitButton = new Button(document.getElementById('green-button'),
   {
     top: dims.SUBMIT_BUTTON_TOP,
     left: dims.SUBMIT_BUTTON_LEFT
   });
-  canvas.add(this.submitButton.fabricObj);
-  this.restoreButton = new Button(document.getElementById('red-button'),
+
+  var restoreButton = new Button(document.getElementById('red-button'),
   {
     top: dims.RESTORE_BUTTON_TOP,
     left: dims.RESTORE_BUTTON_LEFT
   });
-  canvas.add(this.restoreButton.fabricObj);
+  restoreButton.fabricObj.on(
+  {
+    'mouseup': function() {self.onRestore();}
+  });
+
+  this.buttons = {
+    'submit': submitButton,
+    'restore': restoreButton
+  };
+
+  canvas.add.apply(canvas, _.pluck(_.values(this.buttons), 'fabricObj'));
 
   canvas.renderAll();
+};
+
+/**
+ */
+GameManager.prototype.onRestore = function() {
+  this.progress.clearPendingActions();
+};
+
+/**
+ * @param {object} change
+ */
+GameManager.prototype.onPendingActionChange = function(change) {
+  console.log(change);
 };
 
 /**

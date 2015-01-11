@@ -1,6 +1,6 @@
 ﻿'use strict';
 /*jslint node: true*/
-/*global window*/
+/*global window, document*/
 
 var GameManager = require('./../GameManager.js');
 var side = require('./../structs/side.js');
@@ -14,7 +14,7 @@ function draw(container) {
     side: side.LIGHT,
     stage: stage.piecesPlacement
   };
-  gameManager.setProgress(new Progress(progressJson));
+  gameManager.setProgress(new Progress(progressJson, gameManager));
   gameManager.registerRules(gameManager.progress);
   gameManager.initaliseGui();
   document.gm = gameManager;

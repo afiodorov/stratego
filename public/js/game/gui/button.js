@@ -19,13 +19,16 @@ var Button = function(imgElement, paramArgs) {
   var defaultValues = {
     width: dimensions.BUTTON_WIDTH,
     height: dimensions.BUTTON_HEIGHT,
-    selectable: false
+    selectable: false,
+    hoverCursor: 'pointer'
   };
 
   var params = defaults(_.clone(paramArgs), defaultValues);
 
   this.fabricObj = new fabric.Image(imgElement, params);
   this.fabricObj.holder = this;
+
+  this.fabricObj.hoverCursor = 'pointer';
 };
 
 /**

@@ -99,6 +99,8 @@ Tile.prototype.remove = function(piece) {
 };
 
 /**
+ * Add a piece to the tile
+ * @param {gui.Piece}
  */
 Tile.prototype.add = function(piece) {
   var index = this.pieces.indexOf(piece);
@@ -106,6 +108,8 @@ Tile.prototype.add = function(piece) {
   if (index === -1) {
     this.pieces.push(piece);
   }
+
+  /* position the piece */
 };
 
 module.exports = Tile;
