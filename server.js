@@ -18,7 +18,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express_body_parser.urlencoded({extended: true}));
 app.use(express_body_parser.json());
-app.use(cookieParser);
+app.use(cookieParser());
 app.use(express_session({
   store: db.mongoStore,
   secret: secret,
@@ -32,6 +32,8 @@ if(app.get('env') === 'development') {
 
 app.use(express_static(__dirname + '/public/'));
 
+/**
+ */
 app.get('/', function(req, res){
   res.render('lobby');
 });
