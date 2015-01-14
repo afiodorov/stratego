@@ -45,6 +45,7 @@ GameManager.prototype.initialiseGui = function() {
   var canvas = new fabric.Canvas(this.canvasId);
   canvas.hoverCursor = 'pointer';
   canvas.gameManager = this;
+  this.canvas = canvas;
 
   var dims = this.dimensions;
   this.board = new Board(canvas, {

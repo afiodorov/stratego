@@ -5,28 +5,32 @@ var jade = require('jade')
   , express = require('express')
   , app = express()
   , port = process.env.PORT || 5000
-  , cookieParser = express.cookieParser(secret)
-  , db = require('./lib/db.js');
+  , cookieParser = require('cookie-parser')
+  , db = require('./lib/db.js')
+  , express_session = require('express-session')
+  , express_static = require('serve-static')
+  , express_error_handler = require('express-error-handler')
+  , express_body_parser = require('body-parser');
+
 var logger = require('./lib/logger.js');
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
-app.use(express.bodyParser());
+app.use(express_body_parser.urlencoded({extended: true}));
+app.use(express_body_parser.json());
 app.use(cookieParser);
-app.use(express.session({store: db.mongoStore, secret: secret})); 
+app.use(express_session({
+  store: db.mongoStore,
+  secret: secret,
+  resave: true,
+  saveUninitialized: true
+}));
 
-app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});
+if(app.get('env') === 'development') {
+  app.use(express_error_handler({ dumpExceptions: true, showStack: true }));
+}
 
-app.configure('production', function(){
-  process.on('uncaughtException', function(err) {
-      logger.log('error', err);
-  });
-  app.use(express.errorHandler());
-});
-
-app.use(express.static(__dirname + '/public/'));
+app.use(express_static(__dirname + '/public/'));
 
 app.get('/', function(req, res){
   res.render('lobby');
@@ -62,7 +66,7 @@ sessionSocket.of('/lobby').on('connection', function(err, socket, session) {
     logger.log('error', 'no session present');
     return;
   }
-  
+
   var activeConnection = new ActiveConnection(io, socket, session);
   (function() {
     lobby.registerHandlers.call(activeConnection);
