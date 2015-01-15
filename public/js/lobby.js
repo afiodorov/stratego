@@ -1,11 +1,11 @@
 /*global location, localStorage*/
 'use strict';
-var io = require('./lib/socket.io.js');
+var io = require('socket.io-client');
 var _ = require('lodash');
 var $ = require('jquery');
 $.pnotify = require('pnotify');
 var ko = require('knockout');
-var lobbySocket = io.connect(location.origin + '/lobby');
+var lobbySocket = io(location.origin + '/lobby');
 require('knockout-jquery');
 var events = require('./events.js');
 var errors = require('./errors.js');
@@ -14,15 +14,15 @@ function AppViewModel(lobbySocket_) {
     var self = this;
     var lobbySocket = lobbySocket_;
     var _playerInvited = null;
-    Object.defineProperty(self, 'playerInvited', 
+    Object.defineProperty(self, 'playerInvited',
       {get : function(){ return _playerInvited; }});
 
     var _gameToBeClosed = null;
-    Object.defineProperty(self, 'gameToBeClosed', 
+    Object.defineProperty(self, 'gameToBeClosed',
       {get : function(){ return _gameToBeClosed; }});
 
     var _currentGame = null;
-    Object.defineProperty(self, 'currentGame', 
+    Object.defineProperty(self, 'currentGame',
       {get : function(){ return _currentGame; }});
 
     self.activeTab = ko.observable();
@@ -73,7 +73,7 @@ function AppViewModel(lobbySocket_) {
       self.opponentNameOfGameToBeClosed(this.opponentName);
     };
 
-    // this call is bound to a player in self.players 
+    // this call is bound to a player in self.players
     self.openInviteGameDialog = function() {
       self.invitesAvailable([]);
       self.isInviteGameDialogOpen(true);
@@ -116,7 +116,7 @@ function AppViewModel(lobbySocket_) {
     self.emitRequestGame = null;
     self.emitChangeMyPlayerName = null;
     self.emitChangeInvitesAccepted = null;
-    
+
     var findGame = function(gameId) {
       var correspondingGame;
       var allGames = self.games();
@@ -224,7 +224,7 @@ function AppViewModel(lobbySocket_) {
         localStorage.removeItem('currentGameId');
       }
     };
-      
+
     self.onRequestGame = function(inviteData) {
       var uInviteToPlayer = new events.InviteToPlayer(inviteData);
       if(!uInviteToPlayer.isValid) {
@@ -291,11 +291,11 @@ function AppViewModel(lobbySocket_) {
       $("#blockingMsg").text(shouldShowPage.err);
       $("#blockingMsg").dialog({
          closeOnEscape: false,
-         open: function(event, ui) 
+         open: function(event, ui)
                 {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
       });
     };
-    
+
     self.bindSocketHandlers = function() {
       var prop;
       var eventName;

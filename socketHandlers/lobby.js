@@ -23,7 +23,7 @@ function connect() {
   socket.sid = session.id;
   socket.session = session;
 
-  var onlineClients = io.of('/lobby').clients();
+  var onlineClients = _.values(io.of('/lobby').connected);
   // each game has a corresponding socket room
   _joinGameRooms.call(this);
   _checkForDuplicateSession.call(this, onlineClients);
@@ -37,7 +37,7 @@ function connect() {
 }
 
 function disconnect() {
-    this.io.of('/lobby').emit('removePlayerName', 
+    this.io.of('/lobby').emit('removePlayerName',
       {playerName: this.session.playerName});
 }
 
@@ -60,12 +60,12 @@ function changeMyPlayerName(playerName) {
   var session = this.session;
 
   if(!playerName) {
-    socket.emit('failChangingName', 'No player name provided');  
+    socket.emit('failChangingName', 'No player name provided');
     return;
   }
 
   if(clients.indexOf(playerName) !== -1) {
-    socket.emit('failChangingName', 'Duplicate player name');  
+    socket.emit('failChangingName', 'Duplicate player name');
     return;
   }
 
@@ -109,7 +109,7 @@ function requestGame(uInvite) {
           return;
       }
 
-      opponentClient.socket.emit('requestGame', 
+      opponentClient.socket.emit('requestGame',
         {opponentName: session.playerName,
           opponentSide: inviteFromPlayer.mySide});
     });
@@ -157,7 +157,7 @@ function acceptGame(uInvite) {
     var inviteRecord;
     for(i = 0; i < opsession.invites.length; i++) {
       inviteRecord = opsession.invites[i];
-      if(inviteRecord.opponentSid === socket.sid 
+      if(inviteRecord.opponentSid === socket.sid
         && inviteRecord.mySide === inviteToPlayer.opponentSide) {
           inviteRecordIndex = i;
           break;
@@ -205,12 +205,12 @@ function _joinGameRooms() {
 function _setSocketPlayerName(clients) {
   if((this.session.playerName === undefined) ||
         // check for duplicate name in the db of sessions
-        ((clients.indexOf(this.session.playerName) !== -1) 
+        ((clients.indexOf(this.session.playerName) !== -1)
        && (this.socket.sid !== clients[this.session.playerName].sid))) {
     this.session.playerName = lobbyutils.genUniquePlayerName(clients);
     this.session.save();
   }
-  
+
 }
 
 function _checkForDuplicateSession(onlineClients) {

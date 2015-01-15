@@ -18,13 +18,14 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express_body_parser.urlencoded({extended: true}));
 app.use(express_body_parser.json());
-app.use(cookieParser());
-app.use(express_session({
+app.use(cookieParser(secret));
+var session = express_session({
   store: db.mongoStore,
   secret: secret,
-  resave: true,
+  resave: false,
   saveUninitialized: true
-}));
+});
+app.use(session);
 
 if(app.get('env') === 'development') {
   app.use(express_error_handler({ dumpExceptions: true, showStack: true }));
@@ -44,10 +45,8 @@ app.get('/canvas', function(req, res){
 
 var server = http.createServer(app);
 server.listen(port);
-var io = require('socket.io').listen(server)
-  , SessionSocket = require('session.socket.io')
-  , sessionSocket = new SessionSocket(io, db.mongoStore, cookieParser);
-io.set('log level', 1);
+
+var io = require('socket.io')(server);
 logger.log('info', 'http server listening on %d', port);
 
 var lobby = require('./socketHandlers/lobby.js');
@@ -56,13 +55,22 @@ var chat = require('./socketHandlers/chat.js');
 var makeStruct = require('./public/js/lib/structFactory.js');
 
 var ActiveConnection = makeStruct('io socket session');
-sessionSocket.of('/lobby').on('connection', function(err, socket, session) {
-  if(err) {
-    logger.log('error', 'bad session');
-    logger.log('error', err);
-    logger.log('error', new Error().stack);
-    return;
-  }
+
+io.of('/lobby').use(function(socket, next) {
+  var req = socket.request;
+  var res = socket.request.res;
+
+  session(req, res, next);
+  cookieParser(req, res, function(err) {
+    if (err) {
+      console.log(err);
+      return next(err);
+    }
+  });
+});
+
+io.of('/lobby').on('connection', function(socket) {
+  var session = socket.request.session;
 
   if (!session) {
     logger.log('error', 'no session present');
