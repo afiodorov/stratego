@@ -43,6 +43,25 @@ Object.defineProperty(side, 'opposite', {
   enumerable: false
 });
 
+/**
+ * @param {side.DARK|side.LIGHT} side_
+ * @return {string}
+ */
+side.display = function(side_) {
+  if (side_ === side.LIGHT) {
+    return 'light';
+  }
+
+  if (side_ === side.DARK) {
+    return 'dark';
+  }
+
+  throw {name: 'UnknownSide', message: 'Side not found'};
+};
+Object.defineProperty(side, 'display', {
+  enumerable: false
+});
+
 Object.freeze(side);
 /**
  */

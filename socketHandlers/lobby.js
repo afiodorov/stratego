@@ -71,14 +71,14 @@ function requestGame(uInvite) {
         return;
       }
 
-      if (opSession.acceptedInvites === 'dark' &&
-        inviteFromPlayer.mySide !== 'light') {
+      if (opSession.acceptedInvites === side.DARK &&
+        inviteFromPlayer.mySide !== side.LIGHT) {
           logger.log('info', 'invite not accepted: dark accepted');
           return;
       }
 
-      if (opSession.acceptedInvites === 'light' &&
-        inviteFromPlayer.mySide !== 'dark') {
+      if (opSession.acceptedInvites === side.LIGHT &&
+        inviteFromPlayer.mySide !== side.DARK) {
           logger.log('info', 'invite not accepted: light accepted');
           return;
       }

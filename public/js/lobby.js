@@ -241,10 +241,21 @@ function AppViewModel(lobbySocket_) {
       }
       var inviteToPlayer = uInviteToPlayer;
 
+      var displaySide;
+      try {
+        displaySide = side.display(inviteToPlayer.opponentSide);
+      } catch (e) {
+        if (e.name === 'UnknownSide') {
+          displaySide = inviteToPlayer.opponentName;
+        } else {
+          throw e;
+        }
+      }
+
       $.pnotify({
         title: 'Game Request',
         text: inviteToPlayer.opponentName + ' requested a game. ' +
-        'He wants to play: ' + inviteToPlayer.opponentSide + '. ' +
+        'He wants to play: ' + displaySide + '. ' +
         '<a href="#" id="acc' + encodeURI(inviteToPlayer.opponentName) + '">Accept</a>.'
       });
       $("a[id=acc" + encodeURI(inviteToPlayer.opponentName) + "]").click(function(){
