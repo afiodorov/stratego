@@ -20,6 +20,8 @@ var PlayerSchema = new db.Schema({
   name: {type: String, required: true}
 });
 
+PlayerSchema.set('toJSON', {getters: true, virtuals: false});
+
 var PiecesSchema = new db.Schema({
   name: {type: String, required: true},
   holder: {type: String, enum: ['tile', 'hand'], required: true},
@@ -50,7 +52,7 @@ var GameSchema = new db.Schema({
  */
 GameSchema.methods.getModel = function(side) {
 
-  var gameObj = this.toObject();
+  var gameObj = this.toJSON();
 
   var piecesAttr = _.groupBy(gameObj.pieces, function(piece) {
     if (piece.visibleToSides.indexOf(side) !== -1) {

@@ -28,7 +28,7 @@ function pushMessage(chatStruct, callback) {
 
 function getMessages(gameId, limit, callback) {
   Chat.find({gameId: gameId})
-    .sort('_id', 'descending').limit(limit).exec(callback);
+    .sort({'_id': 'descending'}).limit(limit).exec(callback);
 }
 
 function removeMessages(gameId, callback) {
