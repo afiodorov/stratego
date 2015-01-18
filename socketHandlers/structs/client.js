@@ -1,4 +1,5 @@
 'use strict';
+/*jslint node: true*/
 var callConstructor = require('../../public/js/lib/callConstructor.js');
 
 var Client = function(socket, sid) {
@@ -10,4 +11,6 @@ var Client = function(socket, sid) {
   this.socket = socket;
 };
 
+/**
+ */
 module.exports = Client;

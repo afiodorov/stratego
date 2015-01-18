@@ -1,39 +1,15 @@
 'use strict';
+/*jslint node: true*/
 var Event = require('./events/event.js');
 var _ = require('lodash');
+/**
+ */
 _.negate = require('./lib/negate.js');
 
 var acceptedInviteSides = ['light', 'dark', 'random'];
 var logic = require('./game/logic.js');
 var gameStructs = require('./game/structs.js');
 var makeState = require('./events/state.js');
-
-var CardEvent = function(json) {
-  var o;
-  o = new Event();
-  o.card = json.card;
-
-  // if(!gameSturcts.cards) {
-  // o.isValid = false;
-  // }
-};
-
-var Move = function(json) {
-  var o;
-  o = new Event();
-  o.piece = json.piece;
-  o.toTile = json.toTile;
-
-  if (!gameStructs.pieces[o.side][o.piece]) {
-    o.isValid = false;
-  }
-
-  if (!gameStructs.isWithinGrid(o.toTile)) {
-    o.isValid = false;
-  }
-
-  return o;
-};
 
 var InviteFromPlayer = function(json) {
   var o = new Event();
@@ -97,18 +73,8 @@ var ShouldShowPage = function(json) {
   return o;
 };
 
-var Game = function(json) {
-  var o = new Event();
-  o._id = json._id;
-  o.opponentName = json.opponentName;
-
-  o.state = makeState(json.state);
-  if (!o.state.isValid) {
-    o.isValid = false;
-  }
-  return o;
-};
-
+/**
+ */
 module.exports = {
   InviteFromPlayer: InviteFromPlayer,
   InviteToPlayer: InviteToPlayer,
@@ -116,7 +82,5 @@ module.exports = {
   ShouldShowPage: ShouldShowPage,
   RemovePlayer: RemovePlayer,
   ChatMessageToServer: ChatMessageToServer,
-  ChatMessageFromServer: ChatMessageFromServer,
-  Game: Game,
-  Move: Move
+  ChatMessageFromServer: ChatMessageFromServer
 };

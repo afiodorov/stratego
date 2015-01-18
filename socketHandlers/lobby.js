@@ -50,7 +50,12 @@ function resignGame(gameId) {
       game.remove();
       io.of('/lobby').in(gameId).emit('removeGame', gameId);
       socket.broadcast.to(gameId).emit('opponentResigned', session.playerName);
+    } else {
+      throw new Error("can not find game");
     }
+  }).fail(function(err) {
+    logger.log('warn', 'can not find game');
+    console.log(err);
   });
   require('../models/Chat.js').removeMessages(gameId);
 }
@@ -166,7 +171,9 @@ function acceptGame(uInvite) {
 
     var wasInvited = (inviteRecordIndex !== -1);
     if (wasInvited) {
-      gameSocketHandler.start.call(self, opponentClient, opsession, inviteToPlayer.opponentSide);
+      gameSocketHandler.start.call(self, opponentClient, opsession,
+        inviteToPlayer.opponentSide);
+
       opsession.invites.splice(inviteRecordIndex, 1);
       Session.saveNew(opponentClient.sid, opsession);
     } else {
@@ -238,14 +245,15 @@ function _sendListOfGames() {
   Game.getAll(this.socket.sid)
     .then(function(games) {
       games.forEach(function(game) {
-        game.getGameEvent(socket.sid).then(function(state) {
-          socket.emit('addGame', state);
-        }).fail(function(err) {
-          logger.log('info', 'couldn\'t send new game');
-          logger.log('info', err);
-        }).done();
+        var gameEvent = game.getAddGameEvent(socket.sid);
+
+        if(gameEvent.isValid) {
+          socket.emit('addGame', gameEvent.json);
+        } else {
+          logger.log('warn', 'invalid game event', gameEvent);
+        }
       });
-  });
+  }).done();
 }
 
 function _sendListOfPlayers(onlineClients) {

@@ -8,4 +8,3 @@ var stage = {
 /**
  */
 module.exports = stage;
-

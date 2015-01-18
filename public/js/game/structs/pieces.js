@@ -1,11 +1,12 @@
 'use strict';
+/*jslint node:true*/
 var _ = require('lodash');
 var side = require('./side.js');
 
 var pieces = {};
 var makePiece = require('./piece.js');
 
-var addPiece = function (name, desc, str, side) {
+var addPiece = function(name, desc, str, side) {
   var piece = makePiece(name, desc, str, side);
   pieces[name] = piece;
 };
@@ -55,10 +56,14 @@ addPiece('Cave Troll',
   _.values(side).forEach(function(side) {
     Object.defineProperty(pieces, side, {
       enumerable: false,
-      value: _.values(pieces).filter(function(piece) {return piece.side === side;})
+      value: _.values(pieces).filter(
+        function(piece) {return piece.side === side;})
     });
   });
 }());
 
 Object.freeze(pieces);
+
+/**
+ */
 module.exports = pieces;
