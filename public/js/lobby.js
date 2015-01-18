@@ -246,7 +246,7 @@ function AppViewModel(lobbySocket_) {
         displaySide = side.display(inviteToPlayer.opponentSide);
       } catch (e) {
         if (e.name === 'UnknownSide') {
-          displaySide = inviteToPlayer.opponentName;
+          displaySide = inviteToPlayer.opponentSide;
         } else {
           throw e;
         }
