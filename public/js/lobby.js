@@ -9,6 +9,10 @@ var lobbySocket = io(location.origin + '/lobby');
 require('knockout-jquery');
 var events = require('./events.js');
 var errors = require('./errors.js');
+var GameManager = require('./game/GameManager.js');
+var Progress = require('./game/progress.js');
+var side = require('./game/structs/side.js');
+var stage = require('./game/structs/stage.js');
 
 function AppViewModel(lobbySocket_) {
     var self = this;
@@ -137,7 +141,7 @@ function AppViewModel(lobbySocket_) {
 
     self.onSetChatLog = function(log) {
       var correspondingGame = findGame(log.gameId);
-      if(typeof correspondingGame !== 'undefined') {
+      if(correspondingGame !== undefined) {
         correspondingGame.messages(log.log);
       } else {
         console.log("received a chat log for a non-existing game");
@@ -153,9 +157,13 @@ function AppViewModel(lobbySocket_) {
           _currentGame = game;
           self.activeTab(-1);
         }
-        //require('./game/Canvas/canvasBoardManager.js')(game._id);
         lobbySocket.emit('requestChatLog', game._id);
-        console.log(game);
+
+        var gameManager = new GameManager();
+        gameManager.setCanvasId(game._id);
+        gameManager.setProgress(new Progress(game, gameManager));
+        gameManager.registerRules(gameManager.progress);
+        gameManager.initialiseGui();
     };
 
     self.onAddChatMessage = function(uChat) {

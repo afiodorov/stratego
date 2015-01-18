@@ -221,23 +221,23 @@ function _setSocketPlayerName(clients) {
 }
 
 function _checkForDuplicateSession(onlineClients) {
-  var socket = this.socket;
+  //var socket = this.socket;
 
-  var isDuplicateTab = false;
-  onlineClients.forEach(function(client) {
-    if ((client.id !== socket.id) && client.sid === socket.sid) {
-      // TODO handle this gracefully
-      // break the loop as well for efficiency!
-      isDuplicateTab = true;
-    }
-  });
+  //var isDuplicateTab = false;
+  //onlineClients.forEach(function(client) {
+    //if ((client.id !== socket.id) && client.sid === socket.sid) {
+      //// TODO handle this gracefully
+      //// break the loop as well for efficiency!
+      //isDuplicateTab = true;
+    //}
+  //});
 
-  if(isDuplicateTab) {
-    socket.json.emit('setShouldShowPage', {bool: false, err: "This page is already"
-    + " open in one of your tabs. Please close duplicate tabs and refresh."});
-    // socket.close();
-    return;
-  }
+  //if(isDuplicateTab) {
+    //socket.json.emit('setShouldShowPage', {bool: false, err: "This page is already"
+    //+ " open in one of your tabs. Please close duplicate tabs and refresh."});
+    //// socket.close();
+    //return;
+  //}
 }
 
 function _sendListOfGames() {

@@ -9,6 +9,10 @@ var pieces = require('./structs/pieces.js');
 var Button = require('./gui/button.js');
 var _ = require('lodash');
 
+/**
+ */
+_.negate = require('../lib/negate.js');
+
 var GameManager = function() {
   this.dimensions = require('./gui/dimenstion.js');
   return this;
@@ -42,6 +46,7 @@ GameManager.prototype.setProgress = function(progress) {
 GameManager.prototype.initialiseGui = function() {
   var self = this;
 
+  console.log(document.getElementById(this.canvasId));
   var canvas = new fabric.Canvas(this.canvasId);
   canvas.hoverCursor = 'pointer';
   canvas.gameManager = this;
@@ -68,37 +73,48 @@ GameManager.prototype.initialiseGui = function() {
     return piece.side === '__dark__';});
 
 
-  var pile = new Pile(canvas,
-    [
-      new Piece(canvas, lightPieces[0], dims.PIECE_WIDTH, dims.PIECE_HEIGHT),
-      new Piece(canvas, lightPieces[1], dims.PIECE_WIDTH, dims.PIECE_HEIGHT)
-    ],
-    {
-      topOfset: 25,
-      leftOfset: 32,
-      left: dims.BOARD_WIDTH + dims.BOARD_LEFT + 5
-    });
-
-  this.piles = [];
-  this.piles.push(pile);
-
-  canvas.add.apply(canvas, pile.getObjects());
-
+  var piece1, piece2, pile;
   this.pieces = [];
-  for (i = 2; i < lightPieces.length; i++) {
-    piece = new Piece(canvas, lightPieces[i],
+  for (i = 0; i < lightPieces.length; i += 2) {
+    piece1 = new Piece(canvas, lightPieces[i],
       dims.PIECE_WIDTH, dims.PIECE_HEIGHT);
+    piece2 = ((i + 1) < lightPieces.length) ?
+      new Piece(canvas, lightPieces[i + 1],
+      dims.PIECE_WIDTH, dims.PIECE_HEIGHT) : null;
 
-    piece.fabricObj.setTop((dims.PIECE_HEIGHT + 2) * i);
-    piece.fabricObj.setLeft(dims.BOARD_WIDTH + dims.BOARD_LEFT + 5);
-    this.pieces.push(piece);
+    this.pieces.push(piece1);
+    if (piece2) {
+      this.pieces.push(piece2);
+    }
+
+    pile = new Pile(canvas, [piece1, piece2].filter(_.negate(_.isNull)),
+      {
+        topOfset: 25,
+        leftOfset: 32,
+        left: dims.BOARD_WIDTH + dims.BOARD_LEFT + 5,
+        top: (dims.PIECE_HEIGHT + 40) * Math.floor(i / 2)
+      });
   }
 
-  for (i = 0; i < darkPieces.length; i++) {
-    piece = new Piece(canvas, darkPieces[i], dims.PIECE_WIDTH,
-      dims.PIECE_HEIGHT, (dims.PIECE_HEIGHT + 2) * i,
-      dims.BOARD_WIDTH + dims.PIECE_WIDTH + dims.BOARD_LEFT + 30);
-      this.pieces.push(piece);
+  for (i = 0; i < darkPieces.length; i += 2) {
+    piece1 = new Piece(canvas, darkPieces[i],
+      dims.PIECE_WIDTH, dims.PIECE_HEIGHT);
+    piece2 = ((i + 1) < darkPieces.length) ?
+      new Piece(canvas, darkPieces[i + 1],
+      dims.PIECE_WIDTH, dims.PIECE_HEIGHT) : null;
+
+    this.pieces.push(piece1);
+    if (piece2) {
+      this.pieces.push(piece2);
+    }
+
+    pile = new Pile(canvas, [piece1, piece2].filter(_.negate(_.isNull)),
+      {
+        topOfset: 25,
+        leftOfset: 32,
+        left: dims.BOARD_WIDTH + dims.PIECE_WIDTH + dims.BOARD_LEFT + 50,
+        top: (dims.PIECE_HEIGHT + 40) * Math.floor(i / 2)
+      });
   }
 
   canvas.add.apply(canvas, _.pluck(this.pieces, 'fabricObj'));

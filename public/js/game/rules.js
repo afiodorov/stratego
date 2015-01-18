@@ -17,7 +17,13 @@ RulesFactory.getConstructor = function(progress) {
     if (progress.json.side === side.LIGHT) {
       return require('./rules/piecesPlacement/light.js');
     }
+
+    if (progress.json.side === side.DARK) {
+      return require('./rules/piecesPlacement/dark.js');
+    }
   }
+
+  throw new Error("can't initalise rules");
 };
 
 /**
