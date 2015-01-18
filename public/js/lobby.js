@@ -86,16 +86,16 @@ function AppViewModel(lobbySocket_) {
         case 'all':
           self.inviteGameDialogText("Player wants to play any game.");
           self.invitesAvailable.push({id: 'random', label: 'Random'});
-          self.invitesAvailable.push({id: 'dark', label: 'Dark'});
-          self.invitesAvailable.push({id: 'light', label: 'Light'});
+          self.invitesAvailable.push({id: side.DARK, label: 'Dark'});
+          self.invitesAvailable.push({id: side.LIGHT, label: 'Light'});
         break;
-        case 'light':
+        case side.LIGHT:
           self.inviteGameDialogText("Player wants to play light only.");
-          self.invitesAvailable.push({id: 'dark', label: 'Dark'});
+          self.invitesAvailable.push({id: side.DARK, label: 'Dark'});
         break;
-        case 'dark':
+        case side.DARK:
           self.inviteGameDialogText("Player wants to play dark only.");
-          self.invitesAvailable.push({id: 'light', label: 'Light'});
+          self.invitesAvailable.push({id: side.LIGHT, label: 'Light'});
         break;
         case 'none':
           self.inviteGameDialogText("Player doesn't accept invites.");

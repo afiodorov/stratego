@@ -2,11 +2,12 @@
 /*jslint node: true*/
 var Event = require('./events/event.js');
 var _ = require('lodash');
+var side = require('./game/structs/side.js');
 /**
  */
 _.negate = require('./lib/negate.js');
 
-var acceptedInviteSides = ['light', 'dark', 'random'];
+var acceptedInviteSides = _.values(side).concat(['random']);
 var gameStructs = require('./game/structs.js');
 var makeState = require('./events/state.js');
 
