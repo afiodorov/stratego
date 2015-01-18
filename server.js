@@ -35,7 +35,7 @@ app.use(express_static(__dirname + '/public/'));
 
 /**
  */
-app.get('/', function(req, res){
+app.get('/', function(req, res) {
   res.render('lobby');
 });
 
@@ -80,7 +80,6 @@ io.of('/lobby').on('connection', function(socket) {
   var activeConnection = new ActiveConnection(io, socket, session);
   (function() {
     lobby.registerHandlers.call(activeConnection);
-    game.registerHandlers.call(activeConnection);
     chat.registerHandlers.call(activeConnection);
   }());
 });

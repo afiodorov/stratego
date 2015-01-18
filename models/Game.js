@@ -2,7 +2,6 @@
 /*jslint node: true*/
 var AddGameEvent = require('../public/js/events/addGame.js');
 var db = require('../lib/db.js');
-var logic = require('../public/js/game/logic.js');
 var Session = require('./Session.js');
 var Q = require('q');
 var _ = require('lodash');

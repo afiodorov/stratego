@@ -7,7 +7,6 @@ var _ = require('lodash');
 _.negate = require('./lib/negate.js');
 
 var acceptedInviteSides = ['light', 'dark', 'random'];
-var logic = require('./game/logic.js');
 var gameStructs = require('./game/structs.js');
 var makeState = require('./events/state.js');
 

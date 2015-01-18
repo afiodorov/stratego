@@ -1,9 +1,0 @@
-var clients = [];
-var Q = require('q');
-var db = require('./../lib/db.js');
-var lobbyutils = require('./../lib/lobbyutils.js');
-var makeStruct = require('./../lib/structFactory.js').makeStruct;
-var Client = makeStruct("socket sid");
-var Game = require('./../models/Game.js');
-var _ = require('lodash');
-var gameutils = require('./../models/utils/gameutils.js');
