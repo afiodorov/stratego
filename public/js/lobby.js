@@ -3,10 +3,13 @@
 var io = require('socket.io-client');
 var _ = require('lodash');
 var $ = require('jquery');
-$.pnotify = require('pnotify');
+require('jquery-ui');
+require('pnotify');
+
 var ko = require('knockout');
+require('knockout-jqueryui');
+
 var lobbySocket = io(location.origin + '/lobby');
-require('knockout-jquery');
 var events = require('./events.js');
 var errors = require('./errors.js');
 var GameManager = require('./game/GameManager.js');

@@ -3,21 +3,18 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git://github.com/afiodorv/stratego.git"
+    "url": "git://github.com/afiodorov/stratego.git"
   },
   "browser": {
-    "jquery": "./public/vendor/jquery-1.11.0.js",
-    "pnotify": "./public/vendor/pnotify/jquery.pnotify.min.js",
-    "jquery-ui": "./public/vendor/jquery-ui.min.js",
-    "knockout": "./public/vendor/knockout-2.2.1.js",
-    "knockout-jquery": "./public/vendor/knockout-jqueryui.min.js"
+    "pnotify": "./public/vendor/pnotify/jquery.pnotify.js",
+    "knockout-jqueryui": "./public/vendor/knockout-jqueryui.js"
   },
   "browserify-shim": {
-    "jquery": {"exports": "$"},
-    "pnotify": {"exports": "$.pnotify"},
-    "jquery-ui": {"exports": null, "depends": ["jquery"]},
-    "knockout": {"exports": "ko", "depends": ["jquery"]},
-    "knockout-jquery": {"exports": null}
+    "pnotify": {"exports": "jQuery.pnotify", "depends": ["jquery:jQuery"]},
+    "knockout-jqueryui": {"exports": "kojqui", "depends": ["jquery:jQuery", "knockout:ko"]}
+  },
+  "browserify": {
+    "tranform": ["browserify-shim"]
   },
   "dependencies": {
     "serve-static" : "1.8.x",
@@ -36,12 +33,15 @@
     "connect-mongo": "0.6.x",
     "q": "*",
     "open": "*",
-    "browserify-shim": "~3.2.0",
-    "grunt-browserify": "2.0.1",
+    "browserify-shim": "3.8.x",
+    "grunt-browserify": "3.3.x",
     "fabric": "1.4.13",
     "canvas": "1.1.6",
     "jsdom": "x",
-    "lodash": "x"
+    "lodash": "x",
+    "jquery": "1.11.x",
+    "jquery-ui": "1.10.x",
+    "knockout": "3.2.x"
   },
   "engines": {
     "node": "0.10.x",
@@ -55,7 +55,7 @@
     "grunt-concurrent": "~0.4.3",
     "grunt-node-inspector": "~0.1.2",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-contrib-livereload": "~0.1.2",
-    "browserify": "~3.26.0"
+    "browserify": "8.0.x",
+    "tsify": "x"
   }
 }

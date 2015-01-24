@@ -14,10 +14,12 @@ module.exports = function(grunt) {
     },
     browserify: {
       build: {
-        src: ['./public/js/**/*.js'],
+        src: ['./public/js/lobby.js'],
         dest: 'public/app/bundle.js',
         options: {
-          bundleOptions: {debug: true},
+          browserifyOptions: {
+            debug: true
+          },
           transform: ["browserify-shim"],
         }
       }
@@ -38,7 +40,7 @@ module.exports = function(grunt) {
           ignore: ['node_modules/**'],
           env: {
           },
-          // omit this property if you aren't serving HTML files and 
+          // omit this property if you aren't serving HTML files and
           // don't want to open a browser tab on start
           callback: function (nodemon) {
             nodemon.on('log', function (event) {
@@ -69,11 +71,8 @@ module.exports = function(grunt) {
     },
     watch: {
       server: {
-        files: ['.grunt/rebooted'],
-        options: {
-          livereload: true
-        }
-      }, 
+        files: ['.grunt/rebooted']
+      },
       app: {
         files: ['./public/js/**/*.js', './package.json'],
         tasks: ['browserify']
@@ -81,7 +80,7 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('default', ['concurrent']);  
+  grunt.registerTask('default', ['concurrent']);
   grunt.registerTask('heroku', ['browserify']);
   grunt.registerTask('heroku:production', ['browserify']);
   grunt.registerTask('heroku:development', ['browserify']);
@@ -90,7 +89,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-concurrent');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-node-inspector');
-  grunt.loadNpmTasks('grunt-contrib-watch'); 
-  grunt.loadNpmTasks('grunt-contrib-livereload');
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-mocha-test');
 };
