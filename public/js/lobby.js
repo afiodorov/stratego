@@ -1,5 +1,7 @@
 /*global location, localStorage*/
+/*jslint node: true*/
 'use strict';
+
 var io = require('socket.io-client');
 var _ = require('lodash');
 var $ = require('jquery');
@@ -349,21 +351,31 @@ function AppViewModel(lobbySocket_) {
     };
 }
 
-$(function() {
-  $.pnotify.defaults.styling = "jqueryui";
+var main = function() {
+  $(function() {
+    $.pnotify.defaults.styling = "jqueryui";
 
-  ko.bindingHandlers.playerOnline = {
-      update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-        var players = ko.utils.unwrapObservable(valueAccessor());
-        var isPlayerOnline = _.any(players, function(player) {
-           return player.playerName === bindingContext.$data.opponentName;
-        });
-        element.style.visibility = isPlayerOnline ? "visible" : "hidden";
-      }
-  };
+    ko.bindingHandlers.playerOnline = {
+        update: function(element, valueAccessor, allBindings, viewModel,
+          bindingContext) {
 
-  var appViewModel = new AppViewModel(lobbySocket);
-  appViewModel.bindSocketEmitters();
-  ko.applyBindings(appViewModel);
-  appViewModel.bindSocketHandlers();
-});
+          var players = ko.utils.unwrapObservable(valueAccessor());
+          var isPlayerOnline = _.any(players, function(player) {
+             return player.playerName === bindingContext.$data.opponentName;
+          });
+          element.style.visibility = isPlayerOnline ? "visible" : "hidden";
+        }
+    };
+
+    var appViewModel = new AppViewModel(lobbySocket);
+    appViewModel.bindSocketEmitters();
+    ko.applyBindings(appViewModel);
+    appViewModel.bindSocketHandlers();
+  });
+};
+
+main();
+
+module.exports = {
+  main: main
+};

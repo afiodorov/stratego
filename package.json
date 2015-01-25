@@ -55,7 +55,9 @@
     "grunt-concurrent": "~0.4.3",
     "grunt-node-inspector": "~0.1.2",
     "grunt-contrib-watch": "~0.5.3",
+    "watchify": "2.2.x",
     "browserify": "8.0.x",
+    "grunt-watchify": "0.1.x",
     "tsify": "x"
   }
 }

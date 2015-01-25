@@ -7,7 +7,7 @@ module.exports = function(grunt) {
       dev: {
         tasks: ['nodemon', 'node-inspector', 'browserify', 'watch'],
         options: {
-          limit: 4,
+          limit: 2,
           logConcurrentOutput: true
         }
       }
@@ -20,8 +20,24 @@ module.exports = function(grunt) {
           browserifyOptions: {
             debug: true
           },
-          transform: ["browserify-shim"],
+        transform: ['browserify-shim'],
+        plugin: ['tsify']
         }
+      }
+    },
+    watchify: {
+      build: {
+        options: {
+          debug: true,
+          keepalive: true,
+          callback: function(b) {
+            b.plugin('tsify', {'target': 'ES6'});
+            b.transform('browserify-shim');
+            return b;
+          }
+        },
+        src: './public/ts/index.ts',
+        dest: 'public/app/bundle.js'
       }
     },
     mochaTest: {
@@ -72,10 +88,6 @@ module.exports = function(grunt) {
     watch: {
       server: {
         files: ['.grunt/rebooted']
-      },
-      app: {
-        files: ['./public/js/**/*.js', './package.json'],
-        tasks: ['browserify']
       }
     }
   });
@@ -91,4 +103,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-node-inspector');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-watchify');
 };
