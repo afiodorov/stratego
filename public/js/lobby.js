@@ -13,7 +13,6 @@ require('pnotify');
 var ko = require('knockout');
 require('knockout-jqueryui');
 
-var lobbySocket = io(location.origin + '/lobby');
 var events = require('./events.js');
 var errors = require('./errors.js');
 var GameManager = require('./game/GameManager.js');
@@ -353,27 +352,4 @@ function AppViewModel(lobbySocket_) {
     };
 }
 
-var main = function() {
-  $(function() {
-    $.pnotify.defaults.styling = "jqueryui";
-
-    ko.bindingHandlers.playerOnline = {
-        update: function(element, valueAccessor, allBindings, viewModel,
-          bindingContext) {
-
-          var players = ko.utils.unwrapObservable(valueAccessor());
-          var isPlayerOnline = _.any(players, function(player) {
-             return player.playerName === bindingContext.$data.opponentName;
-          });
-          element.style.visibility = isPlayerOnline ? "visible" : "hidden";
-        }
-    };
-
-    var appViewModel = new AppViewModel(lobbySocket);
-    appViewModel.bindSocketEmitters();
-    ko.applyBindings(appViewModel);
-    appViewModel.bindSocketHandlers();
-  });
-};
-
-module.exports = main;
+module.exports = AppViewModel;
