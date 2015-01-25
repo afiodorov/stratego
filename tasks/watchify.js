@@ -7,8 +7,14 @@ var rename = require('gulp-rename');
 var entryFile = './public/ts/index.ts';
 var bundleFile = './public/app/bundle.js';
 
+function errorHandler(err) {
+  console.log('Browserify error:');
+  console.log(err);
+}
+
 function bundleShare(b) {
   b.bundle()
+    .on('error', errorHandler)
     .pipe(source(entryFile))
     .pipe(rename(bundleFile))
     .pipe(gulp.dest('.'));
@@ -28,6 +34,7 @@ function browserifyShare() {
   b.plugin(require('tsify'));
 
   b.on('update', function() {
+    console.log('Running browserify');
     bundleShare(b);
   });
 
