@@ -50,16 +50,6 @@ html
           // ko foreach: games
           div
             canvas.game(data-bind='attr: {id: _id}', width="1000px", height="700px")
-            .chat
-              .messages(data-bind='foreach: messages')
-                .message
-                  span(data-bind='text: \'[\' + moment(date).format(\'HH:mm:ss\') + \'] \'')
-                  span(data-bind='text: playerName + \': \'')
-                  span(data-bind='text: message')
-              .sending-message
-                form(data-bind='submit: $parent.sendChatInput')
-                  input.sending-message(data-bind='value: $parent.chatInput, attr: {placeholder: $parent.myPlayerName}')
-                  button Send
           // /ko
           div(data-bind="dialog: {isOpen: isCloseGameDialogOpen, resizable: false, modal: true, buttons: {Yes: function() {emitResignGame(gameToBeClosed); $(this).dialog(\"close\");}, Cancel: function() { $( this ).dialog(\"close\") } } }")
             span Are you sure you want to finish a game with
