@@ -2,9 +2,9 @@
 /*jslint node: true*/
 'use strict';
 
-var io = require('socket.io-client');
-var _ = require('lodash');
 var $ = require('jquery');
+/**
+ */
 window.$ = $;
 
 require('jquery-ui');
@@ -25,15 +25,15 @@ function AppViewModel(lobbySocket_) {
     var lobbySocket = lobbySocket_;
     var _playerInvited = null;
     Object.defineProperty(self, 'playerInvited',
-      {get : function(){ return _playerInvited; }});
+      {get: function() {return _playerInvited; }});
 
     var _gameToBeClosed = null;
     Object.defineProperty(self, 'gameToBeClosed',
-      {get : function(){ return _gameToBeClosed; }});
+      {get: function() {return _gameToBeClosed; }});
 
     var _currentGame = null;
     Object.defineProperty(self, 'currentGame',
-      {get : function(){ return _currentGame; }});
+      {get: function() {return _currentGame; }});
 
     self.activeTab = ko.observable();
     self.shouldShowPage = ko.observable(true);
@@ -59,20 +59,19 @@ function AppViewModel(lobbySocket_) {
     };
 
     self.sendChatInput = function() {
-      if(_currentGame) {
+      if (_currentGame) {
         var chatMessage = new events.ChatMessageToServer(
         {
           gameId: _currentGame._id,
           message: self.chatInput()
         });
-        if(chatMessage.isValid) {
+        if (chatMessage.isValid) {
           lobbySocket.emit('addChatMessage', chatMessage);
           self.chatInput('');
         } else {
           console.log(errors.EMIT_NOT_VALID_EVENT);
         }
       } else {
-        // TODO display error
         console.log('no chat selected');
       }
     };
@@ -88,23 +87,23 @@ function AppViewModel(lobbySocket_) {
       self.invitesAvailable([]);
       self.isInviteGameDialogOpen(true);
       _playerInvited = this;
-      switch(_playerInvited.invitesAccepted) {
+      switch (_playerInvited.invitesAccepted) {
         case 'all':
-          self.inviteGameDialogText("Player wants to play any game.");
+          self.inviteGameDialogText('Player wants to play any game.');
           self.invitesAvailable.push({id: 'random', label: 'Random'});
           self.invitesAvailable.push({id: side.DARK, label: 'Dark'});
           self.invitesAvailable.push({id: side.LIGHT, label: 'Light'});
         break;
         case side.LIGHT:
-          self.inviteGameDialogText("Player wants to play light only.");
+          self.inviteGameDialogText('Player wants to play light only.');
           self.invitesAvailable.push({id: side.DARK, label: 'Dark'});
         break;
         case side.DARK:
-          self.inviteGameDialogText("Player wants to play dark only.");
+          self.inviteGameDialogText('Player wants to play dark only.');
           self.invitesAvailable.push({id: side.LIGHT, label: 'Light'});
         break;
         case 'none':
-          self.inviteGameDialogText("Player doesn't accept invites.");
+          self.inviteGameDialogText('Player doesn\'t accept invites.');
         break;
       }
     };
@@ -114,7 +113,7 @@ function AppViewModel(lobbySocket_) {
         opponentName: _playerInvited.playerName,
         mySide: mySide
       });
-      if(inviteFromPlayer.isValid) {
+      if (inviteFromPlayer.isValid) {
         lobbySocket.emit('requestGame', inviteFromPlayer.json);
       } else {
         console.log(errors.EMIT_NOT_VALID_EVENT);
@@ -131,8 +130,8 @@ function AppViewModel(lobbySocket_) {
       var correspondingGame;
       var allGames = self.games();
       var i;
-      for(i=0; i<allGames.length; i++) {
-        if(allGames[i]._id === gameId) {
+      for (i = 0; i < allGames.length; i++) {
+        if (allGames[i]._id === gameId) {
           correspondingGame = allGames[i];
           break;
         }
@@ -147,10 +146,10 @@ function AppViewModel(lobbySocket_) {
 
     self.onSetChatLog = function(log) {
       var correspondingGame = findGame(log.gameId);
-      if(correspondingGame !== undefined) {
+      if (correspondingGame !== undefined) {
         correspondingGame.messages(log.log);
       } else {
-        console.log("received a chat log for a non-existing game");
+        console.log('received a chat log for a non-existing game');
         console.log(log);
       }
       return self.onSetChatLog;
@@ -159,7 +158,7 @@ function AppViewModel(lobbySocket_) {
     self.onAddGame = function(game) {
         game.messages = ko.observableArray([]);
         self.games.push(game);
-        if(localStorage.getItem('currentGameId') === game._id) {
+        if (localStorage.getItem('currentGameId') === game._id) {
           _currentGame = game;
           self.activeTab(-1);
         }
@@ -174,18 +173,18 @@ function AppViewModel(lobbySocket_) {
 
     self.onAddChatMessage = function(uChat) {
       var chatMessage = new events.ChatMessageFromServer(uChat);
-      if(!chatMessage.isValid) {
+      if (!chatMessage.isValid) {
         console.log(errors.RECEIVED_NOT_VALID_EVENT);
         return;
       }
 
       var game = findGame(chatMessage.gameId);
-      if(typeof game === 'undefined') {
+      if (game === 'undefined') {
         console.log('received a chat message to an non-existing game');
         return self.onAddChatMessage;
       }
 
-      if(game.messages().length > 20) {
+      if (game.messages().length > 20) {
         game.messages.shift();
       }
 
@@ -194,7 +193,7 @@ function AppViewModel(lobbySocket_) {
 
     self.onAddPlayerName = function(playerData) {
       var uPlayer = new events.Player(playerData);
-      if(uPlayer.isValid) {
+      if (uPlayer.isValid) {
         var player = uPlayer;
         self.players.push(player);
       } else {
@@ -204,7 +203,7 @@ function AppViewModel(lobbySocket_) {
 
     self.onRemovePlayerName = function(playerData) {
       var uPlayer = new events.RemovePlayer(playerData);
-      if(!uPlayer.isValid) {
+      if (!uPlayer.isValid) {
         console.log(errors.RECEIVED_NOT_VALID_EVENT);
         return;
       }
@@ -219,7 +218,7 @@ function AppViewModel(lobbySocket_) {
 
     self.onSetMyPlayerName = function(playerData) {
       var uPlayer = new events.Player(playerData);
-      if(!uPlayer.isValid) {
+      if (!uPlayer.isValid) {
         console.log(errors.RECEIVED_NOT_VALID_EVENT);
         return;
       }
@@ -233,7 +232,7 @@ function AppViewModel(lobbySocket_) {
           return gameIt._id === gameId;
         }
       );
-      if(_currentGame && gameId === _currentGame._id) {
+      if (_currentGame && gameId === _currentGame._id) {
         _currentGame = null;
         localStorage.removeItem('currentGameId');
       }
@@ -241,7 +240,7 @@ function AppViewModel(lobbySocket_) {
 
     self.onRequestGame = function(inviteData) {
       var uInviteToPlayer = new events.InviteToPlayer(inviteData);
-      if(!uInviteToPlayer.isValid) {
+      if (!uInviteToPlayer.isValid) {
         console.log(errors.RECEIVED_NOT_VALID_EVENT);
         return;
       }
@@ -262,11 +261,14 @@ function AppViewModel(lobbySocket_) {
         title: 'Game Request',
         text: inviteToPlayer.opponentName + ' requested a game. ' +
         'He wants to play: ' + displaySide + '. ' +
-        '<a href="#" id="acc' + encodeURI(inviteToPlayer.opponentName) + '">Accept</a>.'
+        '<a href="#" id="acc' +
+          encodeURI(inviteToPlayer.opponentName) + '">Accept</a>.'
       });
-      $("a[id=acc" + encodeURI(inviteToPlayer.opponentName) + "]").click(function(){
+
+      $('a[id=acc' + encodeURI(inviteToPlayer.opponentName) +
+        ']').click(function() {
         lobbySocket.emit('acceptGame', inviteToPlayer.json);
-      return false;});
+        return false;});
     };
 
     self.onGameStarted = function(game) {
@@ -296,7 +298,7 @@ function AppViewModel(lobbySocket_) {
 
     self.onAddNewPlayer = function(data) {
       var newPlayer = new events.Player(data);
-      if(newPlayer.isSelf === false) {
+      if (newPlayer.isSelf === false) {
         self.onAddPlayerName(newPlayer);
       } else {
         self.onSetMyPlayerName(newPlayer);
@@ -306,27 +308,28 @@ function AppViewModel(lobbySocket_) {
 
     self.onSetShouldShowPage = function(data) {
       var uShouldShowPage = new events.ShouldShowPage(data);
-      if(!uShouldShowPage.isValid) {
+      if (!uShouldShowPage.isValid) {
         console.log(errors.RECEIVED_NOT_VALID_EVENT);
         return;
       }
       var shouldShowPage = uShouldShowPage;
 
       self.shouldShowPage(shouldShowPage.bool);
-      $("#blockingMsg").text(shouldShowPage.err);
-      $("#blockingMsg").dialog({
+      $('#blockingMsg').text(shouldShowPage.err);
+      $('#blockingMsg').dialog({
          closeOnEscape: false,
-         open: function(event, ui)
-                {$(".ui-dialog-titlebar-close", $(this).parent()).hide();}
+         open: function() {
+           $('.ui-dialog-titlebar-close', $(this).parent()).hide();
+         }
       });
     };
 
     self.bindSocketHandlers = function() {
       var prop;
       var eventName;
-      for(prop in self) {
-        if(self.hasOwnProperty(prop)) {
-          if(prop.match(/^on/) && typeof self[prop] === 'function') {
+      for (prop in self) {
+        if (self.hasOwnProperty(prop)) {
+          if (prop.match(/^on/) && typeof self[prop] === 'function') {
             eventName = prop[2].toLowerCase() + prop.slice(3);
             lobbySocket.on(eventName, self[prop]);
           }
@@ -341,9 +344,9 @@ function AppViewModel(lobbySocket_) {
         lobbySocket.emit(eventName, objectToEmit);
       };
 
-      for(prop in self) {
-        if(self.hasOwnProperty(prop)) {
-          if(prop.match(/^emit/) && self[prop] === null) {
+      for (prop in self) {
+        if (self.hasOwnProperty(prop)) {
+          if (prop.match(/^emit/) && self[prop] === null) {
             eventName = prop[4].toLowerCase() + prop.slice(5);
             self[prop] = makeSocketEmitter.bind(self, eventName);
           }
@@ -352,4 +355,6 @@ function AppViewModel(lobbySocket_) {
     };
 }
 
+/**
+ */
 module.exports = AppViewModel;
