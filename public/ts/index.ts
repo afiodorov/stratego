@@ -12,20 +12,24 @@ import LobbyViewModel = require('./../js/lobby');
 
 var main = function() {
 	jquery['pnotify']['defaults']['styling'] = 'jqueryui';
+
 	var origin = window.location.protocol + '//' + window.location.hostname;
 	var lobbySocket = io(origin + '/lobby');
 
-	knockout.bindingHandlers['playerOnline'] = function(element,
+	var knockoutHandlersAsAny: any = knockout.bindingHandlers;
+
+		knockoutHandlersAsAny.playerOnline = {};
+		knockoutHandlersAsAny.playerOnline.update = function(element,
 		valueAccessor, allBindings, viewModel, bindingContext) {
 
 		var players = <Array<{playerName: string}>>
 			knockout.utils.unwrapObservable(valueAccessor());
 
-		var isPlayerOnline = _.any(players, (player) => {
-			player.playerName === bindingContext.$data.opponentName;
+		var isPlayerOnline : boolean = _.any(players, (player) => {
+			return player.playerName === bindingContext.$data.opponentName;
 		});
 		element.style.visibility = isPlayerOnline ? 'visible' : 'hidden';
-	}
+	};
 
 	var lobbyViewModel  = new LobbyViewModel(lobbySocket);
 	lobbyViewModel.bindSocketEmitters();
