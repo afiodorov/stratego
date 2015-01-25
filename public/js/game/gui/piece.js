@@ -66,9 +66,9 @@ Piece.prototype.onMove = function() {
   var boundingRect = self.fabricObj.getBoundingRect();
   var leftCorner = new fabric.Point(boundingRect.left, boundingRect.top);
   _.flatten(this.canvas.gameManager.board.tiles).forEach(function(tile) {
-    var hasIntersection = tile.fabricObj.containsPoint(leftCorner);
+    var hasTileIntersection = tile.fabricObj.containsPoint(leftCorner);
 
-    if (hasIntersection &&
+    if (hasTileIntersection &&
       (rules.getAvailTiles(self).indexOf(tile.name) !== -1) &&
       !tile.isFull()) {
       self.setCandidateTile(tile);

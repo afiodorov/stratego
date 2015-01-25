@@ -23,6 +23,6 @@ results
 build
 
 node_modules
+DefinitelyTyped
 lib-cov
-.grunt/
 /public/app/bundle.js

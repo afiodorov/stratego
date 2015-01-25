@@ -31,7 +31,7 @@ function browserifyShare() {
   b = watchify(b);
 
   b.transform(require('browserify-shim'));
-  b.plugin(require('tsify'));
+  b.plugin(require('tsify'), {target: 'ES5'});
 
   b.on('update', function() {
     console.log('Running browserify');

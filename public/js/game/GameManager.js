@@ -46,7 +46,6 @@ GameManager.prototype.setProgress = function(progress) {
 GameManager.prototype.initialiseGui = function() {
   var self = this;
 
-  console.log(document.getElementById(this.canvasId));
   var canvas = new fabric.Canvas(this.canvasId);
 
   canvas.hoverCursor = 'pointer';
@@ -67,14 +66,14 @@ GameManager.prototype.initialiseGui = function() {
 
   /* temporary pieces initialisation directly on canvas */
   var i = 0;
-  var piece;
   var lightPieces = _.values(pieces).filter(function(piece) {
     return piece.side === '__light__';});
   var darkPieces = _.values(pieces).filter(function(piece) {
     return piece.side === '__dark__';});
 
 
-  var piece1, piece2, pile;
+  var piece1, piece2;
+  var pile;
   this.pieces = [];
   for (i = 0; i < lightPieces.length; i += 2) {
     piece1 = new Piece(canvas, lightPieces[i],
@@ -159,9 +158,10 @@ GameManager.prototype.onRestore = function() {
 /**
  * @param {object} change
  */
-GameManager.prototype.onPendingActionChange = function(change) {
+GameManager.prototype.onPendingActionChange = function() {
 
   if (this.progress.pendingActions.length === 0) {
+    console.log('here');
     this.buttons.restore.hide();
   } else {
     this.buttons.restore.show();
@@ -172,7 +172,6 @@ GameManager.prototype.onPendingActionChange = function(change) {
   } else {
     this.buttons.submit.hide();
   }
-  console.log(change);
 };
 
 /**
