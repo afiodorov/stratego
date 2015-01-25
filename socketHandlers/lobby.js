@@ -191,27 +191,6 @@ function _setSocketPlayerName(clients) {
 
 }
 
-function _checkForDuplicateSession() {
-  return;
-  //var socket = this.socket;
-
-  //var isDuplicateTab = false;
-  //onlineClients.forEach(function(client) {
-    //if ((client.id !== socket.id) && client.sid === socket.sid) {
-      //// break the loop as well for efficiency!
-      //isDuplicateTab = true;
-    //}
-  //});
-
-  //if(isDuplicateTab) {
-    //socket.json.emit('setShouldShowPage', {bool: false, err: "This page is
-    //already"
-    //+ " open in one of your tabs. Please close duplicate tabs and refresh."});
-    //// socket.close();
-    //return;
-  //}
-}
-
 function _sendListOfGames() {
   /*jshint validthis:true */
   var self = this;
@@ -312,7 +291,6 @@ function connect() {
   var onlineClients = _.values(io.of('/lobby').connected);
   // each game has a corresponding socket room
   _joinGameRooms.call(self);
-  _checkForDuplicateSession.call(self, onlineClients);
   _setSocketPlayerName.call(self, clients);
   _initialisePlayer.call(self);
   _sendListOfGames.call(self);
