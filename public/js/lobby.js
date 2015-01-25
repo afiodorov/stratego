@@ -1,10 +1,12 @@
-/*global location, localStorage*/
+/*global window, location, localStorage*/
 /*jslint node: true*/
 'use strict';
 
 var io = require('socket.io-client');
 var _ = require('lodash');
 var $ = require('jquery');
+window.$ = $;
+
 require('jquery-ui');
 require('pnotify');
 
