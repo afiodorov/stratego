@@ -36,7 +36,6 @@
     "browserify-shim": "3.8.x",
     "grunt-browserify": "3.3.x",
     "fabric": "1.4.13",
-    "canvas": "1.1.6",
     "jsdom": "x",
     "lodash": "x",
     "jquery": "1.11.x",
